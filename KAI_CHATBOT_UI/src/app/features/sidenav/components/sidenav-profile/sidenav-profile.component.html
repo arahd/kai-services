@@ -1,0 +1,105 @@
+<div class="user-profile-container">
+  <div class="user-profile">
+    <div class="profile-main-info" (click)="togglePopoverEvt.emit($event)">
+      @if (userInfo?.avatar) {
+        <img [src]="userInfo.avatar" class="avatar" alt="User avatar" />
+      } @else {
+        <div class="avatar">{{ userInitial }}</div>
+      }
+      @if (!collapsed || isMobile) {
+        <div class="user-details">
+          <div class="user-name">{{ userInfo?.name || 'Not signed in' }}</div>
+          <div class="user-email" [appTooltip]="userInfo?.email || ''">{{ userInfo?.email || '' }}</div>
+        </div>
+      }
+    </div>
+
+    @if (!collapsed || isMobile) {
+      <button class="ellipsis-menu-btn" (click)="togglePopoverEvt.emit($event); $event.stopPropagation()" aria-label="Profile options">
+        <app-sidenav-icon name="ellipsis" width="18" height="18"></app-sidenav-icon>
+      </button>
+    }
+  </div>
+  
+  @if (popoverOpen && userInfo?.email) {
+    <div
+      class="popover-fixed"
+      [ngStyle]="popoverPosition"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="popover-menu-list">
+        <!-- Settings (Chatbot, Product, and Project pages only) -->
+        @if (isSettingsSupportedPage) {
+          <button class="popover-menu-item" (click)="openSettings(); $event.stopPropagation()" type="button" appTooltip="Settings (Ctrl+,)">
+            <app-sidenav-icon name="settings" width="16" height="16"></app-sidenav-icon>
+            <span>Settings</span>
+          </button>
+        }
+
+        <!-- Help -->
+        <button
+          class="popover-menu-item help-trigger-item"
+          [class.active]="showHelpSubmenu"
+          (click)="openHelp(); $event.stopPropagation()"
+          type="button"
+        >
+          <app-sidenav-icon name="info-circle" width="16" height="16"></app-sidenav-icon>
+          <span>Help</span>
+          <app-sidenav-icon name="chevron-right" width="14" height="14" class="menu-item-chevron"></app-sidenav-icon>
+        </button>
+
+        <hr class="popover-divider" />
+
+        <!-- Logout -->
+        <button class="popover-menu-item logout-item" (click)="logoutEvt.emit(); $event.stopPropagation()" type="button">
+          <app-sidenav-icon name="logout" width="16" height="16"></app-sidenav-icon>
+          <span>Logout</span>
+        </button>
+      </div>
+
+      <!-- Help Submenu Flyout -->
+      @if (showHelpSubmenu) {
+        <div class="popover-submenu" (click)="$event.stopPropagation()">
+          <!-- Quick Walkthrough -->
+          <button class="popover-menu-item" (click)="triggerWalkthrough(); $event.stopPropagation()" type="button">
+            <app-sidenav-icon name="star" width="16" height="16"></app-sidenav-icon>
+            <span>Quick Walkthrough</span>
+          </button>
+
+          <!-- User Manual -->
+          <button class="popover-menu-item" (click)="triggerUserManual(); $event.stopPropagation()" type="button">
+            <app-sidenav-icon name="manual" width="16" height="16"></app-sidenav-icon>
+            <span>User Manual</span>
+          </button>
+
+          <!-- Help Center -->
+          <button class="popover-menu-item" (click)="triggerHelpCenter(); $event.stopPropagation()" type="button">
+            <app-sidenav-icon name="help" width="16" height="16"></app-sidenav-icon>
+            <span>Help Center</span>
+          </button>
+
+          <!-- Privacy Policy -->
+          <button class="popover-menu-item" (click)="triggerPrivacyPolicy(); $event.stopPropagation()" type="button">
+            <app-sidenav-icon name="shield" width="16" height="16"></app-sidenav-icon>
+            <span>Privacy Policy</span>
+          </button>
+
+          <!-- Report a Bug -->
+          <button class="popover-menu-item" (click)="triggerRaiseBug(); $event.stopPropagation()" type="button">
+            <app-sidenav-icon name="bug" width="16" height="16"></app-sidenav-icon>
+            <span>Report a Bug</span>
+          </button>
+
+          <!-- Feature Request -->
+          <button class="popover-menu-item" (click)="triggerFeatureRequest(); $event.stopPropagation()" type="button">
+            <app-sidenav-icon name="sparkle" width="16" height="16"></app-sidenav-icon>
+            <span>Feature Request</span>
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Hidden helper for help modals -->
+  <app-help-menu #helpMenu [models]="models"></app-help-menu>
+</div>

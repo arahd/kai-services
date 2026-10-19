@@ -1,0 +1,76 @@
+<div
+  class="popover-options"
+  [ngStyle]="menuPosition"
+  (click)="$event.stopPropagation()"
+>
+  <ul>
+    @if (showShare) {
+      <li
+        (click)="!disabled ? shareEvt.emit() : null"
+        [class.disabled]="disabled"
+        [appTooltip]="disabled ? disabledTooltip : ''"
+      >
+        <app-sidenav-icon name="share" width="16" height="16"></app-sidenav-icon>
+        <span>Share</span>
+      </li>
+    }
+
+    @if (showPin) {
+      <li
+        (click)="!disabled ? pinEvt.emit() : null"
+        [class.disabled]="disabled"
+        [appTooltip]="disabled ? disabledTooltip : ''"
+      >
+        @if (isPinned) {
+          <app-sidenav-icon
+            name="unpin"
+            width="16"
+            height="16"
+          ></app-sidenav-icon>
+          <span>Unpin Chat</span>
+        } @else {
+          <app-sidenav-icon
+            name="pin-chat"
+            width="16"
+            height="16"
+          ></app-sidenav-icon>
+          <span>Pin Chat</span>
+        }
+      </li>
+    }
+
+    @if (showRename) {
+      <li
+        (click)="!disabled ? renameEvt.emit() : null"
+        [class.disabled]="disabled"
+      >
+        <app-sidenav-icon name="rename" width="16" height="16"></app-sidenav-icon>
+        <span>Rename</span>
+      </li>
+    }
+
+    @if (showMoveToProject) {
+      <li
+        (click)="!disabled ? moveToProjectEvt.emit() : null"
+        [class.disabled]="disabled"
+        [appTooltip]="disabled ? disabledTooltip : ''"
+      >
+        <app-sidenav-icon name="folder" width="16" height="16"></app-sidenav-icon>
+        <span>Move to Project</span>
+      </li>
+    }
+
+    @if (showDelete) {
+
+      <li
+        class="delete"
+        (click)="!disabled ? deleteEvt.emit($event) : null"
+        [class.disabled]="disabled"
+        [appTooltip]="disabled ? disabledTooltip : ''"
+      >
+        <app-sidenav-icon name="delete" width="16" height="16"></app-sidenav-icon>
+        <span>Delete</span>
+      </li>
+    }
+  </ul>
+</div>

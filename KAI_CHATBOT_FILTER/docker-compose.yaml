@@ -1,0 +1,11 @@
+version: "3.5"
+
+services:
+  sensitivesearch:
+    image: sensitivesearch:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # restart: unless-stopped
+    ports:
+      - 5000:5000

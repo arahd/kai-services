@@ -1,0 +1,282 @@
+@use "../../../../../../styles/mixins" as *;
+
+:host {
+  display: block;
+}
+
+/* ── Floating Action Widget Container ── */
+.help-fab-container {
+  position: fixed;
+  bottom: 32px;
+  right: 28px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  @media (max-width: 1260px) {
+    bottom: auto;
+    top: 24px;
+  }
+}
+
+/* ── Circular FAB Trigger Button (Image 1 & 4) ── */
+.help-fab-trigger-btn {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #20a779;
+  border: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  padding: 0;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.25s ease,
+              background-color 0.2s ease;
+
+  /* Luminous Ambient Glow (Image 1) */
+  box-shadow: 
+    0 4px 14px rgba(32, 167, 121, 0.45),
+    0 0 24px rgba(32, 167, 121, 0.35);
+
+  app-chat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    pointer-events: none;
+    transition: transform 0.25s ease;
+  }
+
+  &:hover {
+    transform: scale(1.08);
+    background: #1ca073;
+    box-shadow: 
+      0 6px 20px rgba(32, 167, 121, 0.6),
+      0 0 32px rgba(32, 167, 121, 0.5);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &.is-active {
+    transform: scale(1.04);
+    box-shadow: 
+      0 6px 22px rgba(32, 167, 121, 0.65),
+      0 0 36px rgba(32, 167, 121, 0.55);
+  }
+
+  /* Expanding Radar Ripple Ring (Image 4) */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(32, 167, 121, 0.7);
+    animation: pulseRadarRing 2.6s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    pointer-events: none;
+  }
+
+  /* Luminous Breathing Halo (Image 1) */
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(32, 167, 121, 0.25) 0%, rgba(32, 167, 121, 0) 70%);
+    animation: glowBreath 2.6s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
+
+/* ── "Help & Support" Popover Card (Image 2 & 3) ── */
+.help-fab-popover {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  right: 0;
+  width: 215px;
+  background: var(--px-panel, #ffffff);
+  border: 1px solid var(--px-border, #e2e8f0);
+  border-radius: 14px;
+  box-shadow: 
+    0 12px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 10px 8px 8px 8px;
+  transform-origin: bottom right;
+  animation: popoverFadeUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1001;
+
+  @media (max-width: 1023px) {
+    bottom: auto;
+    top: calc(100% + 14px);
+    transform-origin: top right;
+    animation: popoverFadeDown 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .popover-header-title {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--px-text, #0f172a);
+    padding: 2px 10px 8px 10px;
+    font-family: inherit;
+    letter-spacing: -0.01em;
+  }
+
+  .popover-header-divider {
+    height: 1px;
+    background: var(--px-border, #e2e8f0);
+    margin: 0 4px 6px 4px;
+  }
+
+  .popover-actions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .popover-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 7px 10px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--px-text, #334155);
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-align: left;
+
+    app-chat-icon, svg {
+      color: #64748b;
+      flex-shrink: 0;
+      transition: color 0.18s ease, transform 0.18s ease;
+    }
+
+    &:hover {
+      background: var(--px-hover, #f1f5f9);
+      color: var(--px-text, #0f172a);
+
+      app-chat-icon, svg {
+        color: #20a779;
+        transform: scale(1.06);
+      }
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}
+
+/* ── Keyframe Animations ── */
+@keyframes pulseRadarRing {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+
+@keyframes glowBreath {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.75;
+  }
+}
+
+@keyframes popoverFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes popoverFadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Dark Theme Support ── */
+:host-context(.dark),
+:host-context(body.dark-theme) {
+  .help-fab-popover {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 
+      0 16px 36px rgba(0, 0, 0, 0.4),
+      0 2px 10px rgba(0, 0, 0, 0.2);
+
+    .popover-header-title {
+      color: #f1f5f9;
+    }
+
+    .popover-header-divider {
+      background: #334155;
+    }
+
+    .popover-action-btn {
+      color: #cbd5e1;
+
+      app-chat-icon, svg {
+        color: #94a3b8;
+      }
+
+      &:hover {
+        background: #334155;
+        color: #ffffff;
+
+        app-chat-icon, svg {
+          color: #34d399;
+        }
+      }
+    }
+  }
+}
+
+/* ── Responsive Behavior ── */
+@media (max-width: 768px) {
+  .help-fab-container {
+    display: none;
+  }
+
+  .help-fab-trigger-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .help-fab-popover {
+    width: 200px;
+  }
+}

@@ -1,0 +1,689 @@
+<!-- ═══════════════════════════════════════════════════════════════════════
+     RESUME STANDARDIZER — UPLOAD SCREEN
+     ═══════════════════════════════════════════════════════════════════════ -->
+@if (viewState() === "upload") {
+  <div class="rs-upload-wrapper">
+    <div class="rs-upload-card">
+      <!-- Header -->
+      <div class="rs-header">
+        <h1 class="rs-header__title">
+          <span class="rs-header__wave">👋</span>Welcome to KAI
+          <span class="rs-header__accent">Resume Standardizer</span>
+        </h1>
+        <p class="rs-header__subtitle">
+          Upload a candidate resume to generate a formatted resume
+        </p>
+      </div>
+
+      <div class="rs-divider"></div>
+
+      <!-- Upload Section -->
+      <div class="rs-upload-section">
+        <div class="rs-upload-grid">
+          <!-- Template Column commented out as per user request
+          <div class="rs-upload-col">
+            <div class="rs-upload-section__header">
+              <h2 class="rs-upload-section__title">Upload Template</h2>
+              <p class="rs-upload-section__desc">
+                Upload an organization standard resume template
+              </p>
+            </div>
+            <div class="rs-dropzone-wrapper">
+              <app-file-dropzone
+                label="Template"
+                accept=".pdf,.docx"
+                [file]="templateFile"
+                [errorMessage]="templateError"
+                [uploading]="isUploading()"
+                [progress]="uploadProgress()"
+                [uploadedLayout]="true"
+                buttonText="Browse Files"
+                helperText="Supported formats: PDF, DOCX"
+                (fileSelected)="onTemplateSelected($event)"
+                (previewFile)="onPreviewLocalFile($event)"
+              ></app-file-dropzone>
+            </div>
+          </div>
+          -->
+
+          <!-- Resume Column -->
+          <div class="rs-upload-col">
+            <div class="rs-upload-section__header">
+              <h2 class="rs-upload-section__title">Upload Resume</h2>
+              <p class="rs-upload-section__desc">
+                Upload a candidate resume to standardize
+              </p>
+            </div>
+            <div class="rs-dropzone-wrapper">
+              <app-file-dropzone
+                label="Resume"
+                accept=".pdf,.docx"
+                [file]="resumeFile"
+                [errorMessage]="resumeError"
+                [uploading]="isUploading()"
+                [progress]="uploadProgress()"
+                [uploadedLayout]="true"
+                buttonText="Browse Files"
+                helperText="Supported formats: PDF, DOCX"
+                (fileSelected)="onResumeSelected($event)"
+                (previewFile)="onPreviewLocalFile($event)"
+              ></app-file-dropzone>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="rs-submit-row">
+          <button
+            type="button"
+            class="rs-btn rs-btn--primary"
+            (click)="submitResume()"
+            [disabled]="isUploading()"
+          >
+            Generate Standardized Resume
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PROCESSING SCREEN
+     ═══════════════════════════════════════════════════════════════════════ -->
+@if (viewState() === "processing") {
+  <div class="rs-processing-wrapper">
+    <div class="rs-processing-card">
+      <div class="rs-processing__spinner"></div>
+      <h2 class="rs-processing__title">Generating Your Resume</h2>
+      <p class="rs-processing__desc">
+        We're standardizing your resume to match organization templates. This
+        may take a moment...
+      </p>
+      <!-- <div class="rs-processing__progress-track">
+        <div
+          class="rs-processing__progress-fill"
+          [style.width.%]="uploadProgress()"
+        ></div>
+      </div> -->
+      <!-- <span class="rs-processing__pct">{{ uploadProgress() }}%</span> -->
+    </div>
+  </div>
+}
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     RESULTS SCREEN
+     ═══════════════════════════════════════════════════════════════════════ -->
+@if (viewState() === "results") {
+  <div
+    class="rs-results-wrapper"
+    [class.rs-results--fullscreen]="isFullscreen()"
+  >
+    <!-- Left: PDF Preview Panel -->
+    <div class="rs-pdf-panel">
+      <!-- PDF Toolbar -->
+      <div class="rs-pdf-toolbar">
+        <div class="rs-pdf-toolbar__file-info">
+          <svg
+            class="rs-pdf-toolbar__icon"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+            />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          <span class="rs-pdf-toolbar__name">{{ pdfFileName }}</span>
+          <!-- <span class="rs-pdf-toolbar__page"
+            >Page {{ currentPage() }} of {{ totalPages() }}</span
+          > -->
+        </div>
+        <div class="rs-pdf-toolbar__actions">
+          <!-- Download PDF -->
+          @if (blobPathPdf || blobPath) {
+            <button
+              type="button"
+              class="rs-pdf-toolbar__btn rs-pdf-toolbar__btn--download"
+              (click)="downloadPdf()"
+              [disabled]="isDownloadingPdf()"
+              title="Download PDF (.pdf)"
+            >
+              @if (isDownloadingPdf()) {
+                <span class="rs-btn-spinner"></span>
+              } @else {
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              }
+              <span class="rs-format-label">PDF</span>
+            </button>
+          }
+
+          <!-- Download DOCX -->
+          @if (blobPathDocx) {
+            <button
+              type="button"
+              class="rs-pdf-toolbar__btn rs-pdf-toolbar__btn--download rs-pdf-toolbar__btn--docx"
+              (click)="downloadDocx()"
+              [disabled]="isDownloadingDocx()"
+              title="Download Word (.docx)"
+            >
+              @if (isDownloadingDocx()) {
+                <span class="rs-btn-spinner"></span>
+              } @else {
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              }
+              <span class="rs-format-label">DOCX</span>
+            </button>
+          }
+          <!-- Fullscreen -->
+          <button
+            type="button"
+            class="rs-pdf-toolbar__btn"
+            (click)="toggleFullscreen()"
+            title="Toggle fullscreen"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              @if (isFullscreen()) {
+                <polyline points="4 14 10 14 10 20" />
+                <polyline points="20 10 14 10 14 4" />
+                <line x1="14" y1="10" x2="21" y2="3" />
+                <line x1="3" y1="21" x2="10" y2="14" />
+              } @else {
+                <polyline points="15 3 21 3 21 9" />
+                <polyline points="9 21 3 21 3 15" />
+                <line x1="21" y1="3" x2="14" y2="10" />
+                <line x1="3" y1="21" x2="10" y2="14" />
+              }
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- PDF Viewer with Thumbnails -->
+      <div class="rs-pdf-body">
+        <!-- PDF Content Area -->
+        <div class="rs-pdf-viewer">
+          @if (safePdfUrl) {
+            <iframe
+              class="rs-pdf-iframe"
+              [src]="safePdfUrl"
+              title="Standardized Resume Preview"
+            ></iframe>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Analysis Panel -->
+    @if (!isFullscreen()) {
+      <div class="rs-analysis-panel">
+        <!-- Tabs -->
+        <div class="rs-analysis-tabs">
+          <button
+            type="button"
+            class="rs-analysis-tab"
+            [class.rs-analysis-tab--active]="activeTab() === 'missing'"
+            (click)="setTab('missing')"
+          >
+            <span class="rs-analysis-tab__badge rs-analysis-tab__badge--warn"
+              >Missing</span
+            >
+            @if (missingDetails.length) {
+              <span class="rs-analysis-tab__count">{{
+                missingDetails.length
+              }}</span>
+            }
+          </button>
+          <button
+            type="button"
+            class="rs-analysis-tab"
+            [class.rs-analysis-tab--active]="activeTab() === 'additional'"
+            (click)="setTab('additional')"
+          >
+            Additional Details
+            @if (extraDetails.length) {
+              <span class="rs-analysis-tab__count">{{
+                extraDetails.length
+              }}</span>
+            }
+          </button>
+        </div>
+
+        <!-- Analysis Content -->
+        <div class="rs-analysis-content">
+          @if (analysisStatus() === "matches") {
+            <div class="rs-analysis-match">
+              <div class="rs-analysis-match__icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="#10b981"
+                    stroke-width="2"
+                  />
+                  <path
+                    d="M8 12l3 3 5-5"
+                    stroke="#10b981"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <h3 class="rs-analysis-match__title">Everything Matches</h3>
+              <p class="rs-analysis-match__desc">
+                Your resume matches the organization's standard resume format.
+              </p>
+            </div>
+          } @else {
+            <!-- Missing Details Tab -->
+            @if (activeTab() === "missing") {
+              @if (missingDetails.length) {
+                <div class="rs-detail-list">
+                  @for (detail of missingDetails; track detail.heading) {
+                    <div class="rs-detail-card">
+                      <div class="rs-detail-card__icon">
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="#f59e0b"
+                            stroke-width="2"
+                          />
+                          <line
+                            x1="12"
+                            y1="8"
+                            x2="12"
+                            y2="12"
+                            stroke="#f59e0b"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                          />
+                          <circle cx="12" cy="16" r="1" fill="#f59e0b" />
+                        </svg>
+                      </div>
+                      <div class="rs-detail-card__body">
+                        <h4 class="rs-detail-card__heading">
+                          {{ detail.heading }}
+                        </h4>
+                        <p class="rs-detail-card__desc">
+                          {{ detail.description }}
+                        </p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="rs-detail-empty">
+                  <p>No missing details found.</p>
+                </div>
+              }
+            }
+
+            <!-- Additional Details Tab -->
+            @if (activeTab() === "additional") {
+              @if (extraDetails.length) {
+                <div class="rs-detail-list">
+                  <ng-container
+                    *ngTemplateOutlet="extraDetailTpl; context: { $implicit: extraDetails, depth: 0 }"
+                  ></ng-container>
+                </div>
+              } @else {
+                <div class="rs-detail-empty">
+                  <p>No additional details found.</p>
+                </div>
+              }
+            }
+          }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="rs-analysis-actions">
+          <button
+            type="button"
+            class="rs-btn rs-btn--ghost"
+            (click)="startOver()"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="1 4 1 10 7 10" />
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+            </svg>
+            Start Over
+          </button>
+          <div class="rs-download-dropdown">
+            <button
+              type="button"
+              class="rs-btn rs-btn--primary rs-download-dropdown__trigger"
+              (click)="toggleDownloadDropdown($event)"
+              [disabled]="isDownloadingPdf() || isDownloadingDocx()"
+            >
+              @if (isDownloadingPdf() || isDownloadingDocx()) {
+                <span class="rs-btn-spinner"></span>
+                Downloading...
+              } @else {
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                <span>Download Resume</span>
+                <svg
+                  class="rs-download-dropdown__chevron"
+                  [class.rs-download-dropdown__chevron--open]="downloadDropdownOpen()"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              }
+            </button>
+
+            @if (downloadDropdownOpen()) {
+              <div class="rs-download-dropdown__menu">
+                @if (blobPathPdf || blobPath) {
+                  <button
+                    type="button"
+                    class="rs-download-dropdown__item"
+                    (click)="downloadPdf(); downloadDropdownOpen.set(false)"
+                    [disabled]="isDownloadingPdf()"
+                  >
+                    <span class="rs-download-dropdown__icon">📄</span>
+                    <div class="rs-download-dropdown__info">
+                      <span class="rs-download-dropdown__title">PDF Document</span>
+                      <span class="rs-download-dropdown__sub">Standard PDF format (.pdf)</span>
+                    </div>
+                  </button>
+                }
+                @if (blobPathDocx) {
+                  <button
+                    type="button"
+                    class="rs-download-dropdown__item"
+                    (click)="downloadDocx(); downloadDropdownOpen.set(false)"
+                    [disabled]="isDownloadingDocx()"
+                  >
+                    <span class="rs-download-dropdown__icon">📝</span>
+                    <div class="rs-download-dropdown__info">
+                      <span class="rs-download-dropdown__title">Word Document</span>
+                      <span class="rs-download-dropdown__sub">Editable Word format (.docx)</span>
+                    </div>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<!-- Premium File Preview Modal Overlay -->
+@if (previewFile) {
+  <div class="preview-modal-overlay" (click)="closeFilePreview()">
+    <div class="preview-modal-container" (click)="$event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="preview-modal-header">
+        <div class="preview-file-info">
+          <span class="preview-file-icon">
+            @if (isPreviewImage) {
+              🖼️
+            } @else if (isPreviewPdf) {
+              📄
+            } @else if (isPreviewText) {
+              📝
+            } @else {
+              📦
+            }
+          </span>
+          <span class="preview-file-name" [title]="previewFile.name">{{
+            previewFile.name
+          }}</span>
+        </div>
+        <div class="preview-modal-actions">
+          @if (previewFileUrl) {
+            <a
+              [href]="previewFileUrl"
+              [download]="previewFile.name"
+              class="action-btn download-btn"
+              title="Download File"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </a>
+          }
+          <button
+            class="action-btn close-btn"
+            (click)="closeFilePreview()"
+            title="Close Preview"
+          >
+            &times;
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="preview-modal-body">
+        @if (isPreviewImage) {
+          <div class="preview-content-image">
+            <img [src]="previewFileUrl" alt="Image Preview" />
+          </div>
+        } @else if (isPreviewPdf) {
+          <div class="preview-content-pdf">
+            <iframe
+              [src]="safePreviewUrl"
+              width="100%"
+              height="100%"
+              frameborder="0"
+            ></iframe>
+          </div>
+        } @else if (isPreviewText) {
+          <div class="preview-content-text">
+            <pre><code>{{ previewTextContent }}</code></pre>
+          </div>
+        } @else {
+          <div class="preview-content-fallback">
+            <div class="fallback-card">
+              <div class="fallback-icon">
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  ></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+              </div>
+              <h3>No Preview Available</h3>
+              <p>
+                This file type ({{ getFileExtension(previewFile.name) }}) cannot
+                be previewed inline.
+              </p>
+              @if (previewFileUrl) {
+                <a
+                  [href]="previewFileUrl"
+                  [download]="previewFile.name"
+                  class="premium-download-link"
+                >
+                  Download to view
+                </a>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- RECURSIVE TEMPLATE FOR EXTRA DETAILS (handles any nested data shape) -->
+<ng-template #extraDetailTpl let-details let-depth="depth">
+  @for (detail of details; track detail.heading) {
+    <div
+      class="rs-detail-card rs-detail-card--extra"
+      [class.rs-detail-card--nested]="depth > 0"
+      [style.margin-left.px]="depth * 16"
+    >
+      <div class="rs-detail-card__icon">
+        <!-- Icon based on valueType -->
+        @if (detail.valueType === 'array') {
+          <!-- List icon -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <line x1="8" y1="6" x2="21" y2="6" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+            <line x1="8" y1="12" x2="21" y2="12" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+            <line x1="8" y1="18" x2="21" y2="18" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="4" cy="6" r="1.5" fill="#3b82f6"/>
+            <circle cx="4" cy="12" r="1.5" fill="#3b82f6"/>
+            <circle cx="4" cy="18" r="1.5" fill="#3b82f6"/>
+          </svg>
+        } @else if (detail.valueType === 'object') {
+          <!-- Folder / nested icon -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+              stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        } @else if (detail.valueType === 'link') {
+          <!-- Link icon -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+              stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+              stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        } @else {
+          <!-- Default info/plus icon -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="#3b82f6" stroke-width="2"/>
+            <line x1="12" y1="8" x2="12" y2="16" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+            <line x1="8" y1="12" x2="16" y2="12" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        }
+      </div>
+      <div class="rs-detail-card__body">
+        <h4 class="rs-detail-card__heading">{{ detail.heading }}</h4>
+
+        <!-- String value -->
+        @if (detail.valueType === 'string' && detail.description) {
+          <p class="rs-detail-card__desc">{{ detail.description }}</p>
+        }
+
+        <!-- Link value -->
+        @if (detail.valueType === 'link' && detail.description) {
+          <a class="rs-detail-card__link" [href]="detail.description" target="_blank" rel="noopener noreferrer">
+            {{ detail.description }}
+          </a>
+        }
+
+        <!-- Array of primitives -->
+        @if (detail.valueType === 'array') {
+          <ul class="rs-detail-card__list">
+            @for (item of asStringArray(detail.value); track item) {
+              <li class="rs-detail-card__list-item">
+                @if (isUrl(item)) {
+                  <a class="rs-detail-card__link" [href]="item" target="_blank" rel="noopener noreferrer">{{ item }}</a>
+                } @else {
+                  {{ item }}
+                }
+              </li>
+            }
+          </ul>
+        }
+
+        <!-- Nested object / children -->
+        @if (detail.valueType === 'object') {
+          <div class="rs-detail-card__children">
+            <ng-container
+              *ngTemplateOutlet="extraDetailTpl; context: { $implicit: asDetailArray(detail.value), depth: depth + 1 }"
+            ></ng-container>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</ng-template>

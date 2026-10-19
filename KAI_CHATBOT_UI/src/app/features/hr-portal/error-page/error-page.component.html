@@ -1,0 +1,4 @@
+<div class="error-page-container">
+  <h1>{{ errorMessage || 'Oops something went Wrong!!!' }}</h1>
+  <button type="button" (click)="retry.emit()">Please Try Again</button>
+</div>

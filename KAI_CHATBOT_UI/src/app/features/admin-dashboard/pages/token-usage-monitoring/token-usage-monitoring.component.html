@@ -1,0 +1,369 @@
+  <section class="token-usage-panel">
+    <div class="token-usage-header">
+      <h2 class="pending-panel__title token-usage-title">TOKEN USAGE MONITORING</h2>
+      <div class="token-usage-search">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path
+            d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z"
+            stroke="currentColor"
+            stroke-width="1.25"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M14 14L11.1 11.1"
+            stroke="currentColor"
+            stroke-width="1.25"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <input
+          type="search"
+          [ngModel]="tokenUsageSearchQuery"
+          (ngModelChange)="onTokenUsageSearchChange($event)"
+          placeholder="Search users..."
+          aria-label="Search token usage by user id"
+          [disabled]="loadingTokenUsage"
+        />
+      </div>
+    </div>
+
+    @if (loadingTokenUsage) {
+      <div class="pending-panel__state">
+        <span class="loader" aria-hidden="true"></span>
+        <p>Loading token usage</p>
+      </div>
+    } @else {
+      <div
+        class="pending-table-wrap"
+        [class.token-usage-panel__table--loading]="tokenUsagePageLoading || tokenUsageSearchLoading"
+      >
+        @if (tokenUsageSearchLoading) {
+          <div class="token-usage-search-loading" aria-live="polite">
+            <span class="loader" aria-hidden="true"></span>
+          </div>
+        }
+        <table class="pending-table token-usage-table">
+          <thead>
+            <tr>
+              @for (col of tokenUsageTableColumns; track col.key) {
+                <th class="token-usage-table__th">
+                  <button
+                    type="button"
+                    class="token-usage-table__sortable token-usage-table__th-inner"
+                    (click)="toggleTokenUsageSort(col.key)"
+                    [attr.aria-sort]="
+                      isTokenUsageSortActive(col.key)
+                        ? tokenUsageSortDir === 'asc'
+                          ? 'ascending'
+                          : 'descending'
+                        : 'none'
+                    "
+                  >
+                    <span>{{ col.label }}</span>
+                    <svg
+                      class="token-usage-table__sort-icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M2.25 12L5.25 15L8.25 12"
+                        [attr.stroke]="tokenUsageSortStroke(col.key, 'desc')"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M5.25 15V3"
+                        [attr.stroke]="tokenUsageSortStroke(col.key, 'desc')"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M15.75 6L12.75 3L9.75 6"
+                        [attr.stroke]="tokenUsageSortStroke(col.key, 'asc')"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M12.75 3V15"
+                        [attr.stroke]="tokenUsageSortStroke(col.key, 'asc')"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </th>
+              }
+              <th class="token-usage-table__actions-col token-usage-table__th">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (tokenUsageSearchLoading && tokenUsage.length === 0) {
+              <tr>
+                <td colspan="6" class="token-usage-table__empty">
+                  Searching users…
+                </td>
+              </tr>
+            } @else if (tokenUsage.length === 0) {
+              <tr>
+                <td colspan="6" class="token-usage-table__empty">
+                  @if (isTokenUsageSearchActive) {
+                    No users match your search.
+                  } @else {
+                    No token usage logs on this page.
+                  }
+                </td>
+              </tr>
+            } @else {
+              @for (token of tokenUsageSortedRows; track token.id ?? token.user_id; let rowIndex = $index) {
+                <tr>
+                  <td class="pending-table__email token-usage-table__user">
+                    <button
+                      type="button"
+                      class="token-usage-table__user-link"
+                      (click)="filterTokenUsageByUserId(token.user_id)"
+                    >
+                      {{ token.user_id }}
+                    </button>
+                  </td>
+                  <td>
+                    <div class="observed-date">
+                      <div class="observed-date__date">{{ token.day | date: 'MMM dd, yyyy' }}</div>
+                      <div class="observed-date__time">{{ token.day | date: 'hh:mm a' }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="tokens-used">
+                      <div class="tokens-used__value">{{ token.tokens_used | number }}</div>
+                      <div class="tokens-used__bar" aria-hidden="true">
+                        <div class="tokens-used__bar-fill" [style.width]="tokenUsageBarWidth(token)"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    @if (tokenUserActive(token)) {
+                      <span class="pill pill--active">
+                        <span class="pill__dot" aria-hidden="true"></span>
+                        Active
+                      </span>
+                    } @else {
+                      <span class="pill pill--inactive">
+                        <span class="pill__dot pill__dot--muted" aria-hidden="true"></span>
+                        Inactive
+                      </span>
+                    }
+                  </td>
+                  <td>
+                    @if (loadingAllowSensitiveByUserId[token.user_id]) {
+                      <span class="pill pill--inactive" aria-label="Loading sensitive access status">
+                        <span class="pill__dot pill__dot--muted" aria-hidden="true"></span>
+                        â€¦
+                      </span>
+                    } @else if (tokenSensitiveAllowed(token.user_id) === true) {
+                      <span class="pill pill--allowed">
+                        <span class="pill__dot" aria-hidden="true"></span>
+                        Allowed
+                      </span>
+                    } @else {
+                      <span class="pill pill--restricted">
+                        <span class="pill__dot pill__dot--restricted" aria-hidden="true"></span>
+                        Restricted
+                      </span>
+                    }
+                  </td>
+                  <td class="token-usage-table__actions-col">
+                    <div
+                      class="token-usage-actions"
+                      [class.token-usage-actions--open]="
+                        isTokenUsageActionsMenuOpen(token.user_id)
+                      "
+                    >
+                      <button
+                        type="button"
+                        class="token-usage-actions__trigger token-usage-actions__trigger--kebab"
+                        aria-label="Row actions"
+                        [attr.aria-expanded]="
+                          isTokenUsageActionsMenuOpen(token.user_id)
+                        "
+                        [attr.aria-haspopup]="true"
+                        (click)="toggleTokenUsageActionsMenu($event, token.user_id)"
+                      >
+                        <svg
+                          width="34"
+                          height="34"
+                          viewBox="0 0 34 34"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                        >
+                          <rect x="0.5" y="0.5" width="33" height="33" rx="4.5" stroke="#E0E0E0" />
+                          <path
+                            d="M17 11C17.5523 11 18 10.5523 18 10C18 9.44772 17.5523 9 17 9C16.4477 9 16 9.44772 16 10C16 10.5523 16.4477 11 17 11Z"
+                            stroke="#2C2C2C"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M17 18C17.5523 18 18 17.5523 18 17C18 16.4477 17.5523 16 17 16C16.4477 16 16 16.4477 16 17C16 17.5523 16.4477 18 17 18Z"
+                            stroke="#2C2C2C"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M17 25C17.5523 25 18 24.5523 18 24C18 23.4477 17.5523 23 17 23C16.4477 23 16 23.4477 16 24C16 24.5523 16.4477 25 17 25Z"
+                            stroke="#2C2C2C"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </button>
+                      @if (isTokenUsageActionsMenuOpen(token.user_id)) {
+                        <div
+                          class="token-usage-actions__menu"
+                          [class.token-usage-actions__menu--above]="
+                            isTokenUsageActionsMenuAbove(rowIndex)
+                          "
+                          role="menu"
+                          (click)="$event.stopPropagation()"
+                        >
+                          @if (token.is_blocked) {
+                            <button
+                              type="button"
+                              class="token-usage-actions__row token-usage-actions__row--enable"
+                              role="menuitem"
+                              [disabled]="loadingUsers[token.user_id]"
+                              (click)="onTokenUsageMenuEnableUser(token.user_id, $event)"
+                            >
+                              <span class="token-usage-actions__row-icon" aria-hidden="true">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M13.3333 17.5V15.8333C13.3333 14.9493 12.9821 14.1014 12.357 13.4763C11.7319 12.8512 10.884 12.5 9.99996 12.5H4.99996C4.1159 12.5 3.26806 12.8512 2.64294 13.4763C2.01782 14.1014 1.66663 14.9493 1.66663 15.8333V17.5" stroke="#364153" stroke-linecap="round" stroke-linejoin="round"/>
+                                  <path d="M7.49996 9.16667C9.34091 9.16667 10.8333 7.67428 10.8333 5.83333C10.8333 3.99238 9.34091 2.5 7.49996 2.5C5.65901 2.5 4.16663 3.99238 4.16663 5.83333C4.16663 7.67428 5.65901 9.16667 7.49996 9.16667Z" stroke="#364153" stroke-linecap="round" stroke-linejoin="round"/>
+                                  <path d="M13.3334 9.16667L15 10.8333L18.3334 7.5" stroke="#364153" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              </span>
+                              <span class="token-usage-actions__row-text">Enable User</span>
+                            </button>
+                          } @else {
+                            <button
+                              type="button"
+                              class="token-usage-actions__row token-usage-actions__row--disable"
+                              role="menuitem"
+                              [disabled]="loadingUsers[token.user_id]"
+                              (click)="onTokenUsageMenuDisableUser(token.user_id, $event)"
+                            >
+                              <span class="token-usage-actions__row-icon" aria-hidden="true">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M13.3333 17.5V15.8333C13.3333 14.9493 12.9821 14.1014 12.357 13.4763C11.7319 12.8512 10.884 12.5 9.99996 12.5H4.99996C4.1159 12.5 3.26806 12.8512 2.64294 13.4763C2.01782 14.1014 1.66663 14.9493 1.66663 15.8333V17.5" stroke="#364153" stroke-linecap="round" stroke-linejoin="round"/>
+                                  <path d="M7.49996 9.16667C9.34091 9.16667 10.8333 7.67428 10.8333 5.83333C10.8333 3.99238 9.34091 2.5 7.49996 2.5C5.65901 2.5 4.16663 3.99238 4.16663 5.83333C4.16663 7.67428 5.65901 9.16667 7.49996 9.16667Z" stroke="#364153" stroke-linecap="round" stroke-linejoin="round"/>
+                                  <path d="M14.1666 6.66663L18.3333 10.8333" stroke="#364153" stroke-linecap="round" stroke-linejoin="round"/>
+                                  <path d="M18.3333 6.66663L14.1666 10.8333" stroke="#364153" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              </span>
+                              <span class="token-usage-actions__row-text">Disable User</span>
+                            </button>
+                          }
+
+                          @if (allowSensitiveByUserId[token.user_id] === true) {
+                            <button
+                              type="button"
+                              class="token-usage-actions__row token-usage-actions__row--restrict-sensitive"
+                              role="menuitem"
+                              [disabled]="loadingSensitiveQuestions[token.user_id] || loadingAllowSensitiveByUserId[token.user_id]"
+                              (click)="restrictSensitiveQuestions(token.user_id, $event)"
+                            >
+                              <span class="token-usage-actions__row-icon" aria-hidden="true">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M18.1083 15L11.4416 3.33332C11.2962 3.07682 11.0854 2.86347 10.8307 2.71504C10.576 2.56661 10.2864 2.4884 9.99161 2.4884C9.69678 2.4884 9.40724 2.56661 9.1525 2.71504C8.89777 2.86347 8.68697 3.07682 8.54161 3.33332L1.87494 15C1.72801 15.2544 1.65096 15.5432 1.65162 15.8371C1.65227 16.1309 1.73059 16.4194 1.87865 16.6732C2.0267 16.927 2.23923 17.1371 2.49469 17.2823C2.75014 17.4275 3.03945 17.5026 3.33327 17.5H16.6666C16.959 17.4997 17.2462 17.4225 17.4993 17.2761C17.7525 17.1297 17.9626 16.9192 18.1087 16.6659C18.2548 16.4126 18.3316 16.1253 18.3316 15.8329C18.3315 15.5405 18.2545 15.2532 18.1083 15Z" stroke="#364153" stroke-linecap="round" stroke-linejoin="round"/>
+                                  <path d="M10 7.5V10.8333" stroke="#364153" stroke-linecap="round" stroke-linejoin="round"/>
+                                  <path d="M10 14.1666H10.0083" stroke="#364153" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              </span>
+                              <span class="token-usage-actions__row-text">Restrict Sensitive Questions</span>
+                            </button>
+                          } @else {
+                            <button
+                              type="button"
+                              class="token-usage-actions__row token-usage-actions__row--allow-sensitive"
+                              role="menuitem"
+                              [disabled]="loadingSensitiveQuestions[token.user_id] || loadingAllowSensitiveByUserId[token.user_id]"
+                              (click)="allowSensitiveQuestions(token.user_id, $event)"
+                            >
+                              <span class="token-usage-actions__row-icon" aria-hidden="true">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M9.99996 18.3333C14.6023 18.3333 18.3333 14.6023 18.3333 9.99996C18.3333 5.39759 14.6023 1.66663 9.99996 1.66663C5.39759 1.66663 1.66663 5.39759 1.66663 9.99996C1.66663 14.6023 5.39759 18.3333 9.99996 18.3333Z" stroke="#364153" stroke-linecap="round" stroke-linejoin="round"/>
+                                  <path d="M7.57495 7.49999C7.77087 6.94304 8.15758 6.47341 8.66658 6.17426C9.17558 5.87512 9.77403 5.76577 10.3559 5.86558C10.9378 5.96539 11.4656 6.26792 11.8458 6.71959C12.2261 7.17126 12.4342 7.74292 12.4333 8.33332C12.4333 9.99999 9.93328 10.8333 9.93328 10.8333" stroke="#364153" stroke-linecap="round" stroke-linejoin="round"/>
+                                  <path d="M10 14.1666H10.0083" stroke="#364153" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              </span>
+                              <span class="token-usage-actions__row-text">Allow Sensitive Questions</span>
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (!isTokenUsageSearchActive) {
+        <div class="token-usage-pagination">
+        <button
+          type="button"
+          class="token-usage-pagination__nav"
+          [disabled]="
+            tokenUsagePage <= 1 || loadingTokenUsage || tokenUsagePageLoading
+          "
+          (click)="goToTokenUsagePage(tokenUsagePage - 1)"
+        >
+          &lt; Back
+        </button>
+
+        @for (page of tokenUsagePageNumbers; track $index) {
+          @if (page === '...') {
+            <span class="token-usage-pagination__ellipsis">...</span>
+          } @else {
+            <button
+              type="button"
+              class="token-usage-pagination__page"
+              [class.token-usage-pagination__page--active]="page === tokenUsagePage"
+              [disabled]="loadingTokenUsage || tokenUsagePageLoading"
+              (click)="goToTokenUsagePage(page)"
+            >
+              {{ page }}
+            </button>
+          }
+        }
+
+        <button
+          type="button"
+          class="token-usage-pagination__nav"
+          [disabled]="
+            tokenUsagePage >= tokenUsageTotalPages ||
+            loadingTokenUsage ||
+            tokenUsagePageLoading
+          "
+          (click)="goToTokenUsagePage(tokenUsagePage + 1)"
+        >
+          Next &gt;
+        </button>
+
+        @if (tokenUsagePageLoading) {
+          <span class="loader token-usage-pagination__loader" aria-hidden="true"></span>
+        }
+        </div>
+      }
+
+    }
+  </section>

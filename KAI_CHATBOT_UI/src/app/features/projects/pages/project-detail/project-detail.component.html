@@ -1,0 +1,257 @@
+<div class="project-detail-page">
+  <!-- Top Breadcrumb Header -->
+  <header class="detail-header">
+    <nav class="breadcrumb-nav">
+      <button type="button" class="breadcrumb-root" (click)="navigateBack()">
+        Projects/
+      </button>
+      <span class="breadcrumb-current">{{ project()?.project_name || 'Loading...' }}</span>
+    </nav>
+  </header>
+
+  <!-- Conversations List -->
+  <div class="conversations-container">
+    @if (state.isLoadingConversations()) {
+      <div class="skeleton-list">
+        @for (i of [1, 2, 3, 4, 5, 6, 7]; track i) {
+          <div class="skeleton-row">
+            <div class="skeleton-title" [style.width.px]="140 + i * 20"></div>
+            <div class="skeleton-meta"></div>
+          </div>
+        }
+      </div>
+    } @else if (conversations().length === 0) {
+      <div class="empty-conversations">
+        <p class="empty-text">No conversations in this project yet.</p>
+        <span class="empty-hint">Use the input below to start your first conversation in {{ project()?.project_name }}.</span>
+      </div>
+    } @else {
+      <div class="conversation-rows">
+        @for (conv of conversations(); track conv.conversationID) {
+          <div
+            class="conversation-row"
+            [class.is-pinned]="conv.is_pinned"
+            (click)="openConversation(conv)"
+          >
+            <div class="conversation-title-row">
+              <span class="conversation-title">{{ conv.title }}</span>
+            </div>
+
+            <!-- Right Side: Date, Pin & More Actions -->
+            <div class="conversation-meta" (click)="$event.stopPropagation()">
+              <span class="conversation-date">
+                {{ conv.created_at | date:'MMM d' }}
+              </span>
+
+              <div class="row-actions">
+                <!-- Pin / Action Badge (Visible on pinned or row hover) -->
+                <button
+                  type="button"
+                  class="pin-badge-btn"
+                  [class.is-active]="conv.is_pinned"
+                  (click)="togglePin(conv, $event)"
+                  [title]="conv.is_pinned ? 'Unpin conversation' : 'Pin conversation'"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="17" x2="12" y2="22"></line>
+                    <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path>
+                  </svg>
+                </button>
+
+                <!-- Three-Dots Menu Button -->
+                <button
+                  type="button"
+                  class="options-btn"
+                  (click)="openContextMenu(conv, $event)"
+                  aria-label="More options"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="1"></circle>
+                    <circle cx="19" cy="12" r="1"></circle>
+                    <circle cx="5" cy="12" r="1"></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Bottom Floating Chat Composer Bar -->
+  <div class="bottom-composer-wrapper">
+    <app-prompt-composer
+      class="project-composer"
+      [isWelcomePage]="true"
+      [dropdownDirection]="'up'"
+      [disableModelLock]="true"
+      [placeholder]="'Start a new conversation in ' + (project()?.project_name || 'project')"
+      (messageSent)="onComposerMessage($event)"
+    ></app-prompt-composer>
+  </div>
+
+  <!-- Context Menu for chat row -->
+  @if (contextMenuOpen() && selectedConv()) {
+    <app-chat-context-menu
+      [menuPosition]="menuPosition()"
+      [isPinned]="selectedConv()?.is_pinned || false"
+      [disabled]="false"
+      [disabledTooltip]="''"
+      (shareEvt)="onMenuShare()"
+      (pinEvt)="onMenuPin()"
+      (renameEvt)="onMenuRename()"
+      (deleteEvt)="onMenuDelete()"
+    ></app-chat-context-menu>
+  }
+
+  <!-- Delete confirmation popup -->
+  @if (showConfirm()) {
+    <div class="confirm-overlay" (click)="cancelDelete()">
+      <div class="confirm-box confirm-box--delete" (click)="$event.stopPropagation()">
+        <div class="confirm-header">
+          <h4>Delete Chat</h4>
+          <button class="confirm-close-btn" (click)="cancelDelete()" aria-label="Close">
+            <app-sidenav-icon name="close" width="18" height="18"></app-sidenav-icon>
+          </button>
+        </div>
+        <div class="confirm-divider confirm-divider--spaced"></div>
+        <div class="confirm-body">
+          <p>This will delete the chat permanently.</p>
+          <div class="buttons">
+            <button class="cancel-btn" (click)="cancelDelete()">Cancel</button>
+            <button class="delete-btn" (click)="confirmDelete()">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Rename confirmation popup -->
+  @if (showRenameModal()) {
+    <div class="confirm-overlay" (click)="cancelRename()">
+      <div class="confirm-box" (click)="$event.stopPropagation()">
+        <div class="confirm-header">
+          <h4>Rename this chat</h4>
+          <button class="confirm-close-btn" (click)="cancelRename()" aria-label="Close">
+            <app-sidenav-icon name="close" width="18" height="18"></app-sidenav-icon>
+          </button>
+        </div>
+        <div class="confirm-divider"></div>
+        <div class="confirm-body">
+          <div class="rename-input-group">
+            <input
+              type="text"
+              class="rename-input"
+              [ngModel]="renameValue()"
+              (ngModelChange)="renameValue.set($event)"
+              placeholder="New name..."
+              (keyup.enter)="confirmRename()"
+              autofocus
+            />
+          </div>
+        </div>
+        <div class="confirm-divider"></div>
+        <div class="confirm-footer">
+          <div class="buttons">
+            <button class="cancel-btn" (click)="cancelRename()">Cancel</button>
+            <button class="rename-btn" (click)="confirmRename()">Rename</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Share popup -->
+  @if (showShareModal()) {
+    <div class="share-modal-overlay" (click)="closeShareModal()">
+      <div class="share-modal" (click)="$event.stopPropagation()">
+        <div class="share-modal-header">
+          <h4>{{ shareTitle() }}</h4>
+          <button
+            class="share-modal-close"
+            (click)="closeShareModal()"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="share-modal-divider"></div>
+
+        @if (shareLoading()) {
+          <div class="share-modal-loading">
+            <span class="share-spinner"></span>
+            <span>Generating share link...</span>
+          </div>
+        } @else if (shareUrl()) {
+          <div class="share-modal-body">
+            <div class="share-content-preview">
+              @for (pair of shareConversationPairs(); track $index) {
+                <div class="share-qa-pair">
+                  <div class="share-msg share-msg-user">
+                    <span class="share-msg-label">You</span>
+                    <p>{{ pair.question }}</p>
+                  </div>
+                  @if (pair.answer) {
+                    <div class="share-msg share-msg-bot">
+                      <span class="share-msg-label">KAI</span>
+                      <p>{{ pair.answer }}</p>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="share-actions">
+              <!-- Copy Link -->
+              <button
+                class="share-icon-btn share-link-btn"
+                (click)="copyShareLink()"
+                [appTooltip]="shareLinkCopied() ? 'Copied!' : 'Copy link'"
+              >
+                <app-sidenav-icon
+                  name="copy-link"
+                  width="22"
+                  height="22"
+                ></app-sidenav-icon>
+              </button>
+              <!-- Teams -->
+              <button
+                class="share-icon-btn share-teams-btn"
+                (click)="openSocialShare('teams')"
+                appTooltip="Share on Teams"
+              >
+                <img
+                  src="/teams_logo.png"
+                  alt="Teams"
+                  width="20"
+                  height="20"
+                  class="btn-icon"
+                />
+              </button>
+              <!-- Outlook -->
+              <button
+                class="share-icon-btn share-outlook-btn"
+                (click)="openSocialShare('outlook')"
+                appTooltip="Share on Outlook"
+              >
+                <img
+                  src="/outlook_logo.png"
+                  alt="Outlook"
+                  width="20"
+                  height="20"
+                  class="btn-icon"
+                />
+              </button>
+            </div>
+          </div>
+        } @else {
+          <div class="share-modal-error">
+            <p>Failed to generate share link. Please try again.</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
+

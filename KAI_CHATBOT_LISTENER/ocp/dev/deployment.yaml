@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatbot-listener
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chatbot-listener
+  template:
+    metadata:
+      labels:
+        app: chatbot-listener
+    spec:
+      serviceAccountName: preventpermission
+      containers:
+      - name: chatbot-listener
+        image: kumaranchatbotazcontainerregistry.azurecr.io/ocp_listener:imgtag
+        resources:
+          requests:
+           memory: "128Mi"
+           cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        ports:
+        - containerPort: 5000  # Updated to match Flask application port
+        envFrom:
+        - configMapRef:
+            name: listener-config
+      imagePullSecrets:
+      - name: my-pull-secret

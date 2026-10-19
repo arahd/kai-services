@@ -1,0 +1,345 @@
+@use '../../../../../../styles/mixins' as *;
+
+// ══════════════════════════════════════════════════════════
+//  IDENTITY BAR
+// ══════════════════════════════════════════════════════════
+.id-bar {
+  display: grid;
+  grid-template-columns: 1.2fr 1.6fr auto;
+  gap: 20px;
+  padding: 20px;
+  align-items: center;
+
+  border-radius: 16px;
+  border: 1px solid #eaebea;
+  background: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  }
+
+  // -- Column 1: Profile --
+  &__profile {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0; // prevent flex blowout
+  }
+
+  &__avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #111827;
+    color: #ffffff;
+    font-family: "Manrope", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    @include flex-center;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0; // prevent text overflow
+  }
+
+  &__name {
+    color: #111827;
+    font-family: "Manrope", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+    @include text-truncate;
+  }
+
+  &__role {
+    color: #2d5bff;
+    font-family: "Manrope", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  &__applied-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 6px;
+  }
+
+  &__applied-label {
+    color: #6b7280;
+    font-family: "Manrope", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__applied-value {
+    color: #1f2937;
+    font-family: "Manrope", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.2;
+    @include text-truncate;
+  }
+
+  // -- Column 2: Contact Info --
+  &__contact {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 16px;
+    padding: 0 20px;
+    border-left: 1px solid #eaebea;
+    border-right: 1px solid #eaebea;
+    align-self: stretch;
+    align-content: center;
+  }
+
+  &__contact-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #4b5563;
+    font-family: "Manrope", sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    min-width: 0;
+
+    span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.2s;
+
+      &:hover {
+        color: #2d5bff;
+      }
+    }
+
+    svg {
+      flex-shrink: 0;
+      color: #2d5bff;
+    }
+  }
+
+  // -- Column 3: Score Circular Gauge --
+  &__score-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    padding-left: 20px;
+  }
+
+  &__score-circle {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    @include flex-center;
+  }
+
+  .score-ring-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .score-ring-track {
+    fill: none;
+    stroke: #f3f0fa; // light tinted background track
+    stroke-width: 6;
+  }
+
+  .score-ring-fill {
+    fill: none;
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 263.89;
+    transition: stroke-dashoffset 0.6s ease-out;
+  }
+
+  .score-center-info {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    @include flex-center(column, 4px);
+  }
+
+  .score-pct-text {
+    font-family: "Manrope", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1;
+  }
+
+  .match-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    font-family: "Manrope", sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    border: 1px solid transparent;
+    white-space: nowrap;
+
+    &.hi {
+      background: #e8f5ed;
+      color: #1a7a4a;
+      border-color: #a7f3d0;
+    }
+
+    &.mid {
+      background: #fffdf0;
+      color: #d97706;
+      border-color: #fde68a;
+    }
+
+    &.lo {
+      background: #fceaea;
+      color: #c0292e;
+      border-color: #fca5a5;
+    }
+  }
+
+  .match-badge-icon {
+    width: 8px;
+    height: 8px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+// ==========================================
+//  RESPONSIVE BREAKPOINTS (ALL RESOLUTIONS)
+// ==========================================
+
+// Medium Desktops & Large Tablets
+@media (max-width: 1200px) {
+  .id-bar {
+    grid-template-columns: 1.1fr 1.5fr auto;
+    gap: 16px;
+    padding: 16px;
+
+    &__contact {
+      padding: 0 16px;
+      gap: 10px 12px;
+    }
+  }
+}
+
+// Portrait Tablets & Small Laptops
+@media (max-width: 991px) {
+  .id-bar {
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    padding: 20px;
+
+    &__contact {
+      grid-column: 1 / -1; // Span full width below Profile & Score
+      border-left: none;
+      border-right: none;
+      border-top: 1px solid #eaebea;
+      border-bottom: 1px solid #eaebea;
+      padding: 16px 0;
+      grid-template-columns: repeat(3, minmax(0, 1fr)); // 3 columns for contact elements on tablet landscape!
+    }
+
+    &__score-section {
+      grid-column: 2;
+      grid-row: 1;
+    }
+  }
+}
+
+// Small Tablets & Large Mobiles
+@media (max-width: 768px) {
+  .id-bar {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+
+    &__profile {
+      justify-content: center;
+      text-align: center;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    &__avatar {
+      width: 72px;
+      height: 72px;
+      font-size: 24px;
+    }
+
+    &__info {
+      align-items: center;
+    }
+
+    &__name {
+      text-align: center;
+      white-space: normal;
+    }
+
+    &__applied-value {
+      text-align: center;
+      white-space: normal;
+    }
+
+    &__contact {
+      grid-column: 1;
+      grid-template-columns: repeat(2, minmax(0, 1fr)); // 2 columns for contact items
+      border-bottom: none;
+      padding: 16px 0 0 0;
+    }
+
+    &__score-section {
+      grid-column: 1;
+      grid-row: 3;
+      border-top: 1px solid #eaebea;
+      padding-top: 20px;
+      width: 100%;
+    }
+  }
+}
+
+// Very Small Mobile Devices
+@media (max-width: 480px) {
+  .id-bar {
+    padding: 16px;
+    gap: 16px;
+
+    &__contact {
+      grid-template-columns: 1fr; // Stack contact items vertically on very narrow screens
+      gap: 12px;
+    }
+
+    &__score-circle {
+      transform: scale(0.9); // Scale down gauge slightly to ensure zero side clipping
+    }
+  }
+}

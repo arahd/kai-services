@@ -1,0 +1,123 @@
+<div class="shared-layout">
+  <!-- Header Bar -->
+  <header class="shared-header animate-fade-in">
+    <div class="header-left">
+      <div class="logo-container" (click)="navigateToApp()">
+        <img src="./kumaran-lg.png" alt="KAI Logo" class="app-logo" />
+        <span class="app-title">KAI <span class="badge">Share</span></span>
+      </div>
+    </div>
+    
+    <div class="header-center">
+      <h1 class="chat-title" [appTooltip]="conversationTitle">
+        {{ conversationTitle }}
+      </h1>
+    </div>
+    
+  <div class="header-right">
+       <!--  <button class="launch-btn" (click)="navigateToApp()" appTooltip="Open Chatbot to start a new chat">
+        <span>Launch App</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>-->
+    </div> 
+  </header>
+
+  <!-- Body Content -->
+  <main class="shared-main">
+    <!-- Loading State -->
+    @if (loading) {
+      <div class="state-container loading-state">
+        <div class="skeleton-header">
+          <div class="skeleton-bar title-shimmer"></div>
+        </div>
+        <div class="skeleton-messages">
+          @for (item of [1, 2, 3]; track $index) {
+            <div class="skeleton-bubble user-skeleton">
+              <div class="skeleton-bar text-shimmer-1"></div>
+            </div>
+            <div class="skeleton-bubble bot-skeleton">
+              <div class="skeleton-bar text-shimmer-2"></div>
+              <div class="skeleton-bar text-shimmer-3"></div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (error && !loading) {
+      <div class="state-container error-state animate-scale-up">
+        <div class="error-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <h2>Conversation Not Found</h2>
+        <p>{{ errorMessage }}</p>
+        <button class="action-btn" (click)="navigateToApp()">
+          Start a New Conversation
+        </button>
+      </div>
+    }
+
+    <!-- Loaded Content -->
+    @if (!loading && !error) {
+      <div class="conversation-container">
+        <div class="banner animate-fade-in">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>This is a read-only shared transcript of a conversation with KAI Assistant.</span>
+        </div>
+
+        <div class="messages-list">
+          @for (msg of messages; track $index) {
+            <!-- User Message -->
+            @if (msg.sender === 'user') {
+              <div class="animate-slide-in-right">
+                <app-user-message
+                  [msg]="msg"
+                  [index]="$index"
+                  [copied]="copied[$index]"
+                  [showEdit]="false"
+                  (copyMessage)="copyResponse(msg.message, $index)">
+                </app-user-message>
+              </div>
+            }
+
+            <!-- Bot Message -->
+            @if (msg.sender === 'bot') {
+              <div class="animate-slide-in-left">
+                <app-bot-message
+                  [msg]="msg"
+                  [index]="$index"
+                  [copied]="copied[$index]"
+                  [showShare]="false"
+                  (copyMessage)="copyResponse(msg.message, $index)">
+                </app-bot-message>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    }
+  </main>
+
+  <!-- Sticky Footer CTA -->
+  @if (!loading && !error) {
+    <footer class="shared-footer animate-fade-in">
+      <div class="footer-content">
+        <span class="footer-text">Want to continue this conversation or ask your own questions?</span>
+        <button class="launch-btn footer-btn" (click)="navigateToApp()">
+          Chat with KAI Now
+        </button>
+      </div>
+    </footer>
+  }
+</div>

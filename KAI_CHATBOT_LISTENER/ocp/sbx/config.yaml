@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: listener-config-sbx
+data:
+  APPLICATIONINSIGHTS_CONNECTION_STRING: "<SET_IN_OPENSHIFT_SECRET>"
+  LOGGER_TYPE: "AppInsights"
+  AZURE_TENANT_ID: "fce643da-bde9-4d38-a1ab-31e13fb799c0"
+  AZURE_CLIENT_SECRET: "qJ-8Q~jR6g8iZZChi8NYqrz6uJD6iSN6F0gRucfh"
+  AZURE_CLIENT_ID: "4b93d5c6-3cb8-469d-bb41-b92e7962944e"
+  DB_TYPE: sql
+
+  CUSTOMCONNSTR_ENV: "PRD"
+  HOST_NAME_ENV: "AZURE"
+  CUSTOMCONNSTR_KEYVAULT_ENDPOINT: "kumaranchatbotpocsandbox"
+  CUSTOMCONNSTR_ConfigManagerToken: "<SET_IN_OPENSHIFT_SECRET>"
+  CUSTOMCONNSTR_ConfigManagerURL: "http://chatbot-config-service-ci-sbx/"
+  CONTENT_MANAGER : "contentmanager"
+
+  AUTH_URL: http://chatbot-auth-service-ci-sbx/auth
+  INDEXER_ENDPOINT: http://chatbot-indexerservice-service-ci-sbx
+  RESET_PAGE: https://app-route-kumaranchatbotdev.apps.kumaranchatbotdevocp.eastus.aroapp.io/passwordreset
+  RESET_PAGE_KUMARAN : http://app-route-kumaranchatbotdev.apps.kumaranchatbotdevocp.eastus.aroapp.io/passwordreset
+  SENSITIVE_FILTER_ENDPOINT : http://chatbot-sensitivesearchservice-service-ci-sbx  
+  CONTENT_SEARCH_ENDPOINT: http://chatbot-contentsearchservice-service-ci-sbx
+  CACHE_ENDPOINT : http://chatbot-similar-question-service-ci-sbx
+  VIEW_FILE_URL: http://chatbot-contentmgmtservice-service-ci-sbx/view_file
+  GET_MEANING_URL: http://chatbot-contentmgmtservice-service-ci-sbx/get_meaning
+  CNT_MGMT_MSG_SERVICE_ENDPOINT: http://chatbot-msg-service-ci-sbx
+  CNT_MGMT_SERVICE_ENDPOINT : http://chatbot-contentmgmtservice-service-ci-sbx
+  RESET_PAGE_SCOTIA : http://multibot-scotiabank-angular-dev.azurewebsites.net/passwordreset
+  VIEW_IMAGE_URL: http://chatbot-contentmgmtservice-service-ci-sbx/view_image
+  SENSITIVE_FILTER_ADD_UNAPPROVED: http://chatbot-sensitivesearchservice-service-ci-sbx/add_unapproved
+  SEMATIC_KERNEL_SERVICE: http://chatbot-conversation-service-ci-sbx/
+  EVAL_SERVICE_ENDPOINT: http://chatbot-evaluation-service-ci-sbx
+  CHIT_CHAT_ADD_UNAPPROVED: http://chatbot-sensitivesearchservice-service-ci-sbx/add_chit_chat_unapproved
+  Chit_Chat_URL: http://chatbot-chitchat-service-ci-sbx/
+  SENSITIVE_FILTER_URL: http://chatbot-sensitivesearchservice-service-ci-sbx/
+  ADDUSERFEEDBACK: http://chatbot-feedback-service-ci-sbx/addUserFeedback
+ 

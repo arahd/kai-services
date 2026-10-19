@@ -1,0 +1,41 @@
+<app-toast></app-toast>
+
+<div class="app-root-body" [class.app-layout]="showAppChrome()">
+  @if (showAppChrome()) {
+    @let h = layoutBridge.activeHost();
+    <app-sidenav
+      #rootSidenav
+      [generatingStates]="h?.generatingStates ?? {}"
+      [streaming]="h ? h.getStreaming() : null"
+      [emitActiveChatOnInit]="h?.emitActiveChatOnInit ?? false"
+      [staticMode]="h?.staticMode ?? false"
+      (newChatClicked)="h?.onNewChat()"
+      (chatSelected)="h?.onChatSelected($event)"
+      (searchModalToggle)="h?.onSearchModalToggle($event)"
+      (streamingToggleEvt)="h?.handleStreamingToggle($event)"
+      (contextMenuToggled)="h?.onContextMenuToggled()"
+      (invalidConversation)="h?.onInvalidConversation()"
+      (collapsedChange)="layoutBridge.notifySidenavCollapsed($event)"
+      (closeMobileSidebar)="mobileSidebarOpen = false; layoutBridge.closeMobileSidebar()"
+      [class.sidebar-open]="mobileSidebarOpen || layoutBridge.mobileSidebarOpen()"
+    ></app-sidenav>
+    @if (mobileSidebarOpen || layoutBridge.mobileSidebarOpen()) {
+      <div class="mobile-sidebar-overlay" (click)="mobileSidebarOpen = false; layoutBridge.closeMobileSidebar()"></div>
+    }
+  }
+
+  <div class="main-area" [class.main-wrapper]="showAppChrome()" [class.sidebar-open]="mobileSidebarOpen || layoutBridge.mobileSidebarOpen()">
+    @if (showAppChrome()) {
+      <app-mobile-header></app-mobile-header>
+    }
+    <main class="main-content-host" [class.main-content]="showAppChrome()">
+      @if (showAppChrome()) {
+        <div class="chat-container-shell">
+          <router-outlet />
+        </div>
+      } @else {
+        <router-outlet />
+      }
+    </main>
+  </div>
+</div>

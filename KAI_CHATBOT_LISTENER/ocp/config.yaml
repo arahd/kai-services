@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: listener-config
+data:
+  APPLICATIONINSIGHTS_CONNECTION_STRING: "<SET_IN_OPENSHIFT_SECRET>"
+  LOGGER_TYPE: "AppInsights"
+  AZURE_TENANT_ID: "fce643da-bde9-4d38-a1ab-31e13fb799c0"
+  AZURE_CLIENT_SECRET: "qJ-8Q~jR6g8iZZChi8NYqrz6uJD6iSN6F0gRucfh"
+  AZURE_CLIENT_ID: "4b93d5c6-3cb8-469d-bb41-b92e7962944e"
+  DB_TYPE: sql
+
+  CUSTOMCONNSTR_ENV: "DEV"
+  HOST_NAME_ENV: "AZURE"
+  CUSTOMCONNSTR_KEYVAULT_ENDPOINT: "kumaranchatbotpoc"
+  CUSTOMCONNSTR_ConfigManagerToken: "<SET_IN_OPENSHIFT_SECRET>"
+  CUSTOMCONNSTR_ConfigManagerURL: "https://config-route-kumaranchatbotdev.apps.kumaranchatbotdevocp.eastus.aroapp.io/"
+  CONTENT_MANAGER : "contentmanager"
+ 
+  AUTH_URL: "https://auth-route-kumaranchatbotdev.apps.kumaranchatbotdevocp.eastus.aroapp.io/auth"

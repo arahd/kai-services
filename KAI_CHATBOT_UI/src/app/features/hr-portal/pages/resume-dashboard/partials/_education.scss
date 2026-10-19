@@ -1,0 +1,116 @@
+.education-experience-container {
+  display: flex;
+  padding: 19px 12px;
+  align-items: stretch;
+  gap: 10px;
+  align-self: stretch;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+
+  &__card {
+    display: flex;
+    min-height: 280px;
+    padding: 24px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    flex: 1;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    .heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+
+      span {
+        color: #1e293b;
+        font-family: 'Manrope', sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+      }
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      margin-top: auto;
+      overflow: hidden;
+
+      .progress-bar-fill {
+        height: 100%;
+        border-radius: 6px;
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+    }
+
+    .match-status {
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      margin: 8px 0 0;
+      line-height: 1.4;
+    }
+
+    .status-badge-container {
+      margin-top: auto;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      
+      &--met {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      &--not-met {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+    }
+  }
+}
+
+.compare-section-exp-edu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+
+  .label {
+    color: #64748b;
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .value {
+    color: #0f172a;
+    font-family: 'Manrope', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .sub-info {
+    color: #94a3b8;
+    font-family: 'Manrope', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    margin: 0;
+  }
+}

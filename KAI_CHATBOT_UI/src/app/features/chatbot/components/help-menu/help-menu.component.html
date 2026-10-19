@@ -1,0 +1,639 @@
+<div class="help-fab-container">
+  @if (isMenuOpen) {
+    <div class="help-fab-popover" (click)="$event.stopPropagation()">
+      <div class="popover-header-title">Help &amp; Support</div>
+      <div class="popover-header-divider"></div>
+
+      <div class="popover-actions-list">
+        <button
+          class="popover-action-btn"
+          (click)="startWalkthrough()"
+          type="button"
+        >
+          <app-chat-icon name="star" width="18" height="18"></app-chat-icon>
+          <span>Quick Walkthrough</span>
+        </button>
+
+        <button
+          class="popover-action-btn"
+          (click)="openUserManual()"
+          type="button"
+        >
+          <app-chat-icon name="book-open" width="18" height="18"></app-chat-icon>
+          <span>User Manual</span>
+        </button>
+
+        <button
+          class="popover-action-btn"
+          (click)="openHelpCenter()"
+          type="button"
+        >
+          <app-chat-icon name="help-circle" width="18" height="18"></app-chat-icon>
+          <span>Help Center</span>
+        </button>
+
+        <button
+          class="popover-action-btn"
+          (click)="openPrivacyPolicy()"
+          type="button"
+        >
+          <app-chat-icon name="shield" width="18" height="18"></app-chat-icon>
+          <span>Privacy Policy</span>
+        </button>
+
+        <button
+          class="popover-action-btn"
+          (click)="raiseBug()"
+          type="button"
+        >
+          <app-chat-icon name="bug" width="18" height="18"></app-chat-icon>
+          <span>Report a Bug</span>
+        </button>
+
+        <button
+          class="popover-action-btn"
+          (click)="raiseFeatureRequest()"
+          type="button"
+        >
+          <app-chat-icon name="sparkle" width="18" height="18"></app-chat-icon>
+          <span>Feature Request</span>
+        </button>
+
+        <!-- <button
+          class="popover-action-btn"
+          (click)="openReleaseNotes()"
+          type="button"
+        >
+          <app-chat-icon name="document" width="18" height="18"></app-chat-icon>
+          <span>Release Notes</span>
+        </button> -->
+      </div>
+    </div>
+  }
+
+  <button
+    class="help-fab-trigger-btn"
+    [class.is-active]="isMenuOpen"
+    (click)="toggleMenu(); $event.stopPropagation()"
+    title="Help &amp; Support"
+    aria-label="Help &amp; Support"
+    type="button"
+  >
+    <app-chat-icon name="help-circle" width="24" height="24"></app-chat-icon>
+  </button>
+</div>
+
+<!-- Help Center Modal -->
+@if (showHelpCenterModal) {
+  <div class="help-modal-overlay full-screen-overlay">
+    <div class="help-modal-content full-screen-content">
+      <!-- Top header with Back button -->
+      <div class="help-top-header">
+        <button class="back-chatbot-btn" (click)="closeHelpCenter()">
+          <app-chat-icon
+            name="arrow-left"
+            width="16"
+            height="16"
+          ></app-chat-icon>
+          Back to Chatbot
+        </button>
+      </div>
+
+      <div class="help-page-container">
+        <!-- Hero Banner Section -->
+        <div class="help-hero-banner">
+          <div class="hero-left">
+            <h1>How can we help you?</h1>
+            <p>
+              Browse comprehensive documentation, detailed user guides,
+              step-by-step tutorials, best practices, FAQs, and support
+              resources designed to help you unlock the full potential of KAI.
+            </p>
+          </div>
+          <div class="hero-right">
+            <img src="./Group.png" alt="KAI" width="28" height="28" />
+          </div>
+        </div>
+
+        <!-- Quick Find Answers Section -->
+        <div class="help-section">
+          <h3>Quick find Answers</h3>
+          <div class="guide-grid-new">
+            <!-- 1. Search History -->
+            <div class="guide-card-new">
+              <div class="card-icon-wrap">
+                <app-chat-icon
+                  name="search"
+                  width="20"
+                  height="20"
+                ></app-chat-icon>
+              </div>
+              <h4>Search History</h4>
+              <p>
+                Quickly find past conversations using the search feature in the
+                sidebar.
+              </p>
+            </div>
+
+            <!-- 2. Pin and Manage -->
+            <div class="guide-card-new">
+              <div class="card-icon-wrap">
+                <app-chat-icon
+                  name="pin"
+                  width="20"
+                  height="20"
+                ></app-chat-icon>
+              </div>
+              <h4>Pin and Manage</h4>
+              <p>
+                Pin important chats to the top or delete old ones using the chat
+                options menu.
+              </p>
+            </div>
+
+            <!-- 3. Analyze Files -->
+            <div class="guide-card-new">
+              <div class="card-icon-wrap">
+                <app-chat-icon
+                  name="file-text"
+                  width="20"
+                  height="20"
+                ></app-chat-icon>
+              </div>
+              <h4>Analyze Files</h4>
+              <p>
+                Upload PDF, Excel, or Word files to ask specific questions about
+                your documents.
+              </p>
+            </div>
+
+            <!-- 4. Voice Search -->
+            <div class="guide-card-new">
+              <div class="card-icon-wrap">
+                <app-chat-icon
+                  name="mic"
+                  width="20"
+                  height="20"
+                ></app-chat-icon>
+              </div>
+              <h4>Voice Search</h4>
+              <p>
+                Click the microphone to speak your query naturally instead of
+                typing.
+              </p>
+            </div>
+
+            <!-- 5. Image Generation -->
+            <div class="guide-card-new">
+              <div class="card-icon-wrap">
+                <app-chat-icon
+                  name="image-placeholder"
+                  width="20"
+                  height="20"
+                ></app-chat-icon>
+              </div>
+              <h4>Image Generation</h4>
+              <p>
+                Transform simple text prompts into stunning, high-quality images
+                with creativity and ease.
+              </p>
+              <span class="warning-subtext">Reaches token limit faster</span>
+            </div>
+
+            <!-- 6. User Manual -->
+            <div
+              class="guide-card-new manual-clickable"
+              (click)="openUserManual()"
+            >
+              <div class="card-icon-wrap">
+                <app-chat-icon
+                  name="external-link"
+                  width="20"
+                  height="20"
+                ></app-chat-icon>
+              </div>
+              <h4>User Manual</h4>
+              <p>
+                Access detailed documentation and step-by-step guides for every
+                KAI feature.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Supported AI Models Section -->
+        <div class="help-section">
+          <h3>Supported AI Models, ready for every need</h3>
+          <div class="model-grid-new">
+            @for (model of models; track model.value) {
+              <div class="model-card-new" [class.is-default]="model.isDefault">
+                <div class="model-card-header">
+                  <div class="model-logo-wrap">
+                    @if (
+                      model.value.toLowerCase().includes("gpt") ||
+                      model.value.toLowerCase().includes("4o")
+                    ) {
+                      <app-chat-icon
+                        name="openai"
+                        width="20"
+                        height="20"
+                      ></app-chat-icon>
+                    } @else {
+                      <app-chat-icon
+                        name="claude"
+                        width="20"
+                        height="20"
+                      ></app-chat-icon>
+                    }
+                  </div>
+                  <h4>{{ model.label }}</h4>
+                </div>
+                <p>{{ getModelSummary(model.value) }}</p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Troubleshooting Section -->
+        <div class="help-section">
+          <h3>Troubleshooting</h3>
+          <div class="troubleshoot-grid-new">
+            <div class="troubleshoot-card-new">
+              <h5>Unable to log in?</h5>
+              <p>Check your network or SSO access.</p>
+            </div>
+            <div class="troubleshoot-card-new">
+              <h5>Slow response?</h5>
+              <p>Refresh the page or try again later.</p>
+            </div>
+            <div class="troubleshoot-card-new">
+              <h5>Incorrect response?</h5>
+              <p>Rephrase your query more clearly.</p>
+            </div>
+            <div class="troubleshoot-card-new">
+              <h5>Application not loading?</h5>
+              <p>Clear cache or try another browser.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support Section Footer Banner -->
+        <div class="support-footer-banner-new">
+          <div class="banner-left">
+            <div class="headset-icon-wrap">
+              <app-chat-icon
+                name="headset"
+                width="50"
+                height="50"
+              ></app-chat-icon>
+            </div>
+            <div class="banner-text">
+              <h4>Reach Out to the KAI Team</h4>
+              <p>
+                Connect with our support team for guidance, troubleshooting,
+                personalized assistance, quick resolutions, and expert support.
+              </p>
+              <div class="banner-actions">
+                <button
+                  class="support-action-btn teams-btn"
+                  (click)="contactTeams()"
+                >
+                  <img
+                    src="./teams_logo.png"
+                    alt="Teams"
+                    width="16"
+                    height="16"
+                    class="btn-icon"
+                  />
+                  Teams Chat
+                </button>
+                <button
+                  class="support-action-btn outlook-btn"
+                  (click)="contactOutlook()"
+                >
+                  <img
+                    src="./outlook_logo.png"
+                    alt="Outlook"
+                    width="16"
+                    height="16"
+                    class="btn-icon"
+                  />
+                  Outlook
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="banner-right">
+            <!-- Animated Envelope Illustration -->
+            <img
+              src="./help_page_contact.png"
+              alt="KAI"
+              width="28"
+              height="28"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Privacy Policy Modal -->
+@if (showPrivacyPolicyModal) {
+  <div class="help-modal-overlay full-screen-overlay">
+    <div class="help-modal-content full-screen-content privacy-full-screen">
+      <app-privacy-policy
+        [isModal]="true"
+        (closeEvt)="closePrivacyPolicy()"
+      ></app-privacy-policy>
+    </div>
+  </div>
+}
+
+<!-- Release Notes Modal -->
+@if (showReleaseNotesModal) {
+  <div class="help-modal-overlay" (click)="closeReleaseNotes()">
+    <div class="help-modal-content" (click)="$event.stopPropagation()">
+      <div class="help-modal-header">
+        <h2>Release Notes</h2>
+        <button class="close-btn" (click)="closeReleaseNotes()">
+          <app-chat-icon name="close" width="20" height="20"></app-chat-icon>
+        </button>
+      </div>
+      <div class="help-modal-body release-notes-body">
+        @for (note of releaseNotes; track note.version) {
+          <div class="release-note-item">
+            <div class="version-header">
+              <h3>Version {{ note.version }}</h3>
+              <span class="release-date">{{ note.date }}</span>
+            </div>
+            <ul class="release-changes">
+              @for (change of note.changes; track change) {
+                <li>{{ change }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Bug Report Modal -->
+@if (showBugReportModal && !isBugReportMinimized) {
+  <div class="help-modal-overlay" (click)="minimizeBugReport()">
+    <div class="help-modal-content" (click)="$event.stopPropagation()">
+      <div class="help-modal-header">
+        <div class="modal-title-group">
+          <h2>{{ isFeatureRequest ? 'Feature Request' : 'Submit a Bug Report' }}</h2>
+          @if (isFeatureRequest) {
+            <p class="modal-subtitle">Share your ideas to improve KAI</p>
+          }
+        </div>
+        <div class="header-actions">
+          <button
+            class="minimize-btn"
+            (click)="minimizeBugReport()"
+            [title]="isFeatureRequest ? 'Minimize feature request' : 'Minimize'"
+            [attr.aria-label]="isFeatureRequest ? 'Minimize feature request' : 'Minimize bug report'"
+          >
+            <app-chat-icon name="minus" width="20" height="20"></app-chat-icon>
+          </button>
+          <button
+            class="close-btn"
+            (click)="closeBugReport()"
+            [title]="isFeatureRequest ? 'Close feature request' : 'Close'"
+            [attr.aria-label]="isFeatureRequest ? 'Close feature request' : 'Close bug report'"
+          >
+            <app-chat-icon name="close" width="20" height="20"></app-chat-icon>
+          </button>
+        </div>
+      </div>
+      <div class="help-modal-body">
+        @if (!isBugSubmitted) {
+          <form
+            [formGroup]="bugReportForm"
+            (ngSubmit)="submitBug()"
+            class="bug-form"
+          >
+            <div class="form-group">
+              <label for="bug_name">{{ isFeatureRequest ? 'Title / Summary' : "What's the issue?" }}</label>
+              <input
+                type="text"
+                id="bug_name"
+                formControlName="bug_name"
+                [placeholder]="isFeatureRequest ? 'Brief summary of your idea' : 'Brief summary of the bug'"
+                [class.error]="
+                  bugReportForm.get('bug_name')?.touched &&
+                  bugReportForm.get('bug_name')?.invalid
+                "
+              />
+              @if (
+                bugReportForm.get("bug_name")?.touched &&
+                bugReportForm.get("bug_name")?.errors?.["required"]
+              ) {
+                <span class="error-text">{{ isFeatureRequest ? 'Summary is required' : 'Bug summary is required' }}</span>
+              } @else if (
+                bugReportForm.get("bug_name")?.touched &&
+                bugReportForm.get("bug_name")?.errors?.["minlength"]
+              ) {
+                <span class="error-text">Minimum 5 characters required</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea
+                id="description"
+                formControlName="description"
+                rows="4"
+                [placeholder]="isFeatureRequest ? 'Describe the feature request or suggestion...' : 'Describe the issue and steps to reproduce...'"
+                [class.error]="
+                  bugReportForm.get('description')?.touched &&
+                  bugReportForm.get('description')?.invalid
+                "
+              ></textarea>
+              @if (
+                bugReportForm.get("description")?.touched &&
+                bugReportForm.get("description")?.errors?.["required"]
+              ) {
+                <span class="error-text">Description is required</span>
+              } @else if (
+                bugReportForm.get("description")?.touched &&
+                bugReportForm.get("description")?.errors?.["minlength"]
+              ) {
+                <span class="error-text">Minimum 30 characters required</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label>{{ isFeatureRequest ? 'Attachments' : 'Screenshot' }} <span class="optional">(Optional)</span></label>
+              <div
+                class="screenshot-upload"
+                [class.is-drag-over]="isScreenshotDragOver"
+                (dragenter)="onScreenshotDragEnter($event)"
+                (dragover)="onScreenshotDragOver($event)"
+                (dragleave)="onScreenshotDragLeave($event)"
+                (drop)="onScreenshotDrop($event)"
+              >
+                @if (relatedFiles.length > 0) {
+                  <div class="preview-grid">
+                    @for (entry of relatedFiles; track entry.id) {
+                      <div class="preview-container">
+                        @if (entry.preview) {
+                          <img [src]="entry.preview" [alt]="entry.file.name" />
+                        } @else {
+                          <div
+                            class="preview-loading"
+                            aria-label="Loading preview"
+                          >
+                            <span class="preview-loading-spinner"></span>
+                          </div>
+                        }
+                        <button
+                          type="button"
+                          class="remove-btn"
+                          (click)="removeRelatedFile($index, $event)"
+                          title="Remove file"
+                        >
+                          <app-chat-icon
+                            name="close"
+                            width="14"
+                            height="14"
+                          ></app-chat-icon>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+                @if (relatedFiles.length < maxAttachmentCount) {
+                  <button
+                    type="button"
+                    class="upload-placeholder"
+                    (click)="openScreenshotFilePicker($event)"
+                  >
+                    <div class="upload-circle-icon">
+                      <app-chat-icon
+                        name="upload"
+                        width="20"
+                        height="20"
+                      ></app-chat-icon>
+                    </div>
+                    <span class="upload-title">Click to upload images</span>
+                    <span class="upload-hint">
+                      Up to {{ maxAttachmentCount }} images, max 3MB each ({{
+                        relatedFiles.length
+                      }}/{{ maxAttachmentCount }})
+                    </span>
+                  </button>
+                }
+
+                <input
+                  type="file"
+                  #screenshotFileInput
+                  multiple
+                  (change)="onFilesSelected($event)"
+                  accept="image/*"
+                  style="display: none"
+                />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-secondary"
+                (click)="closeBugReport()"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="btn-primary-action"
+                [disabled]="isSubmittingBug"
+              >
+                @if (isSubmittingBug) {
+                  <span class="spinner"></span>
+                  Submitting...
+                } @else {
+                  {{ isFeatureRequest ? 'Submit Feature Request' : 'Submit Bug' }}
+                }
+              </button>
+            </div>
+          </form>
+        } @else {
+          <div class="bug-success-view">
+            <div class="success-icon-container">
+              <app-chat-icon
+                name="check-circle-outline"
+                width="48"
+                height="48"
+                class="success-icon"
+              ></app-chat-icon>
+            </div>
+            <h3 class="success-title">
+              {{
+                bugSubmissionResponse?.message ||
+                  (isFeatureRequest ? "Feature request created successfully" : "Bug report created successfully")
+              }}
+            </h3>
+            <p class="success-desc">
+              {{ isFeatureRequest ? "Your feedback has been logged. Our technical team will review it shortly." : "Your issue has been logged. Our technical team will review it shortly." }}
+            </p>
+
+            <div class="ticket-card">
+              <div class="ticket-label">TICKET NUMBER -</div>
+              <div class="ticket-value-group">
+                <span class="ticket-number">{{
+                  bugSubmissionResponse?.ticket_number
+                }}</span>
+                <button
+                  class="copy-ticket-btn"
+                  (click)="copyTicketNumber()"
+                  title="Copy ticket number"
+                >
+                  <app-chat-icon
+                    name="copy-ticket"
+                    width="18"
+                    height="18"
+                  ></app-chat-icon>
+                  <span>Copy</span>
+                </button>
+              </div>
+            </div>
+
+            <button class="success-actions" (click)="closeBugReport()">
+              Done
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Minimized Bug Report Bar -->
+@if (showBugReportModal && isBugReportMinimized) {
+  <div class="bug-report-minimized" (click)="restoreBugReport()">
+    <span class="minimized-icon">
+      <app-chat-icon [name]="isFeatureRequest ? 'sparkle' : 'bug'" width="18" height="18"></app-chat-icon>
+    </span>
+    <span class="minimized-title">{{ isFeatureRequest ? 'Feature Request' : 'Submit a Bug Report' }}</span>
+    <button
+      class="minimized-restore"
+      (click)="restoreBugReport()"
+      [title]="isFeatureRequest ? 'Restore feature request' : 'Restore'"
+      [attr.aria-label]="isFeatureRequest ? 'Restore feature request' : 'Restore bug report'"
+    >
+      <app-chat-icon name="chevron-up" width="16" height="16"></app-chat-icon>
+    </button>
+    <button
+      class="minimized-close"
+      (click)="closeBugReport(); $event.stopPropagation()"
+      [title]="isFeatureRequest ? 'Close feature request' : 'Close'"
+      [attr.aria-label]="isFeatureRequest ? 'Close feature request' : 'Close bug report'"
+    >
+      <app-chat-icon name="close" width="16" height="16"></app-chat-icon>
+    </button>
+  </div>
+}

@@ -1,0 +1,1215 @@
+@switch (name) {
+  @case ("sidebar-toggle") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 21 21"
+      fill="none"
+    >
+      <path
+        d="M16.4432 2.59631H4.32782C3.37194 2.59631 2.59705 3.37121 2.59705 4.32708V16.4425C2.59705 17.3983 3.37194 18.1732 4.32782 18.1732H16.4432C17.3991 18.1732 18.174 17.3983 18.174 16.4425V4.32708C18.174 3.37121 17.3991 2.59631 16.4432 2.59631Z"
+        stroke="currentColor"
+        stroke-width="1.15385"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M12.9817 2.59631V18.1732"
+        stroke="currentColor"
+        stroke-width="1.15385"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M8.65475 12.9809L6.05859 10.3847L8.65475 7.78857"
+        stroke="currentColor"
+        stroke-width="1.15385"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("close") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  }
+  @case ("checklist") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <polyline points="9 11 12 14 22 4"></polyline>
+      <path
+        d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+      ></path>
+    </svg>
+  }
+  @case ("new-chat") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 18 18"
+      fill="none"
+    >
+      <path
+        d="M12.6465 3.36544L13.9117 2.09944C14.1755 1.83568 14.5332 1.6875 14.9062 1.6875C15.2793 1.6875 15.637 1.83568 15.9008 2.09944C16.1645 2.36319 16.3127 2.72093 16.3127 3.09394C16.3127 3.46695 16.1645 3.82468 15.9008 4.08844L7.9365 12.0527C7.53999 12.449 7.05102 12.7402 6.51375 12.9002L4.5 13.5002L5.1 11.4864C5.25996 10.9492 5.55123 10.4602 5.9475 10.0637L12.6465 3.36544ZM12.6465 3.36544L14.625 5.34394M13.5 10.5002V14.0627C13.5 14.5102 13.3222 14.9395 13.0057 15.2559C12.6893 15.5724 12.2601 15.7502 11.8125 15.7502H3.9375C3.48995 15.7502 3.06072 15.5724 2.74426 15.2559C2.42779 14.9395 2.25 14.5102 2.25 14.0627V6.18769C2.25 5.74013 2.42779 5.31091 2.74426 4.99444C3.06072 4.67798 3.48995 4.50019 3.9375 4.50019H7.5"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("search") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 20 20"
+      fill="none"
+    >
+      <path
+        d="M9.16667 15.8333C12.8486 15.8333 15.8333 12.8486 15.8333 9.16667C15.8333 5.48477 12.8486 2.5 9.16667 2.5C5.48477 2.5 2.5 5.48477 2.5 9.16667C2.5 12.8486 5.48477 15.8333 9.16667 15.8333Z"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M17.4998 17.5003L13.9165 13.917"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("folder") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
+    </svg>
+  }
+  @case ("folder-plus") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
+      <line x1="12" y1="10" x2="12" y2="16"></line>
+      <line x1="9" y1="13" x2="15" y2="13"></line>
+    </svg>
+  }
+  @case ("chatbot") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 20 20"
+      fill="none"
+    >
+      <path
+        d="M6.5 15.5H5c-1.3807 0-2.5-1.1193-2.5-2.5V7c0-1.38071 1.1193-2.5 2.5-2.5h10c1.3807 0 2.5 1.11929 2.5 2.5v4c0 1.3807-1.1193 2.5-2.5 2.5H9L6.5 17v-1.5Z"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("product") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <polygon points="12 2 22 7 22 17 12 22 2 17 2 7 12 2"></polygon>
+      <polyline points="2 7 12 12 22 7"></polyline>
+      <line x1="12" y1="12" x2="12" y2="22"></line>
+    </svg>
+  }
+  @case ("hr-portal") {
+    <svg
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g clip-path="url(#clip0_sidenav_hr)">
+        <path
+          d="M6.66667 12.5H5.83333C4.94928 12.5 4.10143 12.8512 3.47631 13.4763C2.85119 14.1014 2.5 14.9493 2.5 15.8333V17.5"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M8.33333 9.16667C10.1743 9.16667 11.6667 7.67428 11.6667 5.83333C11.6667 3.99238 10.1743 2.5 8.33333 2.5C6.49238 2.5 5 3.99238 5 5.83333C5 7.67428 6.49238 9.16667 8.33333 9.16667Z"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M8.18793 18V12.8842H8.88899V15.0379H11.5037V12.8842H12.2048V18H11.5037V15.6568H8.88899V18H8.18793ZM13.5835 18V12.8842H15.7688C16.0803 12.8842 16.3519 12.9389 16.5835 13.0484C16.8193 13.1579 17.0024 13.3179 17.133 13.5284C17.2677 13.7347 17.3351 13.9874 17.3351 14.2863C17.3351 14.5137 17.2867 14.7221 17.1898 14.9116C17.093 15.0968 16.9372 15.2463 16.7224 15.36V15.3853C16.9203 15.3853 17.0719 15.44 17.1772 15.5495C17.2824 15.6547 17.3351 15.8063 17.3351 16.0042V18H16.6403V15.9032H14.2845V18H13.5835ZM14.2845 15.3032H15.6993C15.9814 15.3032 16.2088 15.2253 16.3814 15.0695C16.5582 14.9095 16.6467 14.6863 16.6467 14.4C16.6467 14.1095 16.5582 13.8863 16.3814 13.7305C16.2088 13.5747 15.9814 13.4968 15.6993 13.4968H14.2845V15.3032Z"
+          fill="currentColor"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_sidenav_hr">
+          <rect width="20" height="20" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  }
+  @case ("chevron-right") {
+    <svg
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M6 12L10 8L6 4"
+        stroke="currentColor"
+        stroke-width="1.33333"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("resume-standardizer") {
+    <svg
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M11.6667 1.66667H5.00001C4.55798 1.66667 4.13406 1.84226 3.82149 2.15483C3.50893 2.46739 3.33334 2.89131 3.33334 3.33334V16.6667C3.33334 17.1087 3.50893 17.5326 3.82149 17.8452C4.13406 18.1577 4.55798 18.3333 5.00001 18.3333H15C15.442 18.3333 15.866 18.1577 16.1785 17.8452C16.4911 17.5326 16.6667 17.1087 16.6667 16.6667V6.66667L11.6667 1.66667Z"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M11.6667 1.66667V6.66667H16.6667"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M13.3333 10.8333H6.66667"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M13.3333 14.1667H6.66667"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M8.33334 7.50001H6.66667"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("visa-process") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+    >
+      <path
+        d="M4.5 16.5C4.10218 16.5 3.72064 16.342 3.43934 16.0607C3.15804 15.7794 3 15.3978 3 15V3C3 2.60218 3.15804 2.22065 3.43934 1.93934C3.72064 1.65804 4.10218 1.5 4.5 1.5H10.5C10.7374 1.49962 10.9726 1.5462 11.1919 1.63708C11.4112 1.72795 11.6104 1.86132 11.778 2.0295L14.469 4.7205C14.6376 4.88813 14.7714 5.08751 14.8625 5.30712C14.9537 5.52674 15.0004 5.76223 15 6V15C15 15.3978 14.842 15.7794 14.5607 16.0607C14.2794 16.342 13.8978 16.5 13.5 16.5H4.5Z"
+        stroke="#292929"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M10.5 1.5V5.25C10.5 5.44891 10.579 5.63968 10.7197 5.78033C10.8603 5.92098 11.0511 6 11.25 6H15"
+        stroke="#292929"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M11.1136 9L8.11364 12L6.75 10.6364"
+        stroke="#292929"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("history") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+    >
+      <path
+        d="M2.25 9C2.25 10.335 2.64588 11.6401 3.38758 12.7501C4.12928 13.8601 5.18349 14.7253 6.41689 15.2362C7.65029 15.7471 9.00749 15.8808 10.3169 15.6203C11.6262 15.3599 12.829 14.717 13.773 13.773C14.717 12.829 15.3599 11.6262 15.6203 10.3169C15.8808 9.00749 15.7471 7.65029 15.2362 6.41689C14.7253 5.18349 13.8601 4.12928 12.7501 3.38758C11.6401 2.64588 10.335 2.25 9 2.25C7.11296 2.2571 5.30173 2.99342 3.945 4.305L2.25 6"
+        stroke="#292929"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M2.25 2.25V6H6"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M9 5.25V9L12 10.5"
+        stroke="#292929"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("admin") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 20 20"
+      fill="none"
+    >
+      <path
+        d="M13.3759 10.5135C13.4309 10.3446 13.5385 10.1978 13.6829 10.0943C13.8273 9.99089 14.001 9.93631 14.1786 9.93854C14.3563 9.94078 14.5285 9.99971 14.6703 10.1067C14.812 10.2138 14.9159 10.3633 14.9667 10.5335L15.5809 11.7435C15.6406 11.8611 15.7275 11.9629 15.8342 12.0404C15.941 12.1179 16.0647 12.169 16.195 12.1894L17.5567 12.4027C17.732 12.4034 17.9027 12.4593 18.0444 12.5626C18.1861 12.6659 18.2915 12.8113 18.3458 12.978C18.4001 13.1448 18.4004 13.3244 18.3467 13.4913C18.293 13.6582 18.188 13.8039 18.0467 13.9077L17.07 14.881C16.9765 14.9741 16.9065 15.0881 16.8656 15.2135C16.8247 15.339 16.8143 15.4724 16.835 15.6027L17.0509 16.9469C17.1102 17.1153 17.1139 17.2984 17.0613 17.4691C17.0087 17.6399 16.9027 17.7892 16.7588 17.895C16.615 18.0009 16.4409 18.0578 16.2622 18.0572C16.0836 18.0566 15.9099 17.9987 15.7667 17.8919L14.5459 17.2669C14.4283 17.2066 14.298 17.1752 14.1659 17.1752C14.0337 17.1752 13.9035 17.2066 13.7859 17.2669L12.565 17.8919C12.4218 17.9978 12.2485 18.055 12.0704 18.0552C11.8923 18.0554 11.7188 17.9986 11.5754 17.893C11.432 17.7874 11.3262 17.6386 11.2735 17.4685C11.2207 17.2984 11.2239 17.1159 11.2825 16.9477L11.4975 15.6035C11.5183 15.4732 11.5078 15.3398 11.467 15.2144C11.4261 15.0889 11.356 14.975 11.2625 14.8819L10.2992 13.921C10.1531 13.8198 10.0432 13.6745 9.98549 13.5063C9.92783 13.3382 9.92545 13.156 9.97869 12.9864C10.0319 12.8168 10.138 12.6687 10.2814 12.5637C10.4249 12.4586 10.5981 12.4022 10.7759 12.4027L12.1367 12.1894C12.2671 12.169 12.3907 12.1179 12.4975 12.0404C12.6042 11.9629 12.6911 11.8611 12.7509 11.7435L13.3759 10.5135Z"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M6.66667 12.5H5.83333C4.94928 12.5 4.10143 12.8512 3.47631 13.4763C2.85119 14.1014 2.5 14.9493 2.5 15.8333V17.5"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M8.33333 9.16667C10.1743 9.16667 11.6667 7.67428 11.6667 5.83333C11.6667 3.99238 10.1743 2.5 8.33333 2.5C6.49238 2.5 5 3.99238 5 5.83333C5 7.67428 6.49238 9.16667 8.33333 9.16667Z"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("hr-admin-control") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+    >
+      <path
+        d="M7.5 11.25H4.5C3.70435 11.25 2.94129 11.5661 2.37868 12.1287C1.81607 12.6913 1.5 13.4544 1.5 14.25V15.75"
+        stroke="#292929"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M16.5 13.125C16.5 14.9993 15.1875 15.9368 13.6275 16.4805C13.5458 16.5082 13.4571 16.5069 13.3762 16.4768C11.8125 15.9368 10.5 14.9993 10.5 13.1243V10.5C10.5002 10.4007 10.5398 10.3055 10.6101 10.2354C10.6804 10.1652 10.7757 10.1258 10.875 10.1258C11.625 10.1258 12.5625 9.67579 13.215 9.10579C13.2953 9.03988 13.396 9.0038 13.4999 9.00366C13.6038 9.00353 13.7045 9.03935 13.785 9.10504C14.4412 9.67879 15.375 10.125 16.125 10.125C16.2245 10.125 16.3198 10.1646 16.3902 10.2349C16.4605 10.3052 16.5 10.4006 16.5 10.5V13.125Z"
+        stroke="#292929"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M6.75 8.25C8.40685 8.25 9.75 6.90685 9.75 5.25C9.75 3.59315 8.40685 2.25 6.75 2.25C5.09315 2.25 3.75 3.59315 3.75 5.25C3.75 6.90685 5.09315 8.25 6.75 8.25Z"
+        stroke="#292929"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("analytics") {
+    <svg
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M2.5 2.5V15.8333C2.5 16.2754 2.67559 16.6993 2.98816 17.0118C3.30072 17.3244 3.72464 17.5 4.16667 17.5H17.5"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M15.8335 7.5L11.6668 11.6667L8.3335 8.33333L5.8335 10.8333"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("service-user") {
+    <svg
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M14.9844 15.6042C14.4022 14.8332 13.6488 14.208 12.7838 13.7778C11.9187 13.3476 10.9656 13.1241 9.99944 13.125C9.03331 13.1241 8.08018 13.3476 7.21512 13.7778C6.35007 14.208 5.59672 14.8332 5.01444 15.6042M14.9844 15.6042C16.1207 14.5935 16.922 13.2613 17.2838 11.7842C17.6455 10.3072 17.5497 8.75507 17.009 7.33373C16.4683 5.91239 15.5084 4.68898 14.2564 3.82575C13.0045 2.96251 11.5197 2.50024 9.99902 2.50024C8.47833 2.50024 6.99355 2.96251 5.74161 3.82575C4.48967 4.68898 3.52972 5.91239 2.98905 7.33373C2.44839 8.75507 2.35257 10.3072 2.71429 11.7842C3.07601 13.2613 3.87819 14.5935 5.01444 15.6042M14.9844 15.6042C13.6128 16.8276 11.8375 17.5026 9.99944 17.5C8.16113 17.5028 6.3863 16.8278 5.01444 15.6042M12.4994 8.125C12.4994 8.78804 12.236 9.42393 11.7672 9.89277C11.2984 10.3616 10.6625 10.625 9.99944 10.625C9.3364 10.625 8.70052 10.3616 8.23167 9.89277C7.76283 9.42393 7.49944 8.78804 7.49944 8.125C7.49944 7.46196 7.76283 6.82607 8.23167 6.35723C8.70052 5.88839 9.3364 5.625 9.99944 5.625C10.6625 5.625 11.2984 5.88839 11.7672 6.35723C12.236 6.82607 12.4994 7.46196 12.4994 8.125Z"
+        stroke="currentColor"
+        stroke-width="0.833333"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("bug") {
+    <svg
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M10 16.6667V9.16666"
+        stroke="currentColor"
+        stroke-width="0.83"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M11.6667 5.83334C12.5507 5.83334 13.3986 6.18453 14.0237 6.80965C14.6488 7.43478 15 8.28262 15 9.16668V11.6667C15 12.9928 14.4732 14.2645 13.5355 15.2022C12.5979 16.1399 11.3261 16.6667 10 16.6667C8.67392 16.6667 7.40215 16.1399 6.46447 15.2022C5.52678 14.2645 5 12.9928 5 11.6667V9.16668C5 8.28262 5.35119 7.43478 5.97631 6.80965C6.60143 6.18453 7.44928 5.83334 8.33333 5.83334H11.6667Z"
+        stroke="currentColor"
+        stroke-width="0.83"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M11.7668 3.23332L13.3334 1.66666"
+        stroke="currentColor"
+        stroke-width="0.83"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M17.5004 17.5C17.5013 16.6427 17.1719 15.818 16.5807 15.1973C15.9894 14.5765 15.1817 14.2074 14.3254 14.1667"
+        stroke="currentColor"
+        stroke-width="0.83"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M17.5002 4.16666C17.4992 4.98512 17.1972 5.77462 16.6516 6.38473C16.1061 6.99485 15.3551 7.38291 14.5418 7.47499"
+        stroke="currentColor"
+        stroke-width="0.83"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M18.3333 10.8333H15"
+        stroke="currentColor"
+        stroke-width="0.83"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M2.5 17.5C2.49903 16.6427 2.82841 15.818 3.41968 15.1973C4.01096 14.5765 4.81868 14.2074 5.675 14.1667"
+        stroke="currentColor"
+        stroke-width="0.83"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M2.5 4.16666C2.50094 4.98512 2.80297 5.77462 3.34854 6.38473C3.8941 6.99485 4.64507 7.38291 5.45833 7.47499"
+        stroke="currentColor"
+        stroke-width="0.83"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M5 10.8333H1.66666"
+        stroke="currentColor"
+        stroke-width="0.83"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M6.66666 1.66666L8.23333 3.23332"
+        stroke="currentColor"
+        stroke-width="0.83"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M7.5 5.94167V5C7.5 4.33696 7.76339 3.70107 8.23223 3.23223C8.70107 2.76339 9.33696 2.5 10 2.5C10.663 2.5 11.2989 2.76339 11.7678 3.23223C12.2366 3.70107 12.5 4.33696 12.5 5V5.94167"
+        stroke="currentColor"
+        stroke-width="0.83"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("chevron-down") {
+    <svg
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  }
+  @case ("pin") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <g opacity="0.5">
+        <path
+          d="M8 11.333V14.6663"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M5.99992 7.17301C5.99979 7.42106 5.93046 7.66416 5.79973 7.87498C5.669 8.08579 5.48206 8.25596 5.25992 8.36634L4.07325 8.96634C3.85111 9.07673 3.66417 9.24689 3.53344 9.4577C3.40271 9.66852 3.33338 9.91162 3.33325 10.1597V10.6663C3.33325 10.8432 3.40349 11.0127 3.52851 11.1377C3.65354 11.2628 3.82311 11.333 3.99992 11.333H11.9999C12.1767 11.333 12.3463 11.2628 12.4713 11.1377C12.5963 11.0127 12.6666 10.8432 12.6666 10.6663V10.1597C12.6665 9.91162 12.5971 9.66852 12.4664 9.4577C12.3357 9.24689 12.1487 9.07673 11.9266 8.96634L10.7399 8.36634C10.5178 8.25596 10.3308 8.08579 10.2001 7.87498C10.0694 7.66416 10 7.42106 9.99992 7.17301V4.66634C9.99992 4.48953 10.0702 4.31996 10.1952 4.19494C10.3202 4.06991 10.4898 3.99967 10.6666 3.99967C11.0202 3.99967 11.3593 3.8592 11.6094 3.60915C11.8594 3.3591 11.9999 3.01996 11.9999 2.66664C11.9999 2.31272 11.8594 1.97358 11.6094 1.72353C11.3593 1.47348 11.0202 1.33301 10.6666 1.33301L5.33325 1.33301C4.97963 1.33301 4.64049 1.47348 4.39044 1.72353C4.14039 1.97358 3.99992 2.31272 3.99992 2.66664C3.99992 3.01996 4.14039 3.3591 4.39044 3.60915C4.64049 3.8592 4.97963 3.99967 5.33325 3.99967C5.51006 3.99967 5.67963 4.06991 5.80466 4.19494C5.92968 4.31996 5.99992 4.48953 5.99992 4.66664V7.17301Z"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </g>
+    </svg>
+  }
+  @case ("more-horizontal") {
+    <svg
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="1"></circle>
+      <circle cx="19" cy="12" r="1"></circle>
+      <circle cx="5" cy="12" r="1"></circle>
+    </svg>
+  }
+  @case ("copy-link") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path
+        d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+      ></path>
+      <path
+        d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+      ></path>
+    </svg>
+  }
+  @case ("share-teams") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path
+        d="M12.22 8a2.5 2.5 0 1 1-2.5 2.5A2.5 2.5 0 0 1 12.22 8m7.5 1a2 2 0 1 1-2 2 2 2 0 0 1 2-2M12.22 14c-2.33 0-7 1.17-7 3.5V19h14v-1.5c0-2.33-4.67-3.5-7-3.5m7.5 1c-.83 0-2.38.33-2.92.83-.43.37-.62.83-.62 1.34V19H22v-1.5c0-2.33-4.67-3.5-7-3.5z"
+      />
+    </svg>
+  }
+  @case ("share-outlook") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path
+        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+      ></path>
+      <polyline points="22,6 12,13 2,6"></polyline>
+    </svg>
+  }
+  @case ("chat-bubble") {
+    <svg
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M20 14.5c0 1.38-1.12 2.5-2.5 2.5H9l-4.5 3v-3H6.5C5.12 17 4 15.88 4 14.5V7.5C4 6.12 5.12 5 6.5 5h11C18.88 5 20 6.12 20 7.5v7z"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("question-circle") {
+    <svg
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+      <path
+        d="M9.5 9.5a2.5 2.5 0 0 1 4.87.8c0 1.67-2.5 2.5-2.5 2.5"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <circle cx="12" cy="16.5" r="0.8" fill="currentColor" />
+    </svg>
+  }
+  @case ("check") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="3.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  }
+  @case ("check-white") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="white"
+      stroke-width="3.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  }
+  @case ("share") {
+    <svg
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+      <polyline points="16 6 12 2 8 6"></polyline>
+      <line x1="12" y1="2" x2="12" y2="15"></line>
+    </svg>
+  }
+  @case ("unpin") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <path
+        d="M8 11.3333V14.6666"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M9.99977 6.22665V4.66665C9.99977 4.48984 10.07 4.32027 10.195 4.19524C10.3201 4.07022 10.4896 3.99998 10.6664 3.99998C11.0201 3.99998 11.3592 3.8595 11.6092 3.60946C11.8593 3.35941 11.9998 3.02027 11.9998 2.66665C11.9998 2.31302 11.8593 1.97389 11.6092 1.72384C11.3592 1.47379 11.0201 1.33331 10.6664 1.33331H5.25977"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M1.33301 1.33331L14.6663 14.6666"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M5.99967 6V7.17333C5.99954 7.42139 5.93022 7.66449 5.79949 7.8753C5.66876 8.08612 5.48182 8.25628 5.25967 8.36667L4.07301 8.96667C3.85087 9.07705 3.66392 9.24722 3.53319 9.45803C3.40247 9.66884 3.33314 9.91194 3.33301 10.16V10.6667C3.33301 10.8435 3.40325 11.013 3.52827 11.1381C3.65329 11.2631 3.82286 11.3333 3.99967 11.3333H11.333"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("pin-chat") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <path
+        d="M8 11.3333V14.6666"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M5.99967 7.17331C5.99954 7.42137 5.93022 7.66447 5.79949 7.87528C5.66876 8.0861 5.48182 8.25626 5.25967 8.36665L4.07301 8.96665C3.85087 9.07703 3.66392 9.2472 3.53319 9.45801C3.40247 9.66882 3.33314 9.91192 3.33301 10.16V10.6666C3.33301 10.8435 3.40325 11.013 3.52827 11.1381C3.65329 11.2631 3.82286 11.3333 3.99967 11.3333H11.9997C12.1765 11.3333 12.3461 11.2631 12.4711 11.1381C12.5961 11.013 12.6663 10.8435 12.6663 10.6666V10.16C12.6662 9.91192 12.5969 9.66882 12.4662 9.45801C12.3354 9.2472 12.1485 9.07703 11.9263 8.96665L10.7397 8.36665C10.5175 8.25626 10.3306 8.0861 10.1999 7.87528C10.0691 7.66447 9.99981 7.42137 9.99967 7.17331V4.66665C9.99967 4.48984 10.0699 4.32027 10.1949 4.19524C10.32 4.07022 10.4895 3.99998 10.6663 3.99998C11.02 3.99998 11.3591 3.8595 11.6091 3.60946C11.8592 3.35941 11.9997 3.02027 11.9997 2.66665C11.9997 2.31302 11.8592 1.97389 11.6091 1.72384C11.3591 1.47379 11.02 1.33331 10.6663 1.33331H5.33301C4.97939 1.33331 4.64025 1.47379 4.3902 1.72384C4.14015 1.97389 3.99967 2.31302 3.99967 2.66665C3.99967 3.02027 4.14015 3.35941 4.3902 3.60946C4.64025 3.8595 4.97939 3.99998 5.33301 3.99998C5.50982 3.99998 5.67939 4.07022 5.80441 4.19524C5.92944 4.31996 5.99967 4.48953 5.99967 4.66665V7.17331Z"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("rename") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <path
+        d="M14.1156 4.54138C14.4681 4.189 14.6662 3.71103 14.6662 3.21262C14.6663 2.71421 14.4683 2.23619 14.116 1.88372C13.7636 1.53124 13.2856 1.33319 12.7872 1.33313C12.2888 1.33307 11.8108 1.531 11.4583 1.88338L2.56096 10.7827C2.40618 10.9371 2.29171 11.1271 2.22763 11.3361L1.34696 14.2374C1.32973 14.295 1.32843 14.3563 1.3432 14.4146C1.35796 14.473 1.38824 14.5262 1.43083 14.5687C1.47341 14.6112 1.52671 14.6414 1.58507 14.6561C1.64343 14.6708 1.70467 14.6694 1.7623 14.6521L4.6643 13.7721C4.87308 13.7086 5.06308 13.5948 5.21763 13.4407L14.1156 4.54138Z"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M10 3.33331L12.6667 5.99998"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("delete") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <path
+        d="M2 4H14"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M12.6663 4V13.3333C12.6663 14 11.9997 14.6667 11.333 14.6667H4.66634C3.99967 14.6667 3.33301 14 3.33301 13.3333V4"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M5.33301 3.99992V2.66659C5.33301 1.99992 5.99967 1.33325 6.66634 1.33325H9.33301C9.99967 1.33325 10.6663 1.99992 10.6663 2.66659V3.99992"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M6.66699 7.33325V11.3333"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M9.33301 7.33325V11.3333"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("ellipsis") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="1.5"></circle>
+      <circle cx="19" cy="12" r="1.5"></circle>
+      <circle cx="5" cy="12" r="1.5"></circle>
+    </svg>
+  }
+  @case ("more-horizontal") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <circle cx="12" cy="12" r="1.5"></circle>
+      <circle cx="18" cy="12" r="1.5"></circle>
+      <circle cx="6" cy="12" r="1.5"></circle>
+    </svg>
+  }
+  @case ("settings") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="3"></circle>
+      <path
+        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+      ></path>
+    </svg>
+  }
+  @case ("help") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </svg>
+  }
+  @case ("logout") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+      <polyline points="16 17 21 12 16 7"></polyline>
+      <line x1="21" y1="12" x2="9" y2="12"></line>
+    </svg>
+  }
+  @case ("shield") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+    </svg>
+  }
+  @case ("arrow-left") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+  }
+  @case ("star") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path
+        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+      ></path>
+    </svg>
+  }
+  @case ("sparkle") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path
+        d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"
+      />
+    </svg>
+  }
+  @case ("book") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+      <path
+        d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+      ></path>
+    </svg>
+  }
+  @case ("info-circle") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="16" x2="12" y2="12"></line>
+      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </svg>
+  }
+  @case ("clipboard-plus") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+      <path
+        d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+      ></path>
+      <path d="M12 11v6"></path>
+      <path d="M9 14h6"></path>
+    </svg>
+  }
+  @case ("manual") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <rect
+        x="4"
+        y="3"
+        width="16"
+        height="18"
+        rx="2"
+        stroke="currentColor"
+        stroke-width="1.8"
+        fill="none"
+      />
+      <line
+        x1="4"
+        y1="8"
+        x2="20"
+        y2="8"
+        stroke="currentColor"
+        stroke-width="1.8"
+      />
+    </svg>
+  }
+  @case ("release-notes") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path
+        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+        stroke="currentColor"
+        stroke-width="1.8"
+        fill="none"
+      />
+      <polyline
+        points="14 2 14 8 20 8"
+        stroke="currentColor"
+        stroke-width="1.8"
+        fill="none"
+      />
+      <line
+        x1="16"
+        y1="13"
+        x2="8"
+        y2="13"
+        stroke="currentColor"
+        stroke-width="1.8"
+      />
+      <line
+        x1="16"
+        y1="17"
+        x2="8"
+        y2="17"
+        stroke="currentColor"
+        stroke-width="1.8"
+      />
+      <polyline
+        points="10 9 9 9 8 9"
+        stroke="currentColor"
+        stroke-width="1.8"
+      />
+    </svg>
+  }
+  @case ("agent-bot") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <rect
+        x="3"
+        y="11"
+        width="18"
+        height="10"
+        rx="2"
+        stroke="currentColor"
+        stroke-width="1.8"
+        fill="none"
+      />
+      <circle
+        cx="12"
+        cy="5"
+        r="2"
+        stroke="currentColor"
+        stroke-width="1.8"
+        fill="none"
+      />
+      <path d="M12 7v4" stroke="currentColor" stroke-width="1.8" />
+      <line
+        x1="8"
+        y1="16"
+        x2="8.01"
+        y2="16"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+      />
+      <line
+        x1="16"
+        y1="16"
+        x2="16.01"
+        y2="16"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+      />
+    </svg>
+  }
+  @case ("agent-flow") {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path
+        d="M12 2a3 3 0 0 0-3 3c0 .82.33 1.57.88 2.12L7.12 9.88A3 3 0 1 0 8.5 12l2.76-2.76c.24.06.49.1.74.1.25 0 .5-.04.74-.1L15.5 12a3 3 0 1 0 1.38-2.12l-2.76-2.76A3 3 0 0 0 12 2z"
+        stroke="currentColor"
+        stroke-width="1.8"
+        fill="none"
+      />
+    </svg>
+  }
+  @case ("recent-activity") {
+    <svg
+      [attr.width]="width || 20"
+      [attr.height]="height || 20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M18.3333 10H15L12.5 17.5L7.5 2.5L5 10H1.66667"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  }
+  @case ("user-management") {
+    <svg
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+      <circle cx="9" cy="7" r="4"></circle>
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+    </svg>
+  }
+  @case ("users") {
+    <svg
+      [attr.width]="width"
+      [attr.height]="height"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+      <circle cx="9" cy="7" r="4"></circle>
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+    </svg>
+  }
+}

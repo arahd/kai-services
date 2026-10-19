@@ -1,0 +1,50 @@
+<div
+  class="chatbot-wrapper"
+  [class.sidenav-collapsed]="layoutBridge.sidenavCollapsed()"
+  appFileDragDrop
+  (filesDropped)="onFilesDropped($event)"
+  (dragOverState)="isDragOverPage = $event"
+>
+  <router-outlet></router-outlet>
+
+  <!-- Token Limit reached Popup -->
+  @if (chatState.showLimitPopup()) {
+    <app-limit-popup (close)="closeLimitPopup()"></app-limit-popup>
+  }
+
+  <!-- Session Expired Popup -->
+  @if (chatState.showSessionExpiredPopup()) {
+    <app-session-expired-popup
+      (confirm)="handleExpiredSession()"
+    ></app-session-expired-popup>
+  }
+
+  <!-- Full-page drag overlay -->
+  @if (isDragOverPage) {
+    <div class="drag-overlay">
+      <div class="drag-overlay-content">
+        <div class="drag-icon-wrapper">
+          <app-chat-icon
+            name="upload"
+            width="40"
+            height="40"
+            class="upload-svg"
+          ></app-chat-icon>
+        </div>
+        <h2 class="drag-title">Drop your files here</h2>
+        <p class="drag-subtitle">Release to upload your files</p>
+      </div>
+    </div>
+  }
+
+  <!-- Premium File Preview Modal Overlay -->
+  @if (chatFacade.attachment.activePreviewFile()) {
+    <app-file-preview-modal
+      [file]="chatFacade.attachment.activePreviewFile()!"
+      (close)="chatFacade.attachment.activePreviewFile.set(null)"
+    ></app-file-preview-modal>
+  }
+</div>
+
+<!-- Floating Help & Support Widget (FAB) -->
+<app-help-menu></app-help-menu>

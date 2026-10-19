@@ -1,0 +1,20 @@
+<div class="limit-popup-overlay">
+  <div class="limit-popup-content">
+    <div class="popup-header">
+      <div class="warning-icon">
+        <app-chat-icon name="alert" width="36" height="36"></app-chat-icon>
+      </div>
+      <h2>Usage Limit Reached</h2>
+    </div>
+    <div class="popup-body">
+      <p class="sub-text">
+        You have reached your limit for today. Kindly contact the Admin team for further support.
+      </p>
+    </div>
+    <div class="popup-footer">
+      <button class="btn-secondary" (click)="close.emit()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

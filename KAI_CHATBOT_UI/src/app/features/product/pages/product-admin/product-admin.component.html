@@ -1,0 +1,524 @@
+<div class="product-admin-page">
+  <div class="product-admin-wrapper">
+    <!-- Top Header -->
+    <header class="pa-header">
+      <div class="pa-header-text">
+        <h1 class="pa-title">Product Access</h1>
+        <p class="pa-subtitle">Manage product access and roles for users across the platform.</p>
+      </div>
+    </header>
+
+    <!-- Platform Stats -->
+    <div class="pa-stats-bar">
+      <span class="pa-stat-item"><strong>{{ totalUsersCountStat() }}</strong> Users</span>
+      <span class="pa-stat-sep">·</span>
+      <span class="pa-stat-item"><strong>{{ totalProductsCountStat() }}</strong> Products</span>
+      <span class="pa-stat-sep">·</span>
+      <span class="pa-stat-item pa-stat-highlight"><strong>{{ usersWithAccessCountStat() }}</strong> Users with Access</span>
+    </div>
+
+    <!-- Segmented Navigation Tabs (Users / Products) -->
+    <div class="pa-segmented-tabs" role="tablist">
+      <button
+        type="button"
+        class="pa-segment-btn"
+        [class.active]="activeMainTab() === 'users'"
+        (click)="activeMainTab.set('users')"
+        role="tab"
+        [attr.aria-selected]="activeMainTab() === 'users'"
+      >
+        Users
+      </button>
+      <button
+        type="button"
+        class="pa-segment-btn"
+        [class.active]="activeMainTab() === 'products'"
+        (click)="activeMainTab.set('products')"
+        role="tab"
+        [attr.aria-selected]="activeMainTab() === 'products'"
+      >
+        Products
+      </button>
+    </div>
+
+    @if (activeMainTab() === 'users') {
+      <!-- Filter Bar with Select Options (matching screenshot) -->
+      <div class="pa-filter-row">
+        <!-- Search Input -->
+        <div class="pa-search-field">
+          <svg class="pa-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="text"
+            class="pa-search-input"
+            placeholder="Search users or email..."
+            [value]="searchQuery()"
+            (input)="onSearchInput($event)"
+            aria-label="Search users or email"
+          />
+        </div>
+
+        <!-- All Products Multi-Select Dropdown -->
+        <div class="pa-dropdown-container">
+          <button
+            type="button"
+            class="pa-dropdown-trigger"
+            [class.pa-dropdown-trigger--open]="openDropdown() === 'product'"
+            (click)="toggleDropdown('product', $event)"
+            aria-label="Filter by Product"
+            aria-haspopup="listbox"
+            [attr.aria-expanded]="openDropdown() === 'product'"
+          >
+            <span class="pa-dropdown-label">{{ getProductButtonLabel() }}</span>
+            <svg class="pa-dropdown-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          @if (openDropdown() === 'product') {
+            <div class="pa-dropdown-menu" role="listbox" (click)="$event.stopPropagation()">
+              @for (opt of visibleProductOptions(); track opt.id) {
+                <label class="pa-dropdown-item">
+                  <input
+                    type="checkbox"
+                    class="pa-checkbox"
+                    [checked]="isProductSelected(opt.id)"
+                    (change)="toggleProductSelection(opt.id)"
+                  />
+                  <span class="pa-item-text">{{ opt.label }}</span>
+                </label>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Roles Categorized Multi-Select Dropdown -->
+        <div class="pa-dropdown-container">
+          <button
+            type="button"
+            class="pa-dropdown-trigger"
+            [class.pa-dropdown-trigger--open]="openDropdown() === 'role'"
+            (click)="toggleDropdown('role', $event)"
+            aria-label="Filter by Role"
+            aria-haspopup="listbox"
+            [attr.aria-expanded]="openDropdown() === 'role'"
+          >
+            <span class="pa-dropdown-label">{{ getRoleButtonLabel() }}</span>
+            <svg class="pa-dropdown-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          @if (openDropdown() === 'role') {
+            <div class="pa-dropdown-menu pa-dropdown-menu--roles" role="listbox" (click)="$event.stopPropagation()">
+              @for (group of visibleRoleGroups(); track group.suite.id) {
+                <div class="pa-role-group">
+                  <div class="pa-role-group-title">{{ group.suite.name }}</div>
+                  @for (role of group.roles; track role.key) {
+                    <label class="pa-dropdown-item">
+                      <input
+                        type="checkbox"
+                        class="pa-checkbox"
+                        [checked]="isRoleSelected(role.key)"
+                        (change)="toggleRoleSelection(role.key)"
+                      />
+                      <span class="pa-item-text">{{ role.label }}</span>
+                    </label>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Main Table Card Container -->
+      <div class="pa-table-card">
+        <div class="pa-table-wrapper">
+          <table class="pa-table">
+            <thead>
+              <tr>
+                <th class="th-user">
+                  <button
+                    type="button"
+                    class="th-sort-btn"
+                    (click)="toggleSort()"
+                    [attr.aria-sort]="sortColumn() === 'username' ? (sortOrder() === 'asc' ? 'ascending' : 'descending') : 'none'"
+                    title="Click to sort by Username (Ascending / Descending)"
+                  >
+                    <span>USER</span>
+                    <span class="sort-indicator" [class.active]="sortColumn() === 'username'">
+                      @if (sortColumn() === 'username') {
+                        @if (sortOrder() === 'asc') {
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 15l-6-6-6 6"/>
+                          </svg>
+                        } @else {
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9l6 6 6-6"/>
+                          </svg>
+                        }
+                      } @else {
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M7 15l5 5 5-5"/>
+                          <path d="M7 9l5-5 5 5"/>
+                        </svg>
+                      }
+                    </span>
+                  </button>
+                </th>
+                <th class="th-products">PRODUCTS</th>
+                <th class="th-action">ACTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (isLoading()) {
+                <tr>
+                  <td colspan="3" class="pa-loading-cell">
+                    <div class="spinner"></div>
+                    <span>Loading users...</span>
+                  </td>
+                </tr>
+              } @else if (filteredUsers().length === 0) {
+                <tr>
+                  <td colspan="3" class="pa-empty-cell">
+                    <p>No users found matching your search or filters.</p>
+                  </td>
+                </tr>
+              } @else {
+                @for (user of paginatedUsers(); track user.username) {
+                  <tr class="pa-table-row" (click)="openUserDrawer(user)">
+                    <!-- USER Column -->
+                    <td class="td-user">
+                      <span class="pa-user-email">{{ user.username }}</span>
+                    </td>
+
+                    <!-- PRODUCTS Column -->
+                    <td class="td-products">
+                      <button
+                        type="button"
+                        class="pa-products-link"
+                        [class.no-products]="getProductsCount(user) === 0"
+                        (click)="$event.stopPropagation(); openAccessModal(user)"
+                        [title]="'View product access details for ' + user.username"
+                      >
+                        {{ getProductsCountLabel(user) }}
+                      </button>
+                    </td>
+
+                    <!-- ACTION Column -->
+                    <td class="td-action">
+                      <button
+                        type="button"
+                        class="pa-action-view"
+                        (click)="$event.stopPropagation(); openUserDrawer(user)"
+                        [title]="'View and manage access for ' + user.username"
+                      >
+                        <span>Edit</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <line x1="5" y1="12" x2="19" y2="12"></line>
+                          <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Footer Pagination Bar -->
+        <div class="token-usage-pagination">
+          <button
+            type="button"
+            class="token-usage-pagination__nav"
+            [disabled]="currentPage() <= 1 || isLoading()"
+            (click)="prevPage()"
+            aria-label="Previous page"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span>Back</span>
+          </button>
+
+          @for (page of pageNumbers(); track $index) {
+            @if (page === '...') {
+              <span class="token-usage-pagination__ellipsis">...</span>
+            } @else {
+              <button
+                type="button"
+                class="token-usage-pagination__page"
+                [class.token-usage-pagination__page--active]="page === currentPage()"
+                [disabled]="isLoading()"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+            }
+          }
+
+          <button
+            type="button"
+            class="token-usage-pagination__nav"
+            [disabled]="currentPage() >= calculatedTotalPages() || isLoading()"
+            (click)="nextPage()"
+            aria-label="Next page"
+          >
+            <span>Next</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    } @else {
+      <!-- Products Overview Tab -->
+      <div class="pa-products-grid">
+        @for (suite of visibleProductSuites(); track suite.id) {
+          <div class="pa-product-card">
+            <div class="pa-product-card-top">
+              <!-- <span class="pa-product-icon material-symbols-rounded">{{ suite.icon }}</span> -->
+              <h3 class="pa-product-card-title">{{ suite.name }}</h3>
+            </div>
+            @if (suite.description) {
+              <p class="pa-product-card-desc">{{ suite.description }}</p>
+            }
+            <div class="pa-product-card-meta">
+              <span class="pa-product-badge">{{ suite.roles.length }} Role Tiers</span>
+              <button
+                type="button"
+                class="pa-product-action-btn"
+                (click)="activeMainTab.set('users'); setProductFilter(suite.id)"
+              >
+                View Users &rarr;
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Slide-Over Permissions Drawer -->
+  @if (isDrawerOpen() && selectedUser()) {
+    <div class="drawer-overlay" (click)="closeUserDrawer()"></div>
+    <div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+      <!-- Drawer Header -->
+      <div class="drawer-header">
+        <h3 id="drawer-title" class="drawer-title">Product Access</h3>
+        <button
+          type="button"
+          class="close-btn"
+          (click)="closeUserDrawer()"
+          aria-label="Close"
+          title="Close"
+        >
+          &times;
+        </button>
+      </div>
+
+      <!-- User Subheader (email) -->
+      <div class="drawer-user-bar">
+        <span class="drawer-user-email">{{ selectedUser()?.username }}</span>
+      </div>
+
+      <!-- Drawer Body: Product Accordions -->
+      <div class="drawer-body">
+        <div class="pa-accordion-list">
+          @for (group of visibleProductGroups(); track group.suite.id) {
+            <div class="pa-accordion-item" [class.is-expanded]="isProductExpanded(group.suite.id)">
+              <!-- Accordion Header Button -->
+              <button
+                type="button"
+                class="pa-accordion-header"
+                (click)="toggleProductAccordion(group.suite.id)"
+                [attr.aria-expanded]="isProductExpanded(group.suite.id)"
+              >
+                <span class="pa-accordion-title">{{ group.suite.name }}</span>
+                <span class="pa-accordion-chevron">
+                  @if (isProductExpanded(group.suite.id)) {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg>
+                  } @else {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  }
+                </span>
+              </button>
+
+              <!-- Accordion Content / Roles Card -->
+              @if (isProductExpanded(group.suite.id)) {
+                <div class="pa-accordion-content">
+                  <div class="pa-roles-card">
+                    @for (role of group.suite.roles; track role.key) {
+                      <div class="pa-role-row">
+                        <span class="pa-role-label">{{ role.label }}</span>
+                        <label class="toggle-switch" [title]="'Toggle ' + role.label + ' for ' + group.suite.name">
+                          <input
+                            type="checkbox"
+                            [checked]="isRoleDraftChecked(role.key)"
+                            (change)="toggleRoleDraft(role.key)"
+                            [disabled]="isUpdatingPermission()"
+                          />
+                          <span class="slider"></span>
+                        </label>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Global Product Admin accordion option if permitted -->
+          @if (canGrantProductAdmin()) {
+            <div class="pa-accordion-item" [class.is-expanded]="isProductExpanded('is_product_admin')">
+              <button
+                type="button"
+                class="pa-accordion-header"
+                (click)="toggleProductAccordion('is_product_admin')"
+                [attr.aria-expanded]="isProductExpanded('is_product_admin')"
+              >
+                <span class="pa-accordion-title">Product Admin</span>
+                <span class="pa-accordion-chevron">
+                  @if (isProductExpanded('is_product_admin')) {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg>
+                  } @else {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  }
+                </span>
+              </button>
+
+              @if (isProductExpanded('is_product_admin')) {
+                <div class="pa-accordion-content">
+                  <div class="pa-roles-card">
+                    <div class="pa-role-row">
+                      <span class="pa-role-label">Admin</span>
+                      <label class="toggle-switch" title="Toggle Global Product Admin">
+                        <input
+                          type="checkbox"
+                          [checked]="isRoleDraftChecked('is_product_admin')"
+                          (change)="toggleRoleDraft('is_product_admin')"
+                          [disabled]="isUpdatingPermission()"
+                        />
+                        <span class="slider"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          @if (visibleProductGroups().length === 0 && !canGrantProductAdmin()) {
+            <div class="no-admin-access-card">
+              <p>You do not have administrative privileges to grant access for any products.</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Drawer Footer with Cancel and Save Changes -->
+      <div class="drawer-footer">
+        <button
+          type="button"
+          class="btn-cancel"
+          (click)="closeUserDrawer()"
+          [disabled]="isUpdatingPermission()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-save"
+          (click)="saveUserPermissions()"
+          [disabled]="isUpdatingPermission()"
+        >
+          @if (isUpdatingPermission()) {
+            <span>Saving...</span>
+          } @else {
+            <span>Save Changes</span>
+          }
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Product Access Details Popup Modal -->
+  @if (isAccessModalOpen()) {
+    <div class="pa-modal-overlay" (click)="closeAccessModal()">
+      <div class="pa-modal-card" (click)="$event.stopPropagation()">
+        <!-- Modal Header -->
+        <div class="pa-modal-header">
+          <div class="pa-modal-title-group">
+            <div class="pa-modal-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <div class="pa-modal-title-text">
+              <h3 class="pa-modal-title">Product Access</h3>
+              <span class="pa-modal-subtitle">{{ accessModalUser()?.username }}</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="pa-modal-close-btn"
+            (click)="closeAccessModal()"
+            title="Close"
+          >
+            &times;
+          </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="pa-modal-body">
+          @if (accessModalBadges().length === 0) {
+            <div class="pa-modal-empty">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <p>No product access assigned to this user.</p>
+            </div>
+          } @else {
+            <div class="pa-modal-badge-list">
+              @for (badge of accessModalBadges(); track badge.productId || badge.product + badge.role) {
+                <div class="pa-modal-badge-row">
+                  <div class="pa-modal-prod-info">
+                    <span class="pa-modal-prod-name">{{ getFullProductName(badge.productId) || badge.product }}</span>
+                  </div>
+                  <span class="pa-badge-pill" [ngClass]="'tier-' + (badge.tier || 'user')">
+                    {{ badge.role }}
+                  </span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="pa-modal-footer">
+          <button
+            type="button"
+            class="pa-modal-btn"
+            (click)="closeAccessModal()"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

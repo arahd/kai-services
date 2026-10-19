@@ -1,0 +1,105 @@
+// ══════════════════════════════════════════════════════════
+//  SKILLS TABLE
+// ══════════════════════════════════════════════════════════
+.skill-cols {
+  display: grid;
+  grid-template-columns: 2fr 1.1fr 1.3fr 1.2fr 82px;
+  gap: 8px;
+  padding: 7px 16px;
+  background: var(--bg-strip);
+  border-bottom: 1px solid var(--bdr);
+  position: sticky;
+  top: 0;
+
+  span {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .07em;
+    color: var(--t4);
+  }
+}
+
+.skill-row {
+  display: grid;
+  grid-template-columns: 2fr 1.1fr 1.3fr 1.2fr 82px;
+  // gap: 8px;
+  align-items: center;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--bdr);
+  transition: background .1s;
+  height: 100%;
+
+  &:last-of-type { border-bottom: none; }
+  &:hover { background: var(--bg-strip); }
+
+  &__name {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--t1);
+    overflow: hidden;
+  }
+
+  &__meta {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--t3);
+
+    &--green { color: var(--green); font-weight: 500; }
+    &--amber { color: var(--amber); font-weight: 500; }
+  }
+}
+
+.skill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &--green { background: var(--green-bar); }
+  &--amber { background: var(--amber-bar); }
+  &--red   { background: var(--red); }
+}
+
+.tier-micro {
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 4px;
+  padding: 1px 5px;
+  flex-shrink: 0;
+
+  &--blue { color: var(--blue); background: var(--blue-bg); border: 1px solid rgba(26,79,168,.12); }
+}
+
+.match-bar {
+  height: 5px;
+  background: var(--bg-inset);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid var(--bdr);
+
+  &__fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width .7s ease;
+
+    &--green { background: var(--green-bar); }
+    &--amber { background: var(--amber-bar); }
+  }
+}
+
+.match-chip {
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 5px;
+  padding: 3px 7px;
+  text-align: center;
+  white-space: nowrap;
+
+  &--green { background: var(--green-bg); color: var(--green); }
+  &--amber { background: var(--amber-bg); color: var(--amber); }
+  &--red   { background: var(--red-bg);   color: var(--red); }
+}
+

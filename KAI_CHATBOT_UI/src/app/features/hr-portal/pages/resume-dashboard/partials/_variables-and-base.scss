@@ -1,0 +1,16 @@
+// ══════════════════════════════════════════════════════════
+//  Resume Fit Dashboard — fit_v2 Edition
+//  Font: Instrument Sans + Instrument Serif + Fira Code
+//  Theme: Warm off-white · Muted professional palette
+// ══════════════════════════════════════════════════════════
+
+@use '../../../styles/theme';
+
+:host {
+  display: block;
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--t1);
+  // background: var(--bg);
+}
+

@@ -1,0 +1,378 @@
+// ══════════════════════════════════════════════════════════════
+//  KAI Chatbot UI — Shared SCSS Mixins Library
+//  Consolidates duplicated patterns across all components.
+//  Usage:  @use 'path/to/styles/mixins' as *;
+// ══════════════════════════════════════════════════════════════
+
+
+// ─── 1. LAYOUT HELPERS ──────────────────────────────────────
+
+/// Flex container with centered items.
+/// @param {String} $direction [row] — flex-direction
+/// @param {Length} $gap [0]        — gap between items
+@mixin flex-center($direction: row, $gap: 0) {
+  & {
+    display: flex;
+    flex-direction: $direction;
+    align-items: center;
+    justify-content: center;
+    @if $gap != 0 {
+      gap: $gap;
+    }
+  }
+}
+
+/// Vertical flex container.
+/// @param {Length} $gap [0] — gap between items
+@mixin flex-column($gap: 0) {
+  display: flex;
+  flex-direction: column;
+  @if $gap != 0 {
+    gap: $gap;
+  }
+}
+
+
+// ─── 2. TEXT UTILITIES ──────────────────────────────────────
+
+/// Single-line text truncation with ellipsis.
+@mixin text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/// Smooth transition shorthand.
+/// @param {String} $props [all]      — CSS property(s)
+/// @param {Time}   $duration [0.2s]  — transition duration
+/// @param {String} $fn [ease]        — timing function
+@mixin transition-ease($props: all, $duration: 0.2s, $fn: ease) {
+  transition: #{$props} $duration $fn;
+}
+
+
+// ─── 3. SCROLLBAR ────────────────────────────────────────────
+
+/// Custom webkit scrollbar theme (used in chat areas, sidebars, textareas).
+/// @param {Length} $width [6px]
+/// @param {Color}  $thumb-color [var(--px-border)]
+/// @param {Color}  $track-color [transparent]
+/// @param {Color}  $thumb-hover [var(--px-muted)]
+@mixin custom-scrollbar(
+  $width: 6px,
+  $thumb-color: var(--px-border),
+  $track-color: transparent,
+  $thumb-hover: var(--px-muted)
+) {
+  &::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $track-color;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: 10px;
+
+    &:hover {
+      background: $thumb-hover;
+    }
+  }
+}
+
+
+// ─── 4. OVERLAYS & MODALS ────────────────────────────────────
+
+/// Full-screen overlay backdrop (for modals, drag overlays, popups).
+/// @param {Color}  $bg [rgba(0, 0, 0, 0.4)]
+/// @param {Length} $blur [4px]
+/// @param {Number} $z [10000]
+@mixin overlay-backdrop($bg: rgba(0, 0, 0, 0.4), $blur: 4px, $z: 10000) {
+  position: fixed;
+  inset: 0;
+  background: $bg;
+  @if $blur > 0 {
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z;
+}
+
+/// Modal / popup card container.
+/// @param {Length} $radius [16px]
+/// @param {Length} $max-width [480px]
+/// @param {String} $shadow — box-shadow value
+@mixin modal-card(
+  $radius: 16px,
+  $max-width: 480px,
+  $shadow: 0 20px 40px rgba(0, 0, 0, 0.15)
+) {
+  background: var(--px-surface, var(--px-bg, #ffffff));
+  border-radius: $radius;
+  width: 90%;
+  max-width: $max-width;
+  box-shadow: $shadow;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+
+// ─── 5. INTERACTIVE ELEMENTS ─────────────────────────────────
+
+/// Small icon button (copy, like, share, etc.).
+/// @param {Length} $size [1.75rem]
+/// @param {Length} $radius [0.375rem]
+/// @param {Color}  $color [var(--px-muted)]
+/// @param {Color}  $hover-bg [var(--px-hover)]
+/// @param {Color}  $hover-color [var(--px-text)]
+@mixin icon-btn(
+  $size: 1.75rem,
+  $radius: 0.375rem,
+  $color: var(--px-muted),
+  $hover-bg: var(--px-hover),
+  $hover-color: var(--px-text)
+) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $size;
+  height: $size;
+  border-radius: $radius;
+  cursor: pointer;
+  transition: background 0.15s;
+  color: $color;
+  background: transparent;
+  border: none;
+  padding: 0;
+
+  &:hover {
+    background: $hover-bg;
+    color: $hover-color;
+  }
+
+  svg {
+    display: block;
+  }
+}
+
+/// Avatar circle (bot, user, profile initials).
+/// @param {Length} $size [2.25rem]
+/// @param {Color}  $bg [var(--px-panel)]
+/// @param {Color}  $border-color [var(--px-accent)]
+/// @param {Length} $border-width [1px]
+@mixin avatar-circle(
+  $size: 2.25rem,
+  $bg: var(--px-panel),
+  $border-color: var(--px-accent),
+  $border-width: 1px
+) {
+  flex-shrink: 0;
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  background: $bg;
+  border: $border-width solid $border-color;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/// Hover-lift effect (card hover with upward translate + shadow).
+/// @param {Length} $y [-2px]
+/// @param {String} $shadow — box-shadow on hover
+@mixin hover-lift($y: -2px, $shadow: 0 8px 24px rgba(0, 0, 0, 0.15)) {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY($y);
+    box-shadow: $shadow;
+  }
+}
+
+/// Chip / pill button (suggestions, tags, model selector, library tabs).
+/// @param {String} $padding [0.375rem 0.75rem]
+/// @param {Length} $radius [1rem]
+/// @param {Length} $font-size [0.8125rem]
+/// @param {Color}  $bg [var(--px-panel)]
+/// @param {Color}  $border-color [var(--px-border)]
+/// @param {Color}  $text-color [var(--px-text)]
+@mixin chip-pill(
+  $padding: 0.375rem 0.75rem,
+  $radius: 1rem,
+  $font-size: 0.8125rem,
+  $bg: var(--px-panel),
+  $border-color: var(--px-border),
+  $text-color: var(--px-text)
+) {
+  padding: $padding;
+  border: 1px solid $border-color;
+  border-radius: $radius;
+  background: $bg;
+  color: $text-color;
+  font-size: $font-size;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+/// Popover / dropdown container.
+/// @param {Color}  $bg [var(--px-panel)]
+/// @param {Color}  $border-color [var(--px-border)]
+/// @param {Length} $radius [0.75rem]
+/// @param {String} $shadow
+/// @param {Number} $z [1000]
+@mixin popover-dropdown(
+  $bg: var(--px-panel),
+  $border-color: var(--px-border),
+  $radius: 0.75rem,
+  $shadow: 0 10px 25px rgba(0, 0, 0, 0.1),
+  $z: 1000
+) {
+  background: $bg;
+  border: 1px solid $border-color;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  z-index: $z;
+  padding: 0.5rem;
+}
+
+
+// ─── 6. LOADING INDICATORS ──────────────────────────────────
+
+/// Shimmer / skeleton gradient animation.
+/// @param {Color}  $color1 [var(--px-soft)]  — base color
+/// @param {Color}  $color2 [var(--px-hover)] — highlight color
+/// @param {Time}   $duration [1.5s]
+@mixin shimmer-gradient(
+  $color1: var(--px-soft),
+  $color2: var(--px-hover),
+  $duration: 1.5s
+) {
+  @at-root {
+    @keyframes shimmer {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -200% 0;
+      }
+    }
+  }
+
+  & {
+    background: linear-gradient(90deg, $color1 25%, $color2 50%, $color1 75%);
+    background-size: 200% 100%;
+    animation: shimmer $duration infinite;
+  }
+}
+
+/// Circular spinner.
+/// @param {Length} $size [16px]
+/// @param {Length} $border-width [2px]
+/// @param {Color}  $color [var(--px-accent)]        — active arc
+/// @param {Color}  $track-color [var(--px-border)]   — background arc
+/// @param {Time}   $speed [0.8s]
+@mixin spinner(
+  $size: 16px,
+  $border-width: 2px,
+  $color: var(--px-accent),
+  $track-color: var(--px-border),
+  $speed: 0.8s
+) {
+  @at-root {
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  }
+
+  & {
+    width: $size;
+    height: $size;
+    border: $border-width solid $track-color;
+    border-top-color: $color;
+    border-radius: 50%;
+    animation: spin $speed linear infinite;
+  }
+}
+
+
+// ─── 7. SHARED KEYFRAMES ────────────────────────────────────
+// These are output once per compilation unit via @include in each component.
+// Angular's view-encapsulation scopes them, so duplication in CSS output is
+// expected — but the SCSS source is DRY.
+
+/// Generates the standard fade-in keyframe.
+/// @param {String} $name [fadeIn]
+/// @param {Length} $translate-y [0]  — optional translateY on `from`
+@mixin anim-fade-in($name: fadeIn, $translate-y: 0) {
+  @keyframes #{$name} {
+    from {
+      opacity: 0;
+      @if $translate-y != 0 {
+        transform: translateY($translate-y);
+      }
+    }
+    to {
+      opacity: 1;
+      @if $translate-y != 0 {
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+/// Generates a slide-up-and-scale entrance keyframe.
+/// @param {String} $name [slideUp]
+/// @param {Length} $y [20px]
+/// @param {Number} $scale [0.98]
+@mixin anim-slide-up($name: slideUp, $y: 20px, $scale: 0.98) {
+  @keyframes #{$name} {
+    from {
+      opacity: 0;
+      transform: translateY($y) scale($scale);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+}
+
+/// Generates a 360° spin keyframe (for spinners/loaders).
+/// @param {String} $name [spin]
+@mixin anim-spin($name: spin) {
+  @keyframes #{$name} {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+// ─── 8. AUTO-EMITTED KEYFRAMES ──────────────────────────────
+// The shimmer and spin keyframes are always needed when using the
+// shimmer-gradient or spinner mixins. We emit them at the module level
+// so they exist once per file that @use's this module.
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

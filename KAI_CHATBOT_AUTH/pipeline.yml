@@ -1,0 +1,298 @@
+trigger:
+  - release
+
+resources:
+  - repo: self
+
+name: $(Build.BuildId)-$(Date:yyyyMMdd)-$(Rev:r)
+
+variables:
+  # Static Values
+  dockerRegistryServiceConnection: 'ACR_Dev_Connection'
+  containerRegistry: 'kumaranchatbotazcontainerregistry.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  tag: '$(Build.BuildId)'
+  kubernetesServiceConnectiondev: 'devcluster-kumaranchatbotdev'
+  kubernetesServiceConnectionsbx: 'devcluster-kumaranchatbotsbx'
+  namespace-dev: 'kumaranchatbotdev'
+  namespace-sbx: 'kumaranchatbotsbx'
+  vmImageName: 'ubuntu-latest'
+
+  # Respective to pipeline
+  sbx-app-name: authservice-sbx
+  prd-app-name: chatbotauthserviceprod
+  imageRepository: 'ocp_auth'
+
+stages:
+  # 1. Build and Push Docker Image to ACR
+  - stage: Build_and_Push
+    displayName: Build and Push Docker Image
+    jobs:
+      - job: Build_and_Push
+        displayName: Build and Push Job
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - checkout: self
+            persistCredentials: true
+            clean: true
+
+          - script: |
+              git tag dev_$(Build.BuildId)
+              git push origin dev_$(Build.BuildId)
+            workingDirectory: $(Build.SourcesDirectory)
+            displayName: Git Tagging
+            continueOnError: true
+
+          - task: Docker@2
+            displayName: Build Docker Image
+            inputs:
+              command: build
+              repository: $(imageRepository)
+              dockerfile: $(dockerfilePath)
+              containerRegistry: $(dockerRegistryServiceConnection)
+              tags: |
+                $(tag)
+              arguments: '--build-arg APP_VERSION=$(tag)'
+
+          - task: Docker@2
+            displayName: Push Docker Image to ACR
+            inputs:
+              command: push
+              repository: $(imageRepository)
+              containerRegistry: $(dockerRegistryServiceConnection)
+              tags: |
+                $(tag)
+
+  # 2. Deploy to OpenShift Development Environment
+  - stage: Development_Deployment
+    displayName: Deploy to OpenShift (Development)
+    jobs:
+      - job: Development_Deployment
+        displayName: Development Deployment
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          # - task: PowerShell@2
+          #   inputs:
+          #     targetType: 'inline'
+          #     script: "sed -i 's/tag/$(tag)/g' ./chatbot-auth/values.yaml"
+
+          - task: PowerShell@2
+            inputs:
+              targetType: 'inline'
+              script: "sed -i 's/tag/$(tag)/g' ./ocp/dev/deployment.yaml"
+
+          # - task: PowerShell@2
+          #   inputs:
+          #     targetType: 'inline'
+          #     script: "cat ./chatbot-auth/values.yaml"
+              
+          - task: Kubernetes@1
+            displayName: Apply Deployment in OpenShift (Development)
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: $(kubernetesServiceConnectiondev)
+              namespace: $(namespace-dev)
+              command: 'apply'
+              useConfigurationFile: true
+              configuration: './ocp/dev/deployment.yaml'
+
+          - task: Kubernetes@1
+            displayName: Apply Deployment in OpenShift (Development)
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: $(kubernetesServiceConnectiondev)
+              namespace: $(namespace-dev)
+              command: 'apply'
+              useConfigurationFile: true
+              configuration: './ocp/dev/service.yaml'
+
+          # - task: HelmInstaller@1
+          #   inputs:
+          #     helmVersionToInstall: 'latest'
+
+          # - task: HelmDeploy@1
+          #   inputs:
+          #     connectionType: 'Kubernetes Service Connection'
+          #     kubernetesServiceConnection: 'devcluster-kumaranchatbotdev'
+          #     namespace: 'kumaranchatbotdev'
+          #     command: 'install'
+          #     chartType: 'Name'
+          #     chartName: 'chatbot-auth'
+          #     releaseName: 'auth-release'
+
+          # - task: HelmDeploy@1
+          #   inputs:
+          #     connectionType: 'Kubernetes Service Connection'
+          #     kubernetesServiceConnection: 'devcluster-kumaranchatbotdev'
+          #     namespace: 'kumaranchatbotdev'
+          #     command: 'upgrade'
+          #     chartType: 'Name'
+          #     chartName: 'chatbot-auth'
+          #     releaseName: 'auth-release'
+
+
+
+  # 3. Deploy Services and Configurations
+  # - stage: dev_service_and_config_deployment
+  #   trigger: manual 
+  #   jobs:
+  #     - job: applying_service_yaml
+  #       displayName: Deploy Service to OCP
+  #       pool:
+  #         vmImage: $(vmImageName)
+  #       steps:
+  #         - task: Kubernetes@1
+  #           displayName: Deploy Service to OCP (Dev)
+  #           inputs:
+  #             connectionType: 'Kubernetes Service Connection'
+  #             kubernetesServiceEndpoint: $(kubernetesServiceConnectiondev)
+  #             namespace: $(namespace-dev)
+  #             command: 'apply'
+  #             useConfigurationFile: true
+  #             configuration: './ocp/dev/service.yaml'
+
+  #         - task: Kubernetes@1
+  #           displayName: Deploy Service to OCP (Sandbox)
+  #           inputs:
+  #             connectionType: 'Kubernetes Service Connection'
+  #             kubernetesServiceEndpoint: $(kubernetesServiceConnectionsbx)
+  #             namespace: $(namespace-sbx)
+  #             command: 'apply'
+  #             useConfigurationFile: true
+  #             configuration: './ocp/sbx/loadbalancer.yaml'
+
+  #         - task: Kubernetes@1
+  #           displayName: Deploy Config to OCP (Dev)
+  #           inputs:
+  #             connectionType: 'Kubernetes Service Connection'
+  #             kubernetesServiceEndpoint: $(kubernetesServiceConnectiondev)
+  #             namespace: $(namespace-dev)
+  #             command: 'apply'
+  #             useConfigurationFile: true
+  #             configuration: './ocp/dev/config.yaml'
+
+  # # 4. Deploy to OpenShift Sandbox Environment
+  # - stage: Sandbox_Deployment_OCP
+  #   trigger: manual  
+  #   displayName: Deploy to OpenShift (Sandbox)
+  #   jobs:
+  #     - job: Sandbox_Deployment
+  #       displayName: Sandbox Deployment
+  #       pool:
+  #         vmImage: $(vmImageName)
+  #       steps:
+  #         - task: PowerShell@2
+  #           inputs:
+  #             targetType: 'inline'
+  #             script: "sed -i 's/imgtag/$(tag)/g' ./ocp/sbx/deployment.yaml"
+
+  #         - task: Kubernetes@1
+  #           displayName: Apply Deployment in OpenShift (Sandbox)
+  #           inputs:
+  #             connectionType: 'Kubernetes Service Connection'
+  #             kubernetesServiceEndpoint: $(kubernetesServiceConnectionsbx)
+  #             namespace: $(namespace-sbx)
+  #             command: 'apply'
+  #             useConfigurationFile: true
+  #             configuration: './ocp/sbx/deployment.yaml'
+
+  # # 5. Deploy Services to Sandbox
+  # - stage: sbx_service_and_config_deployment
+  #   # trigger: manual  
+  #   jobs:
+  #     - job: applying_service_yaml
+  #       pool:
+  #         vmImage: $(vmImageName)
+  #       steps:
+  #         - task: Kubernetes@1
+  #           displayName: Deploy Service to OCP (Sandbox)
+  #           inputs:
+  #             connectionType: 'Kubernetes Service Connection'
+  #             kubernetesServiceEndpoint: $(kubernetesServiceConnectionsbx)
+  #             namespace: $(namespace-sbx)
+  #             command: 'apply'
+  #             useConfigurationFile: true
+  #             configuration: './ocp/sbx/service.yaml'
+
+  #         - task: Kubernetes@1
+  #           displayName: Deploy Loadbalancer to OCP (Sandbox)
+  #           inputs:
+  #             connectionType: 'Kubernetes Service Connection'
+  #             kubernetesServiceEndpoint: $(kubernetesServiceConnectionsbx)
+  #             namespace: $(namespace-sbx)
+  #             command: 'apply'
+  #             useConfigurationFile: true
+  #             configuration: './ocp/sbx/loadbalancer.yaml'
+
+  #         - task: Kubernetes@1
+  #           displayName: Deploy Config to OCP (Sandbox)
+  #           inputs:
+  #             connectionType: 'Kubernetes Service Connection'
+  #             kubernetesServiceEndpoint: $(kubernetesServiceConnectionsbx)
+  #             namespace: $(namespace-sbx)
+  #             command: 'apply'
+  #             useConfigurationFile: true
+  #             configuration: './ocp/sbx/config.yaml'
+
+  #         - task: Kubernetes@1
+  #           displayName: Deploy Router to OCP (Sandbox)
+  #           inputs:
+  #             connectionType: 'Kubernetes Service Connection'
+  #             kubernetesServiceEndpoint: $(kubernetesServiceConnectionsbx)
+  #             namespace: $(namespace-sbx)
+  #             command: 'apply'
+  #             useConfigurationFile: true
+  #             configuration: './ocp/sbx/router.yaml'
+  # # 5. Deploy Services to Sandbox
+  # - stage: cron
+  #   trigger: manual  
+  #   jobs:
+  #     - job: applying_cron_yaml
+  #       pool:
+  #         vmImage: $(vmImageName)
+  #       steps:
+  #         - task: Kubernetes@1
+  #           displayName: Deploy Router to OCP (dev)
+  #           inputs:
+  #             connectionType: 'Kubernetes Service Connection'
+  #             kubernetesServiceEndpoint: $(kubernetesServiceConnectiondev)
+  #             namespace: $(namespace-dev)
+  #             command: 'apply'
+  #             useConfigurationFile: true
+  #             configuration: './ocp/cron.yaml'
+
+  # # 6. Deploy to Azure Web App (Sandbox)
+  # - stage: Sandbox_Deployment_Azure_Web_app
+  #   displayName: Deploy to Azure Web App (Sandbox)
+  #   trigger: manual
+  #   jobs:
+  #     - job: Sandbox_Deployment
+  #       displayName: Sandbox Deployment to Azure Web App
+  #       pool:
+  #         vmImage: $(vmImageName)
+  #       steps:
+  #         - task: AzureWebAppContainer@1
+  #           displayName: Deploy to Azure Web App (Sandbox)
+  #           inputs:
+  #             azureSubscription: 'M365 Subscription (2da7649e-9fd1-4b68-a1b3-b9f4c429580e)'
+  #             appName: $(sbx-app-name)
+  #             containers: '$(containerRegistry)/$(imageRepository):$(tag)'
+
+  # # 7. Deploy to Azure Web App (Production)
+  # - stage: Production_Deployment_Azure_Web_app
+  #   displayName: Deploy to Azure Web App (Production)
+  #   trigger: manual
+  #   jobs:
+  #     - job: Production_Deployment
+  #       displayName: Production Deployment to Azure Web App
+  #       pool:
+  #         vmImage: $(vmImageName)
+  #       steps:
+  #         - task: AzureWebAppContainer@1
+  #           displayName: Deploy to Azure Web App (Production)
+  #           inputs:
+  #             azureSubscription: 'M365 Subscription (2da7649e-9fd1-4b68-a1b3-b9f4c429580e)'
+  #             appName: $(prd-app-name)
+  #             containers: '$(containerRegistry)/$(imageRepository):$(tag)'

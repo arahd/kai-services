@@ -1,0 +1,165 @@
+<div class="drop-zone-host">
+  <div
+    class="drop-zone"
+    [class.drop-zone--uploading]="uploading"
+    [class.drop-zone--complete]="(uploadedLayout && file && !uploading) || (multiple && files.length > 0)"
+    [class.drop-zone--dragover]="dragOver"
+    (drop)="onFileDrop($event)"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+  >
+    @if (uploading) {
+      <div class="dz-upload-progress" role="status" [attr.aria-label]="label + ' upload ' + progress + ' percent'">
+        <div class="dz-upload-progress__icon" aria-hidden="true">
+          <img src="assets/HR portal/upload green.svg" alt="" />
+        </div>
+        <div class="dz-upload-progress__track" aria-hidden="true">
+          <div class="dz-upload-progress__fill" [style.width.%]="progress"></div>
+        </div>
+        <div class="dz-upload-progress__pct">{{ progress }}%</div>
+      </div>
+    } @else if (multiple && files.length > 0) {
+      <!-- Multiple files uploaded view inside the dropzone container -->
+      <div class="dz-files-list">
+        @for (f of files; track f.name; let idx = $index) {
+          <div
+            class="dz-file-card"
+            (click)="previewFile.emit(f)"
+            role="button"
+            tabindex="0"
+            (keydown.enter)="previewFile.emit(f)"
+          >
+            <div class="dz-file-card__left">
+              <img class="dz-file-card__icon" src="assets/HR portal/doc.svg" alt="" aria-hidden="true" />
+              <div class="dz-file-card__meta">
+                <span class="dz-file-card__name">{{ f.name }}</span>
+                <span class="dz-file-card__size">{{ getFileSize(f.size) }}</span>
+              </div>
+            </div>
+            <button
+               type="button"
+               class="dz-file-card__remove"
+               aria-label="Remove file"
+               (click)="removeFileAtIndex.emit(idx); $event.stopPropagation()"
+            >
+              <app-hr-icon name="close" width="14" height="14"></app-hr-icon>
+            </button>
+          </div>
+        }
+
+        <!-- Add More Resumes button inside the dropzone, shown only if under the limit -->
+        @if (files.length < maxFiles) {
+          <button type="button" class="dz-add-more" (click)="fileInput.click()">
+            <span class="dz-add-more__plus">+</span> Add More Resumes
+          </button>
+        }
+      </div>
+      <input type="file" #fileInput hidden [accept]="accept" [multiple]="multiple" (change)="onFileSelect($event)" />
+    } @else if (uploadedLayout && file && !multiple) {
+      <!-- Single file uploaded view inside the dropzone container -->
+      <div class="dz-files-list">
+        <div
+          class="dz-file-card"
+          (click)="previewFile.emit(file)"
+          role="button"
+          tabindex="0"
+          (keydown.enter)="previewFile.emit(file)"
+        >
+          <div class="dz-file-card__left">
+            <img class="dz-file-card__icon" src="assets/HR portal/doc.svg" alt="" aria-hidden="true" />
+            <div class="dz-file-card__meta">
+              <span class="dz-file-card__name">{{ file.name }}</span>
+              <span class="dz-file-card__size">{{ getFileSize(file.size) }}</span>
+            </div>
+          </div>
+          <button
+             type="button"
+             class="dz-file-card__remove"
+             aria-label="Remove file"
+             (click)="removeFile(); $event.stopPropagation()"
+          >
+            <app-hr-icon name="close" width="14" height="14"></app-hr-icon>
+          </button>
+        </div>
+      </div>
+      <input type="file" #fileInput hidden [accept]="accept" [multiple]="multiple" (change)="onFileSelect($event)" />
+    } @else {
+      <!-- Empty/Default State -->
+      <div class="dz-inner">
+        <div class="dz-icon" aria-hidden="true">
+          <img class="dz-upload-icon" src="assets/HR portal/upload big.svg" alt="" aria-hidden="true" />
+        </div>
+
+        <div class="dz-helper-container">
+          <div class="dz-helper">
+            Drag & drop or <span class="dz-helper-browse">browse</span> files from your computer
+          </div>
+          @if (!isDefaultHelperText) {
+            <div class="dz-subhelper">
+              {{ helperText }}
+            </div>
+          }
+        </div>
+
+        <button type="button" class="dz-browse-btn" (click)="fileInput.click()">
+          {{ buttonText || 'Browse Files' }}
+          <img class="btn-icon" src="assets/HR portal/chev.svg" alt="" aria-hidden="true" />
+        </button>
+      </div>
+
+      <input type="file" #fileInput hidden [accept]="accept" [multiple]="multiple" (change)="onFileSelect($event)" />
+    }
+
+    @if (errorMessage) {
+      <div class="file-error">{{ errorMessage }}</div>
+    }
+  </div>
+
+  <!-- Status banner under the dropzone box -->
+  @if (multiple) {
+    <!-- For multiple resumes -->
+    <div
+      class="dz-status-banner"
+      [class.dz-status-banner--empty]="files.length === 0"
+      [class.dz-status-banner--success]="files.length > 0"
+      role="status"
+    >
+      <img
+        class="dz-status-banner__icon"
+        src="assets/HR portal/doc.svg"
+        [style.filter]="files.length === 0 ? 'grayscale(1) opacity(0.5)' : 'none'"
+        alt=""
+        aria-hidden="true"
+      />
+      @if (files.length === 0) {
+        <span class="dz-status-banner__text">No resumes uploaded yet</span>
+        <span class="dz-status-banner__fraction">0/{{ maxFiles }} uploaded</span>
+      } @else {
+        <span class="dz-status-banner__text">{{ files.length }}/{{ maxFiles }} resumes uploaded</span>
+      }
+    </div>
+  } @else {
+    <!-- For single job description file -->
+    <div
+      class="dz-status-banner"
+      [class.dz-status-banner--empty]="!file"
+      [class.dz-status-banner--success]="!!file"
+      role="status"
+    >
+      <img
+        class="dz-status-banner__icon"
+        src="assets/HR portal/doc.svg"
+        [style.filter]="!file ? 'grayscale(1) opacity(0.5)' : 'none'"
+        alt=""
+        aria-hidden="true"
+      />
+      <span class="dz-status-banner__text">
+        @if (!file) {
+          No files selected
+        } @else {
+          File Uploaded
+        }
+      </span>
+    </div>
+  }
+</div>

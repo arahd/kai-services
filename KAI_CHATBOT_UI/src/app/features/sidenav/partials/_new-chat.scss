@@ -1,0 +1,87 @@
+@use "../../../../styles/mixins" as *;
+
+.new-chat-sticky-wrap {
+  flex-shrink: 0;
+  margin: 4px 15px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  &.collapsed {
+    margin: 12px 0 0 0;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-divider {
+    margin: 12px 0;
+  }
+
+  .action-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 8px;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    color: var(--px-muted);
+    font-size: 0.875rem;
+    transition: all 0.2s;
+
+    svg {
+      color: var(--px-muted);
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      background: var(--px-hover);
+      color: var(--px-text);
+
+      svg {
+        color: var(--px-text);
+      }
+    }
+
+    span {
+      font-family: Manrope, sans-serif;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: normal;
+    }
+  }
+
+  .new-chat-btn {
+    background: var(--px-hover);
+    border-radius: 6px;
+    padding: 9px 8px !important;
+    gap: 0.75rem !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+
+    app-sidenav-icon {
+      color: var(--px-text) !important;
+    }
+
+    span {
+      font-weight: 500;
+      color: var(--px-text) !important;
+    }
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+
+    &.collapsed {
+      background: var(--px-bg);
+      width: 44px;
+      height: 44px;
+      padding: 0 !important;
+      border: none !important;
+      border-radius: 12px;
+      @include flex-center;
+    }
+  }
+}

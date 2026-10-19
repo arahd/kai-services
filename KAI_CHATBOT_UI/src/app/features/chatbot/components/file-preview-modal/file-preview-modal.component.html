@@ -1,0 +1,103 @@
+<div class="preview-modal-overlay" (click)="onClose()">
+  <div class="preview-modal-container" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="preview-modal-header">
+      <div class="preview-file-info">
+        <span class="preview-file-icon">
+          @if (isPreviewImage) {
+            🖼️
+          } @else if (isPreviewPdf) {
+            📄
+          } @else if (isPreviewText) {
+            📝
+          } @else {
+            📦
+          }
+        </span>
+        <span class="preview-file-name" [title]="file.name">{{
+          file.name
+        }}</span>
+      </div>
+      <div class="preview-modal-actions">
+        @if (previewFileUrl) {
+          <a
+            [href]="previewFileUrl"
+            [download]="file.name"
+            class="action-btn download-btn"
+            title="Download File"
+          >
+            <app-chat-icon name="download" width="18" height="18"></app-chat-icon>
+          </a>
+        }
+        <button
+          class="action-btn close-btn"
+          (click)="onClose()"
+          title="Close Preview"
+        >
+          &times;
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="preview-modal-body">
+      @if (isLoading) {
+        <div class="preview-loading-spinner">
+          <div class="spinner-circle"></div>
+          <p>Loading document preview...</p>
+        </div>
+      } @else if (isPreviewImage) {
+        <div class="preview-content-image">
+          <img [src]="previewFileUrl" alt="Image Preview" />
+        </div>
+      } @else if (isPreviewPdf) {
+        <div class="preview-content-pdf">
+          @if (safePreviewUrl) {
+            <iframe
+              [src]="safePreviewUrl"
+              width="100%"
+              height="100%"
+              frameborder="0"
+            ></iframe>
+          } @else {
+            <div class="preview-content-fallback">
+              <div class="fallback-card">
+                <div class="fallback-icon">
+                  <app-chat-icon [name]="getFileIconName(file?.name)" width="32" height="32"></app-chat-icon>
+                </div>
+                <h3>Unable to Load Preview</h3>
+                <p>Could not load PDF content for {{ file.name }}.</p>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (isPreviewText) {
+        <div class="preview-content-text">
+          <pre><code>{{ previewTextContent }}</code></pre>
+        </div>
+      } @else {
+        <div class="preview-content-fallback">
+          <div class="fallback-card">
+            <div class="fallback-icon">
+              <app-chat-icon [name]="getFileIconName(file?.name)" width="32" height="32"></app-chat-icon>
+            </div>
+            <h3>No Preview Available</h3>
+            <p>
+              This file type ({{ file.name | fileExtension }})
+              cannot be previewed inline.
+            </p>
+            @if (previewFileUrl) {
+              <a
+                [href]="previewFileUrl"
+                [download]="file.name"
+                class="premium-download-link"
+              >
+                Download to view
+              </a>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,151 @@
+<!-- Bot Message — Figma: white card, left-aligned, KAI avatar -->
+<div class="bot-message-container">
+  <div class="bot-avatar">
+    <img src="./kumaran-lg.png" alt="KAI" width="28" height="28" />
+  </div>
+
+  <div class="bot-card">
+    <div
+      class="bot-content"
+      [innerHTML]="sanitizedHtml"
+      [appCopyCode]="msg.html || msg.message"
+      [appMermaidRender]="msg.html || msg.message"
+      [isStreaming]="isStreaming"
+    ></div>
+
+    <!-- Bot Generated Images -->
+    @if (msg.images && msg.images.length > 0) {
+    <div class="bot-generated-images">
+      @for (img of msg.images; track $index) {
+      <div class="generated-image-wrapper" (click)="previewImage.emit(img)">
+        <img [src]="img.url" [alt]="img.name" class="generated-image" />
+        <div class="generated-image-overlay">
+          <app-chat-icon name="eye" width="22" height="22"></app-chat-icon>
+          <span class="preview-text">Preview Image</span>
+        </div>
+        <a [href]="img.url" [download]="img.name + '.png'" class="image-download-btn" appTooltip="Download image" (click)="$event.stopPropagation()">
+          <app-chat-icon name="download" width="16" height="16"></app-chat-icon>
+        </a>
+      </div>
+      }
+    </div>
+    }
+
+    <!-- Image loading skeleton -->
+    @if (msg.isImageLoading) {
+    <div class="bot-generated-images skeleton-mode">
+      @for (id of msg.generated_image_ids || ["1"]; track $index) {
+      <div class="generated-image-skeleton">
+        <div class="shimmer-box">
+          <div class="shimmer-icon">
+            <app-chat-icon name="image-placeholder" width="24" height="24"></app-chat-icon>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+    }
+
+    <!-- Image error state -->
+    @if (
+    msg.imageLoadError &&
+    !msg.isImageLoading &&
+    (!msg.images || msg.images.length === 0)
+    ) {
+    <div class="generated-image-error">
+      <app-chat-icon name="error-circle" width="20" height="20"></app-chat-icon>
+      <span>Unable to load image.</span>
+    </div>
+    }
+
+    <!-- Bot Generated Documents (PPT, XLSX, etc.) -->
+    @if (msg.documents && msg.documents.length > 0) {
+    <div class="bot-generated-documents">
+      @for (doc of msg.documents; track $index) {
+      <a
+        [href]="doc.url"
+        [download]="getDocumentDisplayName(doc)"
+        class="generated-document-card"
+        [appTooltip]="getDocumentTooltip(doc.extension)"
+      >
+        <div
+          class="document-icon-wrap"
+          [class.presentation-icon-wrap]="isPresentationExtension(doc.extension)"
+          [class.spreadsheet-icon-wrap]="isSpreadsheetExtension(doc.extension)"
+          [class.word-icon-wrap]="isWordExtension(doc.extension)"
+          [class.pdf-icon-wrap]="isPdfExtension(doc.extension)"
+        >
+          <app-chat-icon [name]="getDocumentIconName(doc.extension)" width="24" height="24"></app-chat-icon>
+        </div>
+        <div class="document-info">
+          <span class="document-name">{{ getDocumentDisplayName(doc) }}</span>
+          <span class="document-label">Click to download</span>
+        </div>
+        <app-chat-icon name="download" width="18" height="18" class="document-download-icon"></app-chat-icon>
+      </a>
+      }
+    </div>
+    }
+
+    <!-- Document loading skeleton -->
+    @if (msg.isDocumentLoading) {
+    <div class="bot-generated-documents skeleton-mode">
+      @for (id of msg.generated_document_ids || ['1']; track $index) {
+      <div class="generated-document-skeleton">
+        <div class="shimmer-box">
+          <div class="shimmer-icon">
+            <app-chat-icon name="presentation" width="24" height="24"></app-chat-icon>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+    }
+
+    <!-- Document error state -->
+    @if (
+    msg.documentLoadError &&
+    !msg.isDocumentLoading &&
+    (!msg.documents || msg.documents.length === 0)
+    ) {
+    <div class="generated-document-error">
+      <app-chat-icon name="error-circle" width="20" height="20"></app-chat-icon>
+      <span>Unable to load document.</span>
+    </div>
+    }
+
+    <!-- Actions (copy / share) — only shown when message is complete -->
+    @if (showActions) {
+    <div class="bot-actions">
+      <span class="icon-btn" [class.copied]="copied" (click)="copyMessage.emit()" appTooltip="Copy full response">
+        @if (!copied) {
+        <app-chat-icon name="copy" width="17" height="17"></app-chat-icon>
+        } @else {
+        <app-chat-icon name="check-circle" width="18" height="18" class="tick-icon"></app-chat-icon>
+        }
+      </span>
+
+      @if (showShare) {
+      <span class="icon-btn share-btn" (click)="shareMessage.emit()" appTooltip="Share full response">
+        <app-chat-icon name="share" width="18" height="18"></app-chat-icon>
+      </span>
+      }
+
+      @if (hasContextAndSource(msg.augSrc)) {
+      <span class="icon-btn" (click)="viewSources.emit(msg.augSrc ?? [])" appTooltip="View Augmented URLs">
+        <app-chat-icon name="link" width="18" height="18"></app-chat-icon>
+      </span>
+      }
+    </div>
+    }
+
+    @if (msg.status === 'failed' && isLast && msg.canRetry !== false) {
+    <div class="bot-retry-section">
+      <button class="retry-btn" (click)="retryMessage.emit()">
+        <app-chat-icon name="refresh" width="14" height="14" class="retry-icon"></app-chat-icon>
+        <span>Retry</span>
+      </button>
+    </div>
+    }
+  </div>
+</div>

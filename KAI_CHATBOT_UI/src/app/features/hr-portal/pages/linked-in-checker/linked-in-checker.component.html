@@ -1,0 +1,256 @@
+@switch (linkedInState().status) {
+@case (apiResponse.PENDING) {
+<app-hr-loader message="Analyzing Profiles" subMessage="Cross-referencing Resume and LinkedIn data..." />
+}
+
+@case (apiResponse.SUCCESS) {
+@if (data()) {
+<div class="consistency-page">
+
+  <!-- ══════════════════════════════════
+             TRUST HEADER
+        ══════════════════════════════════ -->
+  <header class="header">
+    <div class="header__left">
+      <div class="candidate-box">
+        <div class="avatar">{{ data()?.candidate?.full_name?.charAt(0) || 'C' }}</div>
+        <div class="candidate-info">
+          <h1 class="candidate-name">{{ data()?.candidate?.full_name }}</h1>
+          <p class="candidate-title">{{ data()?.candidate?.current_title }}</p>
+          <p class="candidate-loc">
+            <app-hr-icon name="location" width="12" height="12"></app-hr-icon>
+            {{ data()?.candidate?.location }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header__right">
+      <div class="trust-score">
+        <div class="score-ring" [style.background]="scoreRingGradient()">
+          <div class="score-ring__inner">
+            <span class="score-ring__val">{{ scorePercent() }}</span>
+            <span class="score-ring__unit">%</span>
+          </div>
+        </div>
+        <div class="score-meta">
+          <span class="score-label">CONSISTENCY SCORE</span>
+          <span class="score-status" [ngClass]="'score-status--' + scoreClass()">
+            {{ scoreClass() === 'hi' ? 'Trustworthy' : scoreClass() === 'mid' ? 'Minor Variances' : 'High Risk' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════
+             INSIGHTS STRIP
+        ══════════════════════════════════ -->
+  <div class="insight-strip">
+    <div class="insight-item">
+      <app-hr-icon name="check-circle" width="16" height="16"></app-hr-icon>
+      <span class="insight-text">{{ data()?.consistency_assessment?.summary }}</span>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    
+    <!-- ══════════════════════════════════
+               LEFT COLUMN (DISCREPANCIES)
+          ══════════════════════════════════ -->
+    <div class="grid-col grid-col--fixed">
+      
+      <!-- Discrepancies Panel -->
+      <section class="panel panel--discrepancies">
+        <div class="panel__head">
+          <h2 class="panel__title">DISCREPANCIES</h2>
+          <span class="count-badge" [class.count-badge--red]="highSeverityDiscrepancyCount() > 0">
+            {{ discrepancies().length }} identifying
+          </span>
+        </div>
+        
+        <div class="discrepancy-list">
+          @for (item of discrepancies(); track $index) {
+          <div class="disc-card" [ngClass]="'disc-card--' + item.severity">
+            <div class="disc-card__header">
+              <span class="disc-category">{{ formatLabel(item.category) | titlecase }}</span>
+              <span class="sev-pill" [ngClass]="getSeverityClass(item.severity)">{{ item.severity }}</span>
+            </div>
+            <h3 class="disc-item">{{ item.item }}</h3>
+            <div class="comparison-row">
+              <div class="compare-box">
+                <span class="compare-label">RESUME</span>
+                <span class="compare-val">{{ item.resume_value }}</span>
+              </div>
+              <div class="compare-sep"><app-hr-icon name="chevron-right" width="10" height="10"></app-hr-icon></div>
+              <div class="compare-box">
+                <span class="compare-label">LINKEDIN</span>
+                <span class="compare-val">{{ item.linkedin_value }}</span>
+              </div>
+            </div>
+            @if (item.action) {
+            <div class="disc-action">
+              <app-hr-icon name="info" width="10" height="10"></app-hr-icon>
+              {{ formatLabel(item.action) | titlecase }}
+            </div>
+            }
+          </div>
+          } @empty {
+            <div class="empty-state">
+              <app-hr-icon name="check-circle" width="24" height="24"></app-hr-icon>
+              <p>No major discrepancies found.</p>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Recommendations -->
+      <section class="panel panel--rec">
+        <div class="panel__head">
+          <h2 class="panel__title">RECOMMENDATIONS</h2>
+        </div>
+        <ul class="rec-list">
+          @for (rec of recommendations(); track $index) {
+          <li class="rec-item">
+            <app-hr-icon name="bolt" width="14" height="14"></app-hr-icon>
+            {{ rec }}
+          </li>
+          }
+        </ul>
+      </section>
+    </div>
+
+    <!-- ══════════════════════════════════
+               RIGHT COLUMN (DETAILED CHECKS)
+          ══════════════════════════════════ -->
+    <div class="grid-col">
+      
+      <!-- Employment Check Panel -->
+      <section class="panel">
+        <div class="panel__head">
+          <h2 class="panel__title">EMPLOYMENT VERIFICATION</h2>
+          <div class="status-pill status-pill--warn">
+            Score: {{ data()?.consistency_assessment?.checks?.employment?.consistency_score | percent }}
+          </div>
+        </div>
+        
+        <div class="timeline">
+          @for (job of employmentChecks(); track $index) {
+          <div class="timeline-item" [class.timeline-item--warn]="job.consistency_score < 1">
+            <div class="timeline-meta">
+              <div class="status-marker" [class.status-marker--warn]="job.consistency_score < 1"></div>
+              <span class="timeline-score">{{ job.consistency_score * 100 | number:'1.0-0' }}% Match</span>
+            </div>
+            
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <h3>{{ job.company }}</h3>
+                <span class="timeline-loc">{{ job.location_resume }}</span>
+              </div>
+              
+              <div class="job-comparison">
+                <div class="job-col">
+                  <span class="job-tag">RESUME</span>
+                  <div class="job-detail">
+                    <span class="job-title">{{ job.title_resume }}</span>
+                    <span class="job-date">{{ job.date_resume.start }} — {{ job.date_resume.end || 'Present' }}</span>
+                  </div>
+                </div>
+                <div class="job-col">
+                  <span class="job-tag job-tag--blue">LINKEDIN</span>
+                  <div class="job-detail">
+                    <span class="job-title">{{ job.title_linkedin }}</span>
+                    <span class="job-date">{{ job.date_linkedin.start }} — {{ job.date_linkedin.end || 'Present' }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              @if (job.notes.length > 0) {
+              <div class="job-notes">
+                @for (note of job.notes; track $index) {
+                <p><app-hr-icon name="alert-sm" width="10" height="10"></app-hr-icon> {{ note }}</p>
+                }
+              </div>
+              }
+            </div>
+          </div>
+          }
+        </div>
+      </section>
+
+      <!-- Skills & Education Grid -->
+      <div class="sub-grid">
+        
+        <!-- Skills Panel -->
+        <section class="panel panel--skills">
+          <div class="panel__head">
+            <h2 class="panel__title">SKILL CONSISTENCY</h2>
+            <div class="status-pill">
+              {{ skillChecks().consistency_score | percent }}
+            </div>
+          </div>
+          <div class="skills-body">
+            @if (skillChecks().missing_on_linkedin?.length) {
+            <div class="skill-group">
+              <span class="skill-group-label">Only on Resume</span>
+              <div class="skill-tags">
+                @for (s of skillChecks().missing_on_linkedin; track s) {
+                <span class="skill-tag skill-tag--resume">{{ s }}</span>
+                }
+              </div>
+            </div>
+            }
+            @if (skillChecks().missing_on_resume?.length) {
+            <div class="skill-group">
+              <span class="skill-group-label">Only on LinkedIn</span>
+              <div class="skill-tags">
+                @for (s of skillChecks().missing_on_resume; track s) {
+                <span class="skill-tag skill-tag--linkedin">{{ s }}</span>
+                }
+              </div>
+            </div>
+            }
+            @if (!skillChecks().missing_on_linkedin?.length && !skillChecks().missing_on_resume?.length) {
+              <div class="full-match">
+                <app-hr-icon name="check" width="16" height="16"></app-hr-icon>
+                All skills perfectly aligned
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Education Panel -->
+        <section class="panel">
+          <div class="panel__head">
+            <h2 class="panel__title">EDUCATION & CERTIFICATIONS</h2>
+          </div>
+          <div class="check-list">
+            <div class="check-item">
+              <div class="check-icon" [ngClass]="getCheckStatusClass(data()?.consistency_assessment?.checks?.education?.status || 'pass')"></div>
+              <div class="check-info">
+                <span class="check-label">Education History</span>
+                <span class="check-val">{{ data()?.consistency_assessment?.checks?.education?.consistency_score | percent }} consistency</span>
+              </div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon" [ngClass]="getCheckStatusClass(data()?.consistency_assessment?.checks?.certifications?.status || 'pass')"></div>
+              <div class="check-info">
+                <span class="check-label">Certifications</span>
+                <span class="check-val">{{ data()?.consistency_assessment?.checks?.certifications?.consistency_score | percent }} consistency</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+}
+}
+
+@case (apiResponse.FAILURE) {
+<app-error-page [errorMessage]="errorMsg()" (retry)="onRetry()"></app-error-page>
+}
+}

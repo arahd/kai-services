@@ -1,0 +1,751 @@
+<!-- ═══════════════════════════════════════════════════════════════════════
+     VISA PROCESS — UPLOAD SCREEN
+     ═══════════════════════════════════════════════════════════════════════ -->
+@if (viewState() === "upload") {
+  <div class="vp-upload-wrapper">
+    <div class="vp-upload-card">
+      <!-- Header -->
+      <div class="vp-header">
+        <h1 class="vp-header__title">
+          <span class="vp-header__wave">👋</span>Welcome to KAI
+          <span class="vp-header__accent">VISA Process</span>
+        </h1>
+        <p class="vp-header__subtitle">
+          Upload a resume and supportive documents
+        </p>
+      </div>
+
+      @if (!hasAnyVisaPermission()) {
+        <!-- Restricted State when user has 0 visa permissions -->
+        <div class="vp-restricted-state">
+          <div class="vp-restricted-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <h3 class="vp-restricted-title">Access Restricted</h3>
+          <p class="vp-restricted-desc">
+            You do not have access to any Visa Process verification modules (Business Letter, ICT, or Work Extension).
+            Please contact an HR Portal Administrator to assign you the required visa module access.
+          </p>
+        </div>
+      } @else {
+        <!-- Top process assigned alert banner -->
+        <div class="vp-assigned-banner">
+          <app-hr-icon
+            class="vp-assigned-banner__icon"
+            name="visa-assigned-info"
+            width="15"
+            height="15"
+          ></app-hr-icon>
+          <span class="vp-assigned-banner__text">
+            You are currently assigned to the {{ getProcessTitle() }} process
+          </span>
+        </div>
+
+        <!-- Tab bar selection -->
+        <div class="vp-tabs-container">
+          <div class="vp-tabs">
+            @if (canAccessBusiness()) {
+              <button
+                type="button"
+                class="vp-tab-btn"
+                [class.vp-tab-btn--active]="activeProcessTab() === 'business'"
+                (click)="selectProcessTab('business')"
+              >
+                Business Letter
+              </button>
+            }
+            @if (canAccessIct()) {
+              <button
+                type="button"
+                class="vp-tab-btn"
+                [class.vp-tab-btn--active]="activeProcessTab() === 'ict'"
+                (click)="selectProcessTab('ict')"
+              >
+                ICT
+              </button>
+            }
+            @if (canAccessExtension()) {
+              <button
+                type="button"
+                class="vp-tab-btn"
+                [class.vp-tab-btn--active]="activeProcessTab() === 'extension'"
+                (click)="selectProcessTab('extension')"
+              >
+                Work Extension
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Main container card body -->
+        <div class="vp-process-container">
+          <h3 class="vp-process-container__title">{{ getProcessTitle() }}</h3>
+          <p class="vp-process-container__subtitle">
+            Upload all required documents for {{ getProcessTitle() }} before
+            validation.
+          </p>
+
+          <!-- Upload grid -->
+          <div
+            class="vp-upload-grid"
+            [class.vp-upload-grid--2col]="activeProcessTab() !== 'business'"
+          >
+            <!-- Resume Column (All tabs) -->
+            <div class="vp-upload-col">
+              <h4 class="vp-upload-col__title">Resume</h4>
+              <div class="vp-dropzone-wrapper">
+                <app-file-dropzone
+                  label="Resume"
+                  accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  [file]="resumeFile()"
+                  [errorMessage]="resumeError()"
+                  [uploading]="isUploading()"
+                  [progress]="uploadProgress()"
+                  [uploadedLayout]="true"
+                  buttonText="Browse Files"
+                  helperText="Supported formats: PDF, DOCX (Max 10MB)"
+                  (fileSelected)="onResumeSelected($event)"
+                  (previewFile)="onPreviewLocalFile($event)"
+                ></app-file-dropzone>
+              </div>
+            </div>
+
+            <!-- India Letter Column (Business & ICT only) -->
+            @if (activeProcessTab() !== "extension") {
+              <div class="vp-upload-col">
+                <h4 class="vp-upload-col__title">India Letter</h4>
+                <div class="vp-dropzone-wrapper">
+                  <app-file-dropzone
+                    label="India Letter"
+                    accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    [file]="indianLetterFile()"
+                    [errorMessage]="indianLetterError()"
+                    [uploading]="isUploading()"
+                    [progress]="uploadProgress()"
+                    [uploadedLayout]="true"
+                    buttonText="Browse Files"
+                    helperText="Supported formats: PDF, DOCX (Max 10MB)"
+                    (fileSelected)="onIndianLetterSelected($event)"
+                    (previewFile)="onPreviewLocalFile($event)"
+                  ></app-file-dropzone>
+                </div>
+              </div>
+            }
+
+            <!-- Canada Letter Column (Business & Extension only) -->
+            @if (activeProcessTab() !== "ict") {
+              <div class="vp-upload-col">
+                <h4 class="vp-upload-col__title">Canada Letter</h4>
+                <div class="vp-dropzone-wrapper">
+                  <app-file-dropzone
+                    label="Canada Letter"
+                    accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    [file]="canadaLetterFile()"
+                    [errorMessage]="canadaLetterError()"
+                    [uploading]="isUploading()"
+                    [progress]="uploadProgress()"
+                    [uploadedLayout]="true"
+                    buttonText="Browse Files"
+                    helperText="Supported formats: PDF, DOCX (Max 10MB)"
+                    (fileSelected)="onCanadaLetterSelected($event)"
+                    (previewFile)="onPreviewLocalFile($event)"
+                  ></app-file-dropzone>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Submit Button Row -->
+          <div class="vp-submit-row">
+            <button
+              type="button"
+              class="vp-btn vp-btn--primary"
+              (click)="submitVisaDocs()"
+              [disabled]="!canSubmit()"
+            >
+              <app-hr-icon
+                class="vp-btn__icon"
+                name="visa-check-circle"
+                width="17"
+                height="17"
+              ></app-hr-icon>
+              <span>Validate Documents</span>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PROCESSING SCREEN
+     ═══════════════════════════════════════════════════════════════════════ -->
+@if (viewState() === "processing") {
+  <div class="vp-processing-wrapper">
+    <div class="vp-processing-card">
+      <div class="vp-processing__spinner"></div>
+      <h2 class="vp-processing__title">Analyzing Documents</h2>
+      <p class="vp-processing__desc">
+        We're cross-checking document formatting, employer registration, name alignments,
+        and employment durations. This may take a moment...
+      </p>
+    </div>
+  </div>
+}
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     RESULTS SCREEN
+     ═══════════════════════════════════════════════════════════════════════ -->
+@if (viewState() === "results") {
+  <div class="vp-results-wrapper">
+    <div class="vp-results-card">
+      <!-- Results Header -->
+      <div class="vp-results-header">
+        <div>
+          <div class="vp-results-meta">
+            <span class="vp-tag-pill vp-tag-pill--process">{{ responseProcessType() | uppercase }} VISA</span>
+            @if (profileType()) {
+              <span class="vp-tag-pill vp-tag-pill--profile" [title]="'Candidate Profile: ' + profileType()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>PROFILE: {{ profileType() | uppercase }}</span>
+              </span>
+            }
+            @if (tokenUsed()) {
+              <span class="vp-tag-pill vp-tag-pill--tokens">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
+                </svg>
+                {{ tokenUsed() | number }} tokens
+              </span>
+            }
+            @if (emailId()) {
+              <span class="vp-tag-pill vp-tag-pill--email">{{ emailId() }}</span>
+            }
+          </div>
+          <h1 class="vp-results-title">Visa Process Verification Results</h1>
+          <p class="vp-results-subtitle">
+            Comprehensive audit report covering document formatting, consistency, and compliance checks.
+          </p>
+        </div>
+        <button
+          type="button"
+          class="vp-btn vp-btn--secondary"
+          (click)="resetState()"
+        >
+          Verify New Files
+        </button>
+      </div>
+
+      <!-- Overview Banner -->
+      <div
+        class="vp-status-banner"
+        [class.vp-status-banner--warning]="hasAnyIssues()"
+      >
+        <div class="vp-status-banner__icon">
+          @if (hasAnyIssues()) {
+            <app-hr-icon
+              name="visa-warning-triangle"
+              width="24"
+              height="24"
+            ></app-hr-icon>
+          } @else {
+            <app-hr-icon
+              name="visa-success-circle"
+              width="24"
+              height="24"
+            ></app-hr-icon>
+          }
+        </div>
+        <div class="vp-status-banner__info">
+          <h3 class="vp-status-banner__title">
+            @if (hasAnyIssues()) {
+              {{ totalIssuesCount() }} Issues Detected Across Documents
+            } @else {
+              All compliance and formatting requirements successfully matched!
+            }
+          </h3>
+          <p class="vp-status-banner__desc">
+            @if (hasAnyIssues()) {
+              Found {{ totalFormatIssuesCount() }} formatting issue(s) and {{ totalContentIssuesCount() }} content discrepancy/discrepancies. Please review the detailed findings below.
+            } @else {
+              No discrepancies, missing items, or formatting errors were found across all uploaded documents.
+            }
+          </p>
+        </div>
+      </div>
+
+
+      <!-- Results Category Filter Nav -->
+      <div class="vp-results-nav">
+        <button
+          type="button"
+          class="vp-nav-btn"
+          [class.vp-nav-btn--active]="activeResultsCategory() === 'all'"
+          (click)="setResultsCategory('all')"
+        >
+          <span>All Findings</span>
+          <span class="nav-count">{{ totalIssuesCount() }}</span>
+        </button>
+
+        @if (totalFormatIssuesCount() > 0 || activeResultsCategory() === 'format') {
+          <button
+            type="button"
+            class="vp-nav-btn"
+            [class.vp-nav-btn--active]="activeResultsCategory() === 'format'"
+            (click)="setResultsCategory('format')"
+          >
+            <span>Document Formatting</span>
+            <span class="nav-count">{{ totalFormatIssuesCount() }}</span>
+          </button>
+        }
+
+        @if (totalInconsistenciesCount() > 0 || activeResultsCategory() === 'inconsistency') {
+          <button
+            type="button"
+            class="vp-nav-btn"
+            [class.vp-nav-btn--active]="activeResultsCategory() === 'inconsistency'"
+            (click)="setResultsCategory('inconsistency')"
+          >
+            <span>Inconsistencies</span>
+            <span class="nav-count">{{ totalInconsistenciesCount() }}</span>
+          </button>
+        }
+
+        @if (totalMissingItemsCount() > 0 || activeResultsCategory() === 'missing') {
+          <button
+            type="button"
+            class="vp-nav-btn"
+            [class.vp-nav-btn--active]="activeResultsCategory() === 'missing'"
+            (click)="setResultsCategory('missing')"
+          >
+            <span>Missing Items</span>
+            <span class="nav-count">{{ totalMissingItemsCount() }}</span>
+          </button>
+        }
+
+        @if (totalGrammaticalCount() > 0 || activeResultsCategory() === 'grammar') {
+          <button
+            type="button"
+            class="vp-nav-btn"
+            [class.vp-nav-btn--active]="activeResultsCategory() === 'grammar'"
+            (click)="setResultsCategory('grammar')"
+          >
+            <span>Grammar & Typos</span>
+            <span class="nav-count">{{ totalGrammaticalCount() }}</span>
+          </button>
+        }
+
+        @if (totalMiscellaneousCount() > 0 || activeResultsCategory() === 'misc') {
+          <button
+            type="button"
+            class="vp-nav-btn"
+            [class.vp-nav-btn--active]="activeResultsCategory() === 'misc'"
+            (click)="setResultsCategory('misc')"
+          >
+            <span>Miscellaneous</span>
+            <span class="nav-count">{{ totalMiscellaneousCount() }}</span>
+          </button>
+        }
+      </div>
+
+      <!-- ── SECTION 1: DOCUMENT FORMAT ISSUES ───────────────────────────── -->
+      @if (activeResultsCategory() === 'all' || activeResultsCategory() === 'format') {
+        @if (documentFormatIssues().length > 0) {
+          <div class="vp-section">
+            <div class="vp-section__header">
+              <h2 class="vp-section__title">
+                <span class="vp-section__icon">📐</span>
+                Document Formatting Issues
+              </h2>
+              <span class="vp-section__badge">{{ totalFormatIssuesCount() }} issue(s)</span>
+            </div>
+
+            <div class="vp-doc-cards-grid">
+              @for (doc of documentFormatIssues(); track doc.document_name) {
+                <div class="vp-doc-card" [class.vp-doc-card--has-issues]="doc.issues.length > 0">
+                  <div class="vp-doc-card__header">
+                    <div class="vp-doc-card__title-group">
+                      <span class="vp-doc-card__icon">📄</span>
+                      <div>
+                        <h4 class="vp-doc-card__name" [title]="doc.document_name">{{ doc.document_name }}</h4>
+                        <span class="vp-doc-card__type">{{ doc.document_type | uppercase }}</span>
+                      </div>
+                    </div>
+
+                    <div class="vp-doc-card__status">
+                      @if (doc.is_corupted || doc.is_corrupted) {
+                        <span class="vp-badge vp-badge--corrupted">Corrupted File</span>
+                      }
+                      @if (doc.is_pdf) {
+                        <span class="vp-badge vp-badge--unsupported">Document format not supported for PDF</span>
+                      } @else if (doc.issues.length === 0) {
+                        <span class="vp-badge vp-badge--clean">✓ Clean Formatting</span>
+                      } @else {
+                        <span class="vp-badge vp-badge--issues">{{ doc.issues.length }} Issue(s)</span>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Issues in this document -->
+                  @if (doc.issues && doc.issues.length > 0) {
+                    <div class="vp-format-issues-list">
+                      @for (issue of doc.issues; track $index) {
+                        <div class="vp-format-issue-item">
+                          <div class="vp-format-issue-item__top">
+                            <span class="vp-badge" [ngClass]="getIssueTypeBadgeClass(issue.type)">{{ formatIssueType(issue.type) }}</span>
+                          </div>
+
+                          <!-- Detected → Expected diff view -->
+                          @if (getDetectedValue(issue) !== null && getDetectedValue(issue) !== undefined) {
+                            <div class="vp-diff-row">
+                              <span class="vp-diff-chip vp-diff-chip--detected">
+                                <span class="vp-diff-chip__label">Detected</span>
+                                <span class="vp-diff-chip__value">{{ getDetectedValue(issue) }}</span>
+                              </span>
+                              @if (getExpectedValue(issue)) {
+                                <span class="vp-diff-arrow">→</span>
+                                <span class="vp-diff-chip vp-diff-chip--expected">
+                                  <span class="vp-diff-chip__label">Expected</span>
+                                  <span class="vp-diff-chip__value">{{ getExpectedValue(issue) }}</span>
+                                </span>
+                              }
+                            </div>
+                          }
+
+                          @if (issue.issue) {
+                            <p class="vp-format-issue-msg">{{ issue.issue }}</p>
+                          }
+
+                          @if (issue.text_with_issue) {
+                            <div class="vp-format-issue-snippet">
+                              <div class="snippet-header">
+                                <span class="snippet-label">Affected Text:</span>
+                                <button type="button" class="snippet-toggle"
+                                  (click)="toggleSnippet(doc.document_name + '-' + $index)">
+                                  {{ isSnippetExpanded(doc.document_name + '-' + $index) ? '▲ Collapse' : '▼ Expand' }}
+                                </button>
+                              </div>
+                              <blockquote class="snippet-text"
+                                [class.snippet-text--expanded]="isSnippetExpanded(doc.document_name + '-' + $index)">
+                                "{{ issue.text_with_issue }}"
+                              </blockquote>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  } @else if (doc.is_pdf) {
+                    <div class="vp-doc-card__clean-msg vp-doc-card__clean-msg--unsupported">
+                      <span>Document format analysis is not supported for PDF files.</span>
+                    </div>
+                  } @else {
+                    <div class="vp-doc-card__clean-msg">
+                      <span>✓ No formatting defects or styling anomalies detected in this document.</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+
+      <!-- ── SECTION 2: DOCUMENT INCONSISTENCY ───────────────────────────── -->
+      @if (activeResultsCategory() === 'all' || activeResultsCategory() === 'inconsistency') {
+        @if (documentInconsistencies().length > 0) {
+          <div class="vp-section">
+            <div class="vp-section__header">
+              <h2 class="vp-section__title">
+                <span class="vp-section__icon">⚖️</span>
+                Document Inconsistencies
+              </h2>
+              <span class="vp-section__badge">{{ documentInconsistencies().length }} item(s)</span>
+            </div>
+
+            <div class="vp-findings-list">
+              @for (item of documentInconsistencies(); track $index) {
+                <div class="vp-finding-card vp-finding-card--inconsistency">
+                  <!-- Document comparison strip -->
+                  @if (item.documents_involved && item.documents_involved.length > 0) {
+                    <div class="vp-doc-strip">
+                      @for (doc of item.documents_involved; track doc) {
+                        <div class="vp-doc-strip__item" [ngClass]="getDocumentBadgeClass(doc)">
+                          <span class="vp-doc-strip__icon">📄</span>
+                          <span class="vp-doc-strip__name">{{ doc }}</span>
+                        </div>
+                      }
+                    </div>
+                  }
+                  <div class="vp-finding-card__header">
+                    <span class="vp-badge vp-badge--inconsistency">Discrepancy</span>
+                  </div>
+                  <div class="vp-finding-card__body">
+                    @if (item.issue && item.description) {
+                      <h4 class="vp-finding-issue-title">{{ item.issue }}</h4>
+                      <p class="vp-finding-desc"
+                         [class.vp-finding-desc--truncated]="!isDescriptionExpanded('inc-' + $index)">
+                        {{ item.description }}
+                      </p>
+                      @if (item.description.length > 150) {
+                        <button type="button" class="vp-read-more"
+                          (click)="toggleDescription('inc-' + $index)">
+                          {{ isDescriptionExpanded('inc-' + $index) ? 'Show less' : 'Read more' }}
+                        </button>
+                      }
+                    } @else if (item.issue) {
+                      <p class="vp-finding-text">{{ item.issue }}</p>
+                    } @else {
+                      <p class="vp-finding-text">{{ item.inconsistency }}</p>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+
+      <!-- ── SECTION 3: MISSING ITEMS ────────────────────────────────────── -->
+      @if (activeResultsCategory() === 'all' || activeResultsCategory() === 'missing') {
+        @if (missingItems().length > 0) {
+          <div class="vp-section">
+            <div class="vp-section__header">
+              <h2 class="vp-section__title">
+                <span class="vp-section__icon">📋</span>
+                Missing Mandatory Information
+              </h2>
+              <span class="vp-section__badge">{{ missingItems().length }} item(s)</span>
+            </div>
+
+            <div class="vp-findings-list">
+              @for (item of missingItems(); track $index) {
+                <div class="vp-finding-card vp-finding-card--missing">
+                  <div class="vp-finding-card__header">
+                    <span class="vp-badge vp-badge--missing">Missing Requirement</span>
+                  </div>
+                  <div class="vp-finding-card__body">
+                    @if (item.description) {
+                      <h4 class="vp-finding-issue-title">{{ item.inconsistency || item.issue }}</h4>
+                      <p class="vp-finding-desc">{{ item.description }}</p>
+                    } @else {
+                      <p class="vp-finding-text">{{ item.inconsistency || item.issue }}</p>
+                    }
+
+                    <!-- Document Coverage Matrix -->
+                    @if ((item.present_in && item.present_in.length > 0) || (item.missing_from && item.missing_from.length > 0)) {
+                      <div class="vp-coverage-matrix">
+                        <span class="vp-coverage-matrix__label">Document Coverage</span>
+                        <div class="vp-coverage-matrix__grid">
+                          @if (item.present_in && item.present_in.length > 0) {
+                            @for (p of item.present_in; track p) {
+                              <div class="vp-coverage-cell vp-coverage-cell--present">
+                                <span class="vp-coverage-cell__icon">✓</span>
+                                <span class="vp-coverage-cell__name">{{ p }}</span>
+                                <span class="vp-coverage-cell__status">Present</span>
+                              </div>
+                            }
+                          }
+                          @if (item.missing_from && item.missing_from.length > 0) {
+                            @for (m of item.missing_from; track m) {
+                              <div class="vp-coverage-cell vp-coverage-cell--missing">
+                                <span class="vp-coverage-cell__icon">✗</span>
+                                <span class="vp-coverage-cell__name">{{ m }}</span>
+                                <span class="vp-coverage-cell__status">Missing</span>
+                              </div>
+                            }
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+
+      <!-- ── SECTION 4: GRAMMATICAL & TYPOS ──────────────────────────────── -->
+      @if (activeResultsCategory() === 'all' || activeResultsCategory() === 'grammar') {
+        @if (grammaticalIssues().length > 0) {
+          <div class="vp-section">
+            <div class="vp-section__header">
+              <h2 class="vp-section__title">
+                <span class="vp-section__icon">✍️</span>
+                Grammatical & Typographical Issues
+              </h2>
+              <span class="vp-section__badge">{{ grammaticalIssues().length }} item(s)</span>
+            </div>
+
+            <div class="vp-findings-list">
+              @for (item of grammaticalIssues(); track $index) {
+                <div class="vp-finding-card vp-finding-card--grammar">
+                  <div class="vp-finding-card__header">
+                    <h4 class="vp-finding-issue-title">{{ item.issue }}</h4>
+                    @if (item.documents_involved && item.documents_involved.length > 0) {
+                      <div class="vp-doc-tags">
+                        @for (doc of item.documents_involved; track doc) {
+                          <span class="vp-doc-tag" [class]="getDocumentBadgeClass(doc)">{{ doc }}</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                  <div class="vp-finding-card__body">
+                    <p class="vp-finding-desc">{{ item.description }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+
+      <!-- ── SECTION 5: MISCELLANEOUS ────────────────────────────────────── -->
+      @if (activeResultsCategory() === 'all' || activeResultsCategory() === 'misc') {
+        @if (miscellaneousIssues().length > 0) {
+          <div class="vp-section">
+            <div class="vp-section__header">
+              <h2 class="vp-section__title">
+                <span class="vp-section__icon">⚠️</span>
+                Miscellaneous & Risk Analysis
+              </h2>
+              <span class="vp-section__badge">{{ miscellaneousIssues().length }} item(s)</span>
+            </div>
+
+            <div class="vp-findings-list">
+              @for (item of miscellaneousIssues(); track $index) {
+                <div class="vp-finding-card vp-finding-card--misc">
+                  <div class="vp-finding-card__header">
+                    <h4 class="vp-finding-issue-title">{{ item.issue }}</h4>
+                    @if (item.documents_involved && item.documents_involved.length > 0) {
+                      <div class="vp-doc-tags">
+                        @for (doc of item.documents_involved; track doc) {
+                          <span class="vp-doc-tag" [class]="getDocumentBadgeClass(doc)">{{ doc }}</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                  <div class="vp-finding-card__body">
+                    <p class="vp-finding-desc">{{ item.description }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+
+      <!-- Clean State when active category has 0 issues -->
+      @if (!hasAnyIssues()) {
+        <div class="vp-results-empty">
+          <div class="vp-results-empty__icon">🎉</div>
+          <h3 class="vp-results-empty__title">Verification Clean</h3>
+          <p class="vp-results-empty__desc">
+            All legal details, names, addresses, dates, and typography formatting match across all uploaded documents.
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     FILE PREVIEW MODAL
+     ═══════════════════════════════════════════════════════════════════════ -->
+@if (previewFile()) {
+  <div class="preview-modal-overlay" (click)="closeFilePreview()">
+    <div class="preview-modal-container" (click)="$event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="preview-modal-header">
+        <div class="preview-file-info">
+          <span class="preview-file-icon">📄</span>
+          <span class="preview-file-name" [title]="previewFile()?.name">
+            {{ previewFile()?.name }}
+          </span>
+        </div>
+        <div class="preview-modal-actions">
+          @if (previewFileUrl()) {
+            <a
+              [href]="previewFileUrl()"
+              [download]="previewFile()?.name || 'download'"
+              class="action-btn download-btn"
+              title="Download File"
+            >
+              <app-hr-icon name="download" width="18" height="18"></app-hr-icon>
+            </a>
+          }
+          <button
+            type="button"
+            class="action-btn close-btn"
+            (click)="closeFilePreview()"
+            title="Close Preview"
+          >
+            &times;
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="preview-modal-body">
+        @if (isPreviewImage) {
+          <div class="preview-content-image">
+            <img [src]="previewFileUrl()" alt="Image Preview" />
+          </div>
+        } @else if (isPreviewPdf) {
+          <div class="preview-content-pdf">
+            <iframe
+              [src]="safePreviewUrl()"
+              width="100%"
+              height="100%"
+              frameborder="0"
+            ></iframe>
+          </div>
+        } @else if (isPreviewDocx) {
+          <div class="preview-content-docx">
+            @if (isRenderingDocx()) {
+              <div class="docx-loading">
+                <div class="vp-processing__spinner"></div>
+                <p>Loading document preview...</p>
+              </div>
+            }
+            <div #docxContainer class="docx-render-container"></div>
+          </div>
+        } @else if (isPreviewText) {
+          <div class="preview-content-text">
+            <pre><code>{{ previewTextContent() }}</code></pre>
+          </div>
+        } @else {
+          <div class="preview-content-fallback">
+            <div class="fallback-card">
+              <div class="fallback-icon">
+                <app-hr-icon name="job" width="48" height="48"></app-hr-icon>
+              </div>
+              <h3>No Preview Available</h3>
+              <p>
+                This file type ({{
+                  getFileExtension(previewFile()?.name || "")
+                }}) cannot be previewed inline.
+              </p>
+              @if (previewFileUrl()) {
+                <a
+                  [href]="previewFileUrl()"
+                  [download]="previewFile()?.name || 'download'"
+                  class="premium-download-link"
+                >
+                  Download to view
+                </a>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

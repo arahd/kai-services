@@ -1,0 +1,214 @@
+<div class="chat-main-layout">
+  <!-- Chat area -->
+  <div class="chat-area">
+    @if (activeProjectBreadcrumb(); as project) {
+      <div class="project-chat-breadcrumb-bar">
+        <nav class="project-breadcrumb" aria-label="Project Breadcrumb">
+          <button
+            type="button"
+            class="crumb-btn crumb-link"
+            (click)="goToProjects()"
+            title="Go to Projects"
+          >
+            Projects
+          </button>
+          <span class="crumb-slash">/</span>
+          <button
+            type="button"
+            class="crumb-btn crumb-link"
+            (click)="goToProject(project.projectId)"
+            [title]="'Go to ' + project.projectName"
+          >
+            {{ project.projectName }}
+          </button>
+          <span class="crumb-slash">/</span>
+          <span class="crumb-active crumb-conversation-name" [title]="conversationBreadcrumbName()">{{ conversationBreadcrumbName() }}</span>
+        </nav>
+      </div>
+    }
+
+    @if (isConversationLoading() || !chatState.currentConversation()) {
+      <!-- Skeleton Pulse loader shown while switching conversations -->
+      <div class="conv-skeleton-wrap" aria-busy="true" aria-label="Loading conversation">
+        <div class="conv-skeleton-row conv-skeleton-row--bot">
+          <div class="conv-skel-avatar"></div>
+          <div class="conv-skel-lines">
+            <div class="conv-skel-line conv-skel-line--w90"></div>
+            <div class="conv-skel-line conv-skel-line--w75"></div>
+            <div class="conv-skel-line conv-skel-line--w60"></div>
+          </div>
+        </div>
+        <div class="conv-skeleton-row conv-skeleton-row--user">
+          <div class="conv-skel-bubble conv-skel-bubble--w50"></div>
+        </div>
+        <div class="conv-skeleton-row conv-skeleton-row--bot">
+          <div class="conv-skel-avatar"></div>
+          <div class="conv-skel-lines">
+            <div class="conv-skel-line conv-skel-line--w80"></div>
+            <div class="conv-skel-line conv-skel-line--w55"></div>
+          </div>
+        </div>
+        <div class="conv-skeleton-row conv-skeleton-row--user">
+          <div class="conv-skel-bubble conv-skel-bubble--w35"></div>
+        </div>
+        <div class="conv-skeleton-row conv-skeleton-row--bot">
+          <div class="conv-skel-avatar"></div>
+          <div class="conv-skel-lines">
+            <div class="conv-skel-line conv-skel-line--w65"></div>
+            <div class="conv-skel-line conv-skel-line--w40"></div>
+          </div>
+        </div>
+      </div>
+    } @else if (chatState.currentConversation()) {
+      <div
+        class="messages-wrap"
+        appChatScroll
+        [isGenerating]="
+          chatState.isChatGenerating(
+            chatState.currentConversation()!.conversationID ||
+              chatState.currentConversation()!.id.toString()
+          )
+        "
+        [chatScrollTrigger]="chatState.currentConversation()!.messages"
+      >
+        <div class="messages">
+          @for (
+            msg of chatState.currentConversation()!.messages;
+            track msg;
+            let i = $index, isLast = $last
+          ) {
+            @if (shouldShowDateSeparator(i)) {
+              <div class="date-separator">
+                <span class="date-label">{{ getDateSeparatorLabel(i) }}</span>
+              </div>
+            }
+
+            <div
+              class="message"
+              [id]="'chat-msg-' + i"
+              [class.user]="msg.sender === 'user'"
+              [class.user-msg]="msg.sender === 'user'"
+              [class.bot]="msg.sender === 'bot'"
+              [class.bot-msg]="msg.sender === 'bot'"
+            >
+              @switch (msg.sender) {
+                @case ("user") {
+                  <app-user-message
+                    [msg]="msg"
+                    [index]="i"
+                    [copied]="copied[i]"
+                    [userAvatar]="chatState.userInfo.avatar ?? null"
+                    [userName]="chatState.userInfo.name"
+                    (copyMessage)="copyUserMessage(msg, i)"
+                    (editMessage)="editUserMessage(msg)"
+                    (toggleCollapse)="toggleMessageCollapse(msg)"
+                    (previewFile)="
+                      chatFacade.attachment.activePreviewFile.set($event.file)
+                    "
+                  ></app-user-message>
+                }
+                @case ("bot") {
+                  <app-bot-message
+                    [msg]="msg"
+                    [index]="i"
+                    [isLast]="isLast"
+                    [copied]="copied[i]"
+                    [showActions]="canShowMessageActions(msg)"
+                    (copyMessage)="copyBotMessage(msg, i)"
+                    (shareMessage)="shareMessage(msg)"
+                    (viewSources)="openAugUrlPopup($event)"
+                    (retryMessage)="retryMessage(i)"
+                    (previewImage)="previewBotImage($event)"
+                  ></app-bot-message>
+
+                  @if (
+                    msg.suggestions &&
+                    msg.suggestions.length > 0 &&
+                    msg.status === "completed" &&
+                    !msg.isPlaceholder &&
+                    i === chatState.currentConversation()!.messages.length - 1
+                  ) {
+                    <div class="inline-suggestions-card">
+                      <!-- <div class="inline-suggestions-header">
+                        <app-chat-icon
+                          name="star"
+                          width="14"
+                          height="14"
+                        ></app-chat-icon>
+                        Suggested follow-ups
+                      </div> -->
+                      <div class="inline-suggestions-list">
+                        @for (q of msg.suggestions; track q) {
+                          <button
+                            class="inline-suggestion-chip"
+                            [disabled]="
+                              chatState.isChatGenerating(
+                                chatState.currentConversation()!
+                                  .conversationID ||
+                                  chatState
+                                    .currentConversation()!
+                                    .id.toString()
+                              )
+                            "
+                            (click)="handleSuggestionClick(q)"
+                          >
+                            {{ q }}
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                }
+              }
+            </div>
+          }
+
+          <!-- ⏳ Thinking Loader -->
+          @if (chatState.shouldShowSkeleton()) {
+            <div class="bot-message-container thinking-loader-container">
+              <div class="bot-avatar">
+                <img
+                  src="./kumaran-lg.png"
+                  alt="KAI"
+                  width="28"
+                  height="28"
+                />
+              </div>
+              <div class="thinking-pill-card">
+                <div class="thinking-pill-left">
+                  <div class="thinking-sparkle-icon">
+                    <app-chat-icon
+                      name="sparkle"
+                      width="15"
+                      height="15"
+                      class="sparkle-svg"
+                    ></app-chat-icon>
+                  </div>
+                  <span class="thinking-status-text shimmer-text">{{
+                    chatState.currentLoadingMessage()
+                  }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Prompt composer is ALWAYS visible in screen -->
+    <app-prompt-composer class="composer-wrapper"></app-prompt-composer>
+  </div>
+
+  <!-- Right-Side Question Navigator Panel -->
+  <app-question-navigator
+    [messages]="chatState.currentConversation()?.messages"
+  ></app-question-navigator>
+</div>
+
+<app-common-popup
+  [show]="showPopup"
+  title="Response Sources"
+  [items]="augUrls"
+  (closePopup)="onPopupClose()"
+>
+</app-common-popup>

@@ -1,0 +1,39 @@
+// ══════════════════════════════════════════════════════════
+//  RED FLAGS
+// ══════════════════════════════════════════════════════════
+.flag-list {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.flag-item {
+  border: 1px solid var(--red-bg);
+  border-left: 3px solid var(--red);
+  border-radius: var(--r);
+  background: rgba(252,234,234,.35);
+  padding: 9px 12px;
+
+  &__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  &__text {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--t1);
+  }
+
+  &__reason {
+    font-size: 11px;
+    color: var(--t3);
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+

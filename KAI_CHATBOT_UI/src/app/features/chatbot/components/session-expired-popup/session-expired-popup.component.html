@@ -1,0 +1,20 @@
+<div class="limit-popup-overlay">
+  <div class="limit-popup-content">
+    <div class="popup-header">
+      <div class="warning-icon">
+        <app-chat-icon name="expired" width="36" height="36" style="color: #ef4444;"></app-chat-icon>
+      </div>
+      <h2>Session Expired</h2>
+    </div>
+    <div class="popup-body">
+      <p class="sub-text">
+        Your conversation session has been expired. Please start a new one.
+      </p>
+    </div>
+    <div class="popup-footer">
+      <button class="btn-primary-action" (click)="confirm.emit()">
+        Start New Conversation
+      </button>
+    </div>
+  </div>
+</div>

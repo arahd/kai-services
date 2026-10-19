@@ -1,0 +1,565 @@
+<!-- Prompt Composer — Figma: rounded input container at bottom -->
+<div class="input-section">
+  <!-- Scroll to bottom button -->
+  @if (showScrollToBottom) {
+    <button
+      class="scroll-bottom-btn"
+      (click)="chatScrollService.scrollToBottom()"
+    >
+      <app-chat-icon name="scroll-down" width="30" height="30"></app-chat-icon>
+    </button>
+  }
+
+  <!-- Floating Queue Tray (above composer, outside the box) -->
+  @if (promptQueue.length > 0) {
+    <div class="queue-tray" [class.collapsed]="isQueueCollapsed">
+      <div
+        class="queue-tray-header"
+        (click)="toggleQueueCollapse()"
+        [appTooltip]="isQueueCollapsed ? 'Click to expand queued prompts' : 'Click to collapse'"
+      >
+        <div class="queue-title">
+          <span class="queue-title-text">Queued Prompts</span>
+          <span class="queue-badge">{{ promptQueue.length }}</span>
+
+          @if (isQueueCollapsed && promptQueue.length > 0) {
+            <span class="queue-collapsed-preview">
+              <span class="queue-preview-prefix">Up next:</span>
+              <span class="queue-preview-text">"{{ promptQueue[0].message }}"</span>
+              @if (promptQueue.length > 1) {
+                <span class="queue-preview-more">+{{ promptQueue.length - 1 }} more</span>
+              }
+            </span>
+          }
+        </div>
+
+        <div class="queue-header-actions" (click)="$event.stopPropagation()">
+          @if (!isQueueCollapsed && promptQueue.length > 1) {
+            <button
+              type="button"
+              class="queue-clear-btn"
+              (click)="clearQueue()"
+              appTooltip="Clear all queued prompts"
+            >
+              Clear all
+            </button>
+          }
+          <button
+            type="button"
+            class="queue-toggle-btn"
+            (click)="toggleQueueCollapse($event)"
+            [appTooltip]="isQueueCollapsed ? 'Expand queued prompts' : 'Collapse queued prompts'"
+            [attr.aria-expanded]="!isQueueCollapsed"
+          >
+            <app-chat-icon
+              [name]="isQueueCollapsed ? 'chevron-down' : 'chevron-up'"
+              width="14"
+              height="14"
+            ></app-chat-icon>
+          </button>
+        </div>
+      </div>
+
+      @if (!isQueueCollapsed) {
+        <div class="queue-list">
+          @for (item of promptQueue; track item.id; let idx = $index) {
+            <div
+              class="queue-card"
+              [class.editing]="item.editing"
+              [class.dragging]="draggedIndex === idx"
+              [class.drag-over]="dragOverIndex === idx && draggedIndex !== idx"
+              [attr.draggable]="!item.editing"
+              (dragstart)="onDragStart($event, idx)"
+              (dragover)="onDragOver($event, idx)"
+              (drop)="onDrop($event, idx)"
+              (dragend)="onDragEnd()"
+            >
+              <!-- Drag Handle (shown when > 1 item) -->
+              @if (promptQueue.length > 1) {
+                <span class="queue-drag-handle" title="Drag to reorder">
+                  <app-chat-icon name="drag-handle" width="14" height="14"></app-chat-icon>
+                </span>
+              }
+
+              <div class="queue-card-left">
+                <span class="queue-index">{{ idx + 1 }}</span>
+              </div>
+
+              @if (item.editing) {
+                <div class="queue-edit-box">
+                  <textarea
+                    class="queue-edit-textarea"
+                    rows="2"
+                    [value]="item.editDraft ?? item.message"
+                    (input)="onQueueEditInput(item.id, $event)"
+                    (keydown)="handleQueueEditKeydown(item.id, $event)"
+                    placeholder="Edit your prompt..."
+                  ></textarea>
+                  <div class="queue-edit-actions">
+                    <button
+                      type="button"
+                      class="queue-pill-btn save"
+                      (click)="confirmEditQueueItem(item.id)"
+                      appTooltip="Save changes (Enter)"
+                    >
+                      <app-chat-icon name="check-simple" width="12" height="12"></app-chat-icon>
+                      <span>Save</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="queue-pill-btn cancel"
+                      (click)="cancelEditQueueItem(item.id)"
+                      appTooltip="Cancel (Esc)"
+                    >
+                      <app-chat-icon name="close" width="12" height="12"></app-chat-icon>
+                      <span>Cancel</span>
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <div class="queue-card-body">
+                  <span class="queue-text" [appTooltip]="item.message.length > 60 ? item.message : ''">{{ item.message }}</span>
+                  @if (item.files && item.files.length > 0) {
+                    <span class="queue-files-indicator">
+                      <app-chat-icon name="document" width="11" height="11"></app-chat-icon>
+                      <span>{{ item.files.length }}</span>
+                    </span>
+                  }
+                </div>
+                <div class="queue-card-actions">
+                  @if (promptQueue.length > 1) {
+                    <button
+                      type="button"
+                      class="queue-icon-btn reorder"
+                      [disabled]="idx === 0"
+                      (click)="moveQueueItemUp(idx)"
+                      appTooltip="Move up"
+                    >
+                      <app-chat-icon name="arrow-up" width="12" height="12"></app-chat-icon>
+                    </button>
+                    <button
+                      type="button"
+                      class="queue-icon-btn reorder"
+                      [disabled]="idx === promptQueue.length - 1"
+                      (click)="moveQueueItemDown(idx)"
+                      appTooltip="Move down"
+                    >
+                      <app-chat-icon name="arrow-down" width="12" height="12"></app-chat-icon>
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    class="queue-icon-btn edit"
+                    (click)="startEditQueueItem(item.id)"
+                    appTooltip="Edit prompt"
+                  >
+                    <app-chat-icon name="edit" width="13" height="13"></app-chat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    class="queue-icon-btn delete"
+                    (click)="deleteQueueItem(item.id)"
+                    appTooltip="Remove from queue"
+                  >
+                    <app-chat-icon name="trash" width="13" height="13"></app-chat-icon>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Composer Container -->
+  <div
+    class="premium-composer"
+    [style.border-radius]="isSingleLine ? '2.5rem' : '1.5rem'"
+    [class.has-messages]="hasMessages"
+  >
+    <div class="composer-inner" [class.single-line]="isSingleLine">
+      <!-- Sparkle icon — only in multi-line mode when empty and queue is empty -->
+      @if (
+        !isSingleLine &&
+        inputMessage.length === 0 &&
+        filePreviews.length === 0 &&
+        promptQueue.length === 0
+      ) {
+        <div
+          class="input-header"
+          [class.hidden]="inputMessage.trim() || uploadedCount > 0"
+        >
+          <app-chat-icon name="sparkles" width="26" height="26"></app-chat-icon>
+        </div>
+      }
+
+      <!-- File previews (only in multi-line mode, since files force multi-line) -->
+      @if (filePreviews.length > 0) {
+        <div
+          class="composer-file-previews"
+          [class.has-left-scroll]="showLeftScroll"
+          [class.has-right-scroll]="showRightScroll"
+        >
+          @if (showLeftScroll) {
+            <button
+              class="scroll-arrow prev"
+              (click)="scrollFiles('left')"
+              appTooltip="Scroll left"
+            >
+              <app-chat-icon
+                name="chevron-left"
+                width="12"
+                height="12"
+              ></app-chat-icon>
+            </button>
+          }
+          <div
+            class="file-previews-scroll"
+            #fileScrollContainer
+            (scroll)="onFileScroll()"
+          >
+            @for (fp of filePreviews; track $index; let i = $index) {
+              @if (fp.error) {
+                <div class="file-preview-chip error" [appTooltip]="fp.error">
+                  <div class="chip-left">
+                    <div class="chip-error-icon">
+                      <app-chat-icon
+                        name="circle-cross"
+                        width="18"
+                        height="18"
+                      ></app-chat-icon>
+                    </div>
+                  </div>
+                  <div class="chip-details">
+                    <span class="chip-name">{{ fp.name }}</span>
+                    <span class="chip-error-text">Failed</span>
+                  </div>
+                  <button
+                    class="chip-remove"
+                    (click)="removeFile(i); $event.stopPropagation()"
+                  >
+                    <app-chat-icon
+                      name="close"
+                      width="10"
+                      height="10"
+                    ></app-chat-icon>
+                  </button>
+                </div>
+              } @else {
+                <div
+                  class="file-preview-chip"
+                  [class.clickable]="fp.uploaded && !fp.deleting"
+                  [class.uploading]="fp.uploading"
+                  [class.deleting]="fp.deleting"
+                  [style.cursor]="fp.uploaded && !fp.deleting ? 'pointer' : 'default'"
+                  
+                  (click)="fp.uploaded && !fp.deleting ? previewFile(fp, i) : null"
+                >
+                  <div class="chip-left">
+                    @if (isImageFile(fp.name) && fp.previewUrl) {
+                      <img [src]="fp.previewUrl" class="chip-img" alt="" />
+                    } @else {
+                      <div class="chip-doc" [ngClass]="getFileTypeClass(fp.name)">
+                        <app-chat-icon
+                          [name]="getFileIconName(fp.name)"
+                          width="20"
+                          height="20"
+                        ></app-chat-icon>
+                      </div>
+                    }
+                  </div>
+                  <div class="chip-details">
+                    <span class="chip-name">{{ fp.name }}</span>
+                    <span class="chip-type">
+                      @if (fp.deleting) {
+                        Removing...
+                      } @else if (fp.uploading) {
+                        Uploading {{ fp.progress }}%
+                      } @else {
+                        {{ getFileTypeLabel(fp.name) }}
+                      }
+                    </span>
+                  </div>
+                  @if (!fp.deleting) {
+                    <button
+                      class="chip-remove"
+                      [disabled]="fp.deleting"
+                      (click)="removeFile(i); $event.stopPropagation()"
+                      [appTooltip]="fp.uploading ? 'Cancel upload' : ''"
+                    >
+                      <app-chat-icon
+                        name="close"
+                        width="10"
+                        height="10"
+                      ></app-chat-icon>
+                    </button>
+                  }
+
+                  <!-- Progress bar fill at bottom only when actively uploading -->
+                  @if (fp.uploading) {
+                    <div class="chip-progress-bar">
+                      <div
+                        class="chip-progress-fill"
+                        [style.width.%]="fp.progress"
+                      ></div>
+                    </div>
+                  }
+                </div>
+              }
+            }
+          </div>
+          @if (showRightScroll) {
+            <button
+              class="scroll-arrow next"
+              (click)="scrollFiles('right')"
+              appTooltip="Scroll right"
+            >
+              <app-chat-icon
+                name="chevron-right"
+                width="12"
+                height="12"
+              ></app-chat-icon>
+            </button>
+          }
+        </div>
+      }
+
+
+      <!-- Unified input row: CSS handles single vs multi layout -->
+      <div class="composer-input-row">
+        <!-- Attach button (visible in single-line; hidden in multi-line where it goes to action-row) -->
+        <button
+          id="tour-file-upload"
+          class="icon-action-btn attach-btn-circle inline-attach"
+          (click)="openFilePicker()"
+          appTooltip="Attach file"
+        >
+          <app-chat-icon name="plus" width="16" height="16"></app-chat-icon>
+        </button>
+
+        <div class="textarea-wrapper" [class.expanded]="isExpanded">
+          <textarea
+            id="chatInput"
+            #textArea
+            rows="1"
+            (paste)="handlePaste($event)"
+            [ngModel]="inputMessage"
+            (ngModelChange)="onInputChange($event)"
+            [placeholder]="isGenerating ? 'Type next prompt (press Enter to queue)...' : placeholder"
+            (input)="autoResize($event)"
+            (keydown)="handleTextareaKeydown($event)"
+            [class.expanded]="isExpanded"
+            [class.tabular]="inputMessage.includes('\t') || inputMessage.includes(' | ')"
+          ></textarea>
+        </div>
+
+        <!-- Controls (visible inline in single-line mode) -->
+        <div class="composer-controls">
+          <!-- Model Selector -->
+          <div
+            id="tour-model-selector"
+            class="model-selector-pill"
+            [class.open]="modelDropdownOpen"
+            [class.model-locked]="isModelLocked"
+            (click)="toggleModelDropdown($event)"
+            [appTooltip]="isModelLocked ? 'Model locked for this conversation. Start a new chat to switch.' : 'Select Model'"
+          >
+            <span>{{ selectedModelLabel || "GPT-5.1" }}</span>
+            @if (!isModelLocked) {
+              <app-chat-icon
+                name="chevron-down"
+                width="12"
+                height="12"
+              ></app-chat-icon>
+            }
+            @if (modelDropdownOpen) {
+              <div class="options" [ngClass]="dropdownDirection === 'up' ? 'options-bottom' : (dropdownDirection === 'down' ? 'options-top' : (isWelcomePage ? 'options-top' : 'options-bottom'))">
+                @for (model of models; track $index) {
+                  <div
+                    class="option"
+                    [class.selected]="model.value === selectedModel"
+                    (click)="selectModel(model, $event)"
+                  >
+                    <div class="model-option-value">
+                      <p>{{ model.label }}</p>
+                      @if (model.description) {
+                        <p>{{ model.description }}</p>
+                      }
+                    </div>
+                    @if (model.value === selectedModel) {
+                      <div>
+                        <app-chat-icon
+                          name="check-simple"
+                          width="11"
+                          height="8"
+                        ></app-chat-icon>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Voice Button -->
+          <button
+            id="tour-mic-input"
+            class="icon-action-btn mic-btn-circle"
+            [class.active]="isListening"
+            (click)="isListening ? stopVoice() : startVoice()"
+            [disabled]="isGenerating"
+            [appTooltip]="isListening ? 'Click to stop recording' : 'Voice input'"
+            type="button"
+          >
+            @if (isListening) {
+              <app-chat-icon name="mic" width="18" height="18" class="mic-icon-active"></app-chat-icon>
+              <app-chat-icon name="close" width="16" height="16" class="mic-icon-cancel"></app-chat-icon>
+            } @else {
+              <app-chat-icon name="mic" width="18" height="18"></app-chat-icon>
+            }
+          </button>
+
+          <!-- Send / Stop / Queue -->
+          @if (isGenerating) {
+            <button
+              class="send-action-btn stop"
+              (click)="cancelGeneration()"
+              appTooltip="Stop generating"
+            >
+              <app-chat-icon name="stop" width="16" height="16"></app-chat-icon>
+            </button>
+          }
+          @if (!isGenerating || inputMessage.trim().length > 0) {
+            <button
+              class="send-action-btn"
+              [class.queue-btn]="isGenerating"
+              (click)="sendMessage()"
+              [disabled]="!inputMessage.trim()"
+              [appTooltip]="isGenerating ? 'Add to queue' : 'Send message'"
+            >
+              <app-chat-icon name="send" width="20" height="20"></app-chat-icon>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Action row (only in multi-line mode — attach on left, controls on right) -->
+      <div class="composer-action-row">
+        <div class="controls-left">
+          <button
+            class="icon-action-btn attach-btn-circle action-row-attach"
+            (click)="openFilePicker()"
+            appTooltip="Attach file"
+          >
+            <app-chat-icon name="plus" width="16" height="16"></app-chat-icon>
+          </button>
+        </div>
+        <div class="controls-right">
+          <!-- Model Selector -->
+          <div
+            id="tour-model-selector-expanded"
+            class="model-selector-pill"
+            [class.open]="modelDropdownOpen"
+            [class.model-locked]="isModelLocked"
+            (click)="toggleModelDropdown($event)"
+            [attr.title]="isModelLocked ? 'Model locked for this conversation. Start a new chat to switch.' : null"
+            [appTooltip]="isModelLocked ? 'Model locked for this conversation. Start a new chat to switch.' : 'Select Model'"
+          >
+            <span>{{ selectedModelLabel || "GPT-5.1" }}</span>
+            @if (!isModelLocked) {
+              <app-chat-icon
+                name="chevron-down"
+                width="12"
+                height="12"
+              ></app-chat-icon>
+            }
+            @if (modelDropdownOpen) {
+              <div class="options" [ngClass]="dropdownDirection === 'up' ? 'options-bottom' : (dropdownDirection === 'down' ? 'options-top' : (isWelcomePage ? 'options-top' : 'options-bottom'))">
+                @for (model of models; track $index) {
+                  <div
+                    class="option"
+                    [class.selected]="model.value === selectedModel"
+                    (click)="selectModel(model, $event)"
+                  >
+                    <div class="model-option-value">
+                      <p>{{ model.label }}</p>
+                      @if (model.description) {
+                        <p>{{ model.description }}</p>
+                      }
+                    </div>
+                    @if (model.value === selectedModel) {
+                      <div>
+                        <app-chat-icon
+                          name="check-simple"
+                          width="11"
+                          height="8"
+                        ></app-chat-icon>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Voice Button -->
+          <button
+            class="icon-action-btn mic-btn-circle"
+            [class.active]="isListening"
+            (click)="isListening ? stopVoice() : startVoice()"
+            [disabled]="isGenerating"
+            [appTooltip]="isListening ? 'Click to stop recording' : 'Voice input'"
+            type="button"
+          >
+            @if (isListening) {
+              <app-chat-icon name="mic" width="18" height="18" class="mic-icon-active"></app-chat-icon>
+              <app-chat-icon name="close" width="16" height="16" class="mic-icon-cancel"></app-chat-icon>
+            } @else {
+              <app-chat-icon name="mic" width="18" height="18"></app-chat-icon>
+            }
+          </button>
+
+          <!-- Send / Stop / Queue -->
+          @if (isGenerating) {
+            <button
+              class="send-action-btn stop"
+              (click)="cancelGeneration()"
+              appTooltip="Stop generating"
+            >
+              <app-chat-icon name="stop" width="16" height="16"></app-chat-icon>
+            </button>
+          }
+          @if (!isGenerating || inputMessage.trim().length > 0) {
+            <button
+              class="send-action-btn"
+              [class.queue-btn]="isGenerating"
+              (click)="sendMessage()"
+              [disabled]="!inputMessage.trim()"
+              [appTooltip]="isGenerating ? 'Add to queue' : 'Send message'"
+            >
+              <app-chat-icon name="send" width="20" height="20"></app-chat-icon>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disclaimer -->
+  @if (!isWelcomePage) {
+    <div class="bottom-controls">
+      <div class="disclaimer">
+        K-AI is AI-powered. double-check for accuracy.
+      </div>
+    </div>
+  }
+  <!-- Hidden file input for direct file picking -->
+  <input
+    type="file"
+    #hiddenFileInput
+    (change)="onFileSelected($event)"
+    multiple
+    style="display: none"
+  />
+</div>

@@ -1,0 +1,75 @@
+<div class="login-page">
+  <div class="login-page__pattern login-page__pattern--left" aria-hidden="true">
+    <img src="assets/login/login-bg-pattern.png" alt="" class="login-page__pattern-image" />
+  </div>
+
+  <div class="login-page__pattern login-page__pattern--right" aria-hidden="true">
+    <img src="assets/login/login-bg-pattern-right.png" alt="" class="login-page__pattern-image" />
+
+  </div>
+
+  <div class="login-card-stack">
+  <div class="login-card">
+    <div class="login-hero" aria-hidden="true">
+      <img src="assets/login/login-hero.svg" alt="" class="login-hero__image" />
+    </div>
+
+    <div class="login-content">
+      <h1 class="login-title">Enterprise AI</h1>
+      <h2 class="login-subtitle">Built for Kumaranites</h2>
+      <div class="login-subtitle-line"></div>
+      <p class="login-description">
+        Securely access multiple AI models, internal knowledge,<br />
+        document intelligence, and enterprise-grade<br />
+        governance—all in one platform.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="login-button"
+      (click)="login()"
+      [disabled]="loading()"
+      aria-label="Sign in with Azure ID"
+    >
+      @if (loading()) {
+        <span class="login-button__loading" aria-hidden="true"></span>
+        <span>{{ loadingMessage() }}</span>
+      } @else {
+        <span class="login-button__icon" aria-hidden="true">
+          <img src="assets/login/azure-icon.svg" alt="" />
+        </span>
+        <span>Sign in with Azure ID</span>
+      }
+    </button>
+
+    @if (errorMessage) {
+      <div class="login-error-card">
+        <div class="error-content">
+          <svg class="error-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <div class="error-text">
+            <strong>Login Failed</strong>
+            <p>{{ errorMessage }}</p>
+          </div>
+        </div>
+        <div class="error-divider"></div>
+        <p class="support-label">Need help? Contact our Admin Team:</p>
+        <div class="support-actions">
+          <button type="button" class="support-btn teams" (click)="contactTeams()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Teams
+          </button>
+          <button type="button" class="support-btn outlook" (click)="contactOutlook()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            Outlook
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+  </div>
+</div>

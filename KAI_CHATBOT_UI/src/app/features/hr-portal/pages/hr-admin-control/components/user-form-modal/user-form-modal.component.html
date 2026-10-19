@@ -1,0 +1,254 @@
+@if (isOpen) {
+  <div
+    class="modal-backdrop"
+    (click)="onBackdropClick($event)"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="edit-modal-card" (click)="$event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h2 class="modal-title">Edit User</h2>
+        <button
+          type="button"
+          class="modal-close-btn"
+          (click)="close.emit()"
+          aria-label="Close modal"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- User Name Subheader -->
+      <div class="user-name-section">
+        <h3 class="user-display-name">{{ user?.user_name || user?.email_id || 'User' }}</h3>
+      </div>
+
+      <!-- Error / Validation Alert -->
+      @if (errorMessage) {
+        <div class="modal-alert modal-alert--error">
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      @if (validationError()) {
+        <div class="modal-alert modal-alert--warning">
+          <span>{{ validationError() }}</span>
+        </div>
+      }
+
+      <!-- Modal Body -->
+      <div class="modal-body-scroll">
+        <!-- Admin Access Section -->
+        <div class="setting-row">
+          <div class="setting-text">
+            <span class="setting-title">Admin Access</span>
+            <span class="setting-desc">Allow user to manage users and permissions</span>
+          </div>
+          <label class="switch-toggle">
+            <input
+              type="checkbox"
+              [checked]="isAdmin()"
+              (change)="isAdmin.set($any($event.target).checked)"
+            />
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Resume Modules Section -->
+        <div class="module-group">
+          <div class="module-group-header">
+            <span class="group-title">Resume Modules</span>
+            <div class="select-all-wrap">
+              <label class="switch-toggle">
+                <input
+                  type="checkbox"
+                  [checked]="isAllResumeSelected()"
+                  (change)="toggleAllResume($any($event.target).checked)"
+                />
+                <span class="switch-slider"></span>
+              </label>
+              <span class="select-all-label">Select all</span>
+            </div>
+          </div>
+
+          <div class="module-box">
+            <!-- Internal Resume -->
+            <div class="module-item">
+              <div class="item-left">
+                <svg class="item-icon item-icon--resume" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <line x1="10" y1="9" x2="8" y2="9"></line>
+                </svg>
+                <span class="item-name">Internal Resume</span>
+              </div>
+              <label class="switch-toggle">
+                <input
+                  type="checkbox"
+                  [checked]="resumeInternal()"
+                  (change)="resumeInternal.set($any($event.target).checked)"
+                />
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <!-- Offshore Resume -->
+            <div class="module-item">
+              <div class="item-left">
+                <svg class="item-icon item-icon--resume" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <line x1="10" y1="9" x2="8" y2="9"></line>
+                </svg>
+                <span class="item-name">Offshore Resume</span>
+              </div>
+              <label class="switch-toggle">
+                <input
+                  type="checkbox"
+                  [checked]="resumeOffshore()"
+                  (change)="resumeOffshore.set($any($event.target).checked)"
+                />
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <!-- Onsite Resume -->
+            <div class="module-item">
+              <div class="item-left">
+                <svg class="item-icon item-icon--resume" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <line x1="10" y1="9" x2="8" y2="9"></line>
+                </svg>
+                <span class="item-name">Onsite Resume</span>
+              </div>
+              <label class="switch-toggle">
+                <input
+                  type="checkbox"
+                  [checked]="resumeOnsite()"
+                  (change)="resumeOnsite.set($any($event.target).checked)"
+                />
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- VISA Modules Section -->
+        <div class="module-group">
+          <div class="module-group-header">
+            <span class="group-title">VISA Modules</span>
+            <div class="select-all-wrap">
+              <label class="switch-toggle">
+                <input
+                  type="checkbox"
+                  [checked]="isAllVisaSelected()"
+                  (change)="toggleAllVisa($any($event.target).checked)"
+                />
+                <span class="switch-slider"></span>
+              </label>
+              <span class="select-all-label">Select all</span>
+            </div>
+          </div>
+
+          <div class="module-box">
+            <!-- Business Visa -->
+            <div class="module-item">
+              <div class="item-left">
+                <svg class="item-icon item-icon--visa" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="5" width="20" height="14" rx="3"></rect>
+                  <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+                <span class="item-name">Business Visa</span>
+              </div>
+              <label class="switch-toggle">
+                <input
+                  type="checkbox"
+                  [checked]="visaBusiness()"
+                  (change)="visaBusiness.set($any($event.target).checked)"
+                />
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <!-- Visa Extension -->
+            <div class="module-item">
+              <div class="item-left">
+                <svg class="item-icon item-icon--visa" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="5" width="20" height="14" rx="3"></rect>
+                  <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+                <span class="item-name">Visa Extension</span>
+              </div>
+              <label class="switch-toggle">
+                <input
+                  type="checkbox"
+                  [checked]="visaExtension()"
+                  (change)="visaExtension.set($any($event.target).checked)"
+                />
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <!-- ICT Visa -->
+            <div class="module-item">
+              <div class="item-left">
+                <svg class="item-icon item-icon--visa" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="5" width="20" height="14" rx="3"></rect>
+                  <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+                <span class="item-name">ICT Visa</span>
+              </div>
+              <label class="switch-toggle">
+                <input
+                  type="checkbox"
+                  [checked]="visaIct()"
+                  (change)="visaIct.set($any($event.target).checked)"
+                />
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn-cancel"
+          [disabled]="isSubmitting"
+          (click)="close.emit()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-save"
+          [disabled]="isSubmitting"
+          (click)="onSubmit()"
+        >
+          @if (isSubmitting) {
+            <span>Saving...</span>
+          } @else {
+            <span>Save Changes</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

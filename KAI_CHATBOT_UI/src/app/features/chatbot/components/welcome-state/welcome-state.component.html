@@ -1,0 +1,57 @@
+<div class="welcome-wrapper">
+  <div class="welcome-center-content">
+    <div class="welcome-header">
+      <h1 class="welcome-heading">Welcome, {{ displayName }} 👋</h1>
+      <p class="welcome-sub">How can I help you today?</p>
+    </div>
+
+    <!-- Mobile-only category pills matching screenshot -->
+    <div class="mobile-category-pills">
+      @for (category of categories; track category.id) {
+        <button
+          type="button"
+          class="mobile-pill"
+          [class.active]="selectedCategoryId === category.id"
+          (click)="onMobileCategoryClick(category)"
+        >
+          {{ category.name }}
+        </button>
+      }
+    </div>
+  </div>
+   
+  <!-- Prompt Composer section -->
+  <ng-content></ng-content>
+
+  <!-- Prompt Library & Templates Section -->
+  <div class="prompt-library-section">
+    <h2 class="library-title">Prompt Library & Templates</h2>
+    
+    <div class="library-tabs-container">
+      <div class="library-tabs">
+        @for (category of categories; track category.id) {
+          <button 
+            class="library-tab" 
+            [class.active]="selectedCategoryId === category.id"
+            (click)="selectCategory(category.id)"
+          >
+            {{ category.name }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="template-grid">
+      @for (template of activeTemplates; track template.title) {
+        <button class="template-card" (click)="templateClicked(template)">
+          <div class="template-icon-wrap" [ngClass]="template.color || 'blue'">
+            <app-chat-icon [name]="template.icon" width="18" height="18"></app-chat-icon>
+          </div>
+          <h3 class="template-title">{{ template.title }}</h3>
+          <p class="template-desc">{{ template.desc }}</p>
+        </button>
+      }
+    </div>
+  </div>
+</div>
+

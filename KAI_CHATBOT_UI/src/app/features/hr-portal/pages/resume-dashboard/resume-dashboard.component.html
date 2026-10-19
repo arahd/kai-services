@@ -1,0 +1,1787 @@
+@switch (status()) {
+  @case (apiResponse.INITIAL) {
+    @if (isSubmitting()) {
+      <div class="submitting-overlay" aria-hidden="true"></div>
+    }
+    <section class="kai-hr-upload">
+      <div class="kai-hr-upload__card" [class.kai-hr-upload__card--wide]="uploadTab() === 'jd'">
+        <div class="kai-hr-upload__header">
+          <div class="kai-hr-upload__title">
+            <span class="wave wave--emoji" aria-hidden="true">👋</span>
+            <span class="kai-hr-upload__title-words">
+              <span>Welcome to KAI</span>
+              <span class="accent">HR Intelligence</span>
+            </span>
+          </div>
+          <div class="kai-hr-upload__subtitle">
+            Upload a job description or paste a Linkedin profile to begin analysis
+          </div>
+        </div>
+
+        <div class="kai-hr-upload__body">
+          @if (uploadTab() === "jd") {
+            <div class="kai-hr-upload__grid">
+              <div class="kai-hr-upload__col">
+                <div class="block-title">Upload Job Description</div>
+                <app-file-dropzone
+                  label="Job Description"
+                  [file]="jdAttaching() ? null : jdFile"
+                  [errorMessage]="jdError"
+                  [uploadedLayout]="true"
+                  [uploading]="jdAttaching()"
+                  [progress]="jdAttachProgress()"
+                  accept=".pdf,.docx"
+                  buttonText="Browse Files"
+                  (fileSelected)="onSelectJd($event)"
+                  (previewFile)="onPreviewLocalFile($event)"
+                ></app-file-dropzone>
+              </div>
+
+              <div class="kai-hr-upload__col">
+                <div class="block-title">Upload Resumes</div>
+                <app-file-dropzone
+                  label="Resume"
+                  [file]="null"
+                  [files]="resumeFiles"
+                  [maxFiles]="maxResumes"
+                  [errorMessage]="resumeError"
+                  [uploadedLayout]="false"
+                  [uploading]="resumeAttaching()"
+                  [progress]="resumeAttachProgress()"
+                  [multiple]="true"
+                  helperText="You can upload up to 5 resumes"
+                  accept=".pdf,.docx"
+                  buttonText="Browse Files"
+                  (fileSelected)="onSelectResumeSingleOrMulti($event)"
+                  (filesSelected)="onSelectMultipleResumes($event)"
+                  (removeFileAtIndex)="removeResumeFile($event)"
+                  (previewFile)="onPreviewLocalFile($event)"
+                ></app-file-dropzone>
+              </div>
+            </div>
+          } @else {
+            <div class="block-title">LinkedIn Profile URL</div>
+            <div class="li-url">
+              <input
+                type="text"
+                [(ngModel)]="linkedInUrl"
+                placeholder="https://www.linkedin.com/in/username"
+              />
+            </div>
+            @if (linkedInUrlError) {
+              <div class="field-error">{{ linkedInUrlError }}</div>
+            }
+
+            <div class="block-title">Upload Resume</div>
+            <app-file-dropzone
+              label="Resume"
+              [file]="resumeAttaching() ? null : resumeFile"
+              [errorMessage]="resumeError"
+              [uploadedLayout]="true"
+              [uploading]="resumeAttaching()"
+              [progress]="resumeAttachProgress()"
+              accept=".pdf,.docx"
+              buttonText="Browse Files"
+              (fileSelected)="onSelectResumeSingleOrMulti($event)"
+              (previewFile)="onPreviewLocalFile($event)"
+            ></app-file-dropzone>
+          }
+
+          @if (submitError) {
+            <div class="submit-error">{{ submitError }}</div>
+          }
+
+          <div class="btn-analyze-container">
+            <button
+              type="button"
+              class="btn-analyze"
+              (click)="uploadTab() === 'jd' ? onAnalyzeJdFit() : submitLinkedIn()"
+              [attr.aria-disabled]="!canSubmit()"
+              [class.is-disabled]="!canSubmit()"
+            >
+              @if (isSubmitting()) {
+                <span class="btn-spinner" aria-hidden="true"></span>
+              }
+              {{ uploadTab() === 'jd' ? 'Analyze Resumes' : 'Analyze Job Description' }}
+            </button>
+          </div>
+          <!-- <div class="kai-hr-upload__footnote">
+            KAI will analyze skills, experience, and fitment instantly
+          </div> -->
+        </div>
+      </div>
+    </section>
+  }
+  @case (apiResponse.PENDING) {
+    <app-resume-dashboard-skeleton />
+  }
+
+  @case (apiResponse.SUCCESS) {
+    @if (viewMode() === 'multiple-results') {
+      <div class="fit-page fit-page--multi">
+        <header class="fit-page-header">
+          <div>
+            <h1 class="fit-page-header__heading">Candidate Analysis Dashboard</h1>
+            <p class="fit-page-header__subheading">
+              @if (multiUploadSummary()?.successfully_processed) {
+                Showing {{ multiUploadSummary()?.successfully_processed }} candidate(s) matched against job description
+                @if (failedResumes().length > 0) {
+                  • <span class="failed-count-sub">{{ failedResumes().length }} document(s) disqualified</span>
+                }
+              } @else {
+                @if (failedResumes().length > 0) {
+                  <span class="failed-count-sub">0 candidates matched • {{ failedResumes().length }} uploaded document(s) failed validation</span>
+                } @else {
+                  Showing 0 candidates matched against job description
+                }
+              }
+            </p>
+          </div>
+
+          <div class="fit-page-header__button-card">
+            <button
+              class="fit-page-header__button fit-page-header__back-to-upload-btn"
+              type="button"
+              (click)="backToUpload()"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              Back to Upload
+            </button>
+          </div>
+        </header>
+
+        <!-- Disqualified Documents Notification Strip -->
+        @if (failedResumes().length > 0) {
+          <div class="disqualified-alert-banner">
+            <div class="disqualified-alert-banner__content">
+              <span class="disqualified-alert-banner__icon">⚠️</span>
+              <div class="disqualified-alert-banner__text">
+                <strong>{{ failedResumes().length }} uploaded file(s)</strong> were identified as unrelated or non-resume documents and excluded from ranking.
+              </div>
+            </div>
+            <button type="button" class="disqualified-alert-banner__btn" (click)="openDisqualifiedModal()">
+              View Disqualified Files ({{ failedResumes().length }}) →
+            </button>
+          </div>
+        }
+
+        <div class="multi-results-card">
+          <div class="multi-results-card__header">
+            <span>RESUME ANALYSIS</span>
+          </div>
+          
+          <!-- Matched Candidates View -->
+          @if (multiUploadSummary()?.ranked_candidates && multiUploadSummary()!.ranked_candidates.length > 0) {
+            <div class="multi-results-table-wrap">
+              <table class="multi-results-table">
+                <thead>
+                  <tr>
+                    <th>CANDIDATE NAME</th>
+                    <th class="text-center">MATCH SCORE</th>
+                    <th>EXPERIENCE</th>
+                    <th>SKILLS MATCH</th>
+                    <th class="text-right">ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (cand of multiUploadSummary()?.ranked_candidates; track cand.blob_key; let idx = $index) {
+                    @let score = parseScore(cand.total_score);
+                    @let match = getSkillsMatchInfo(cand.tier, score);
+                    <tr>
+                      <td class="cand-name-col">
+                        <div class="cand-name">{{ cand.candidate_name || 'Candidate ' + (idx + 1) }}</div>
+                        <div class="cand-filename">{{ cand.resume_filename }}</div>
+                      </td>
+                      <td class="cand-score-col text-center">
+                        <div class="gauge-container">
+                          <svg width="64" height="36" viewBox="0 0 64 36" class="gauge-svg">
+                            <path d="M 8 32 A 24 24 0 0 1 56 32" fill="none" stroke="#E2E8F0" stroke-width="5" stroke-linecap="round" />
+                            <path d="M 8 32 A 24 24 0 0 1 56 32" fill="none" 
+                                  [attr.stroke]="score >= 80 ? '#49ab74' : (score >= 50 ? '#F9C835' : '#FB2C36')" 
+                                  stroke-width="5" stroke-linecap="round" 
+                                  stroke-dasharray="75.4" 
+                                  [attr.stroke-dashoffset]="75.4 - (score / 100) * 75.4" />
+                            <text x="32" y="32" text-anchor="middle" font-size="12" font-family="Manrope" font-weight="700" fill="#1F2937">{{ score }}%</text>
+                          </svg>
+                        </div>
+                      </td>
+                      <td class="cand-exp-col">
+                        <span class="cand-exp-val" [class.cand-exp-val--empty]="cand.overall_experience === 0 || cand.overall_experience === null">
+                          {{ formatExp(cand.overall_experience) }}
+                        </span>
+                      </td>
+                      <td class="cand-skills-col">
+                        <span class="skills-match-pill" [ngClass]="match.cssClass">
+                          {{ match.text }}
+                        </span>
+                      </td>
+                      <td class="cand-actions-col text-right">
+                        <button type="button" class="btn-view-cand" (click)="viewSingleCandidate(cand.blob_key)">
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <!-- Empty Candidates State -->
+            <div class="multi-empty-state">
+              <div class="multi-empty-state__icon">📄</div>
+              <h3 class="multi-empty-state__title">No Valid Candidates Matched</h3>
+              <p class="multi-empty-state__desc">
+                @if (failedResumes().length > 0) {
+                  All uploaded document(s) failed resume validation checks and were categorized as unrelated files.
+                } @else {
+                  No candidate profiles were processed from the uploaded files.
+                }
+              </p>
+              @if (failedResumes().length > 0) {
+                <button type="button" class="btn-review-failed" (click)="openDisqualifiedModal()">
+                  View Disqualified Files ({{ failedResumes().length }}) →
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Disqualified Documents Modal Overlay -->
+        @if (isDisqualifiedModalOpen()) {
+          <div class="kai-modal-backdrop" (click)="closeDisqualifiedModal()">
+            <div class="kai-modal disqualified-modal" (click)="$event.stopPropagation()">
+              <div class="kai-modal__header disqualified-modal__header">
+                <div class="disqualified-modal__title-wrap">
+                  <span class="disqualified-modal__icon">⚠️</span>
+                  <div>
+                    <h3 class="kai-modal__title">Disqualified Documents ({{ failedResumes().length }})</h3>
+                    <p class="disqualified-modal__sub">
+                      The following uploaded files did not meet standard resume requirements and were excluded from ranking.
+                    </p>
+                  </div>
+                </div>
+                <button type="button" class="kai-modal__close" (click)="closeDisqualifiedModal()" title="Close">✕</button>
+              </div>
+
+              <div class="disqualified-modal__body">
+                <div class="failed-docs-list">
+                  @for (item of failedResumes(); track item.filename; let idx = $index) {
+                    <div class="failed-doc-card">
+                      <div class="failed-doc-card__header">
+                        <div class="failed-doc-card__file-wrap">
+                          <div class="failed-doc-card__file-icon">📄</div>
+                          <div>
+                            <div class="failed-doc-card__filename" [title]="item.filename">{{ item.filename }}</div>
+                            <div class="failed-doc-card__category-row">
+                              <span class="failed-category-pill" [ngClass]="getFailedCategoryClass(item.error)">
+                                {{ getFailedCategory(item.error) }}
+                              </span>
+                              @if (item.error_code) {
+                                <span class="failed-code-pill">{{ item.error_code }}</span>
+                              }
+                              @if (item.confidence !== undefined && item.confidence !== null) {
+                                <span class="failed-confidence-pill" [title]="'Confidence: ' + item.confidence + '%'">
+                                  Resume Likelihood: {{ item.confidence }}%
+                                </span>
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="failed-doc-card__body">
+                        @if (item.details) {
+                          <div class="failed-doc-section">
+                            <div class="failed-doc-section__label">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                              </svg>
+                              <span>Analysis Details</span>
+                            </div>
+                            <p class="failed-doc-section__text">{{ item.details }}</p>
+                          </div>
+                        }
+
+                        @if (item.red_flags && item.red_flags.length > 0) {
+                          <div class="failed-doc-section">
+                            <div class="failed-doc-section__label">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                              </svg>
+                              <span>Identified Discrepancies</span>
+                            </div>
+                            <div class="failed-red-flags-grid">
+                              @for (flag of item.red_flags; track flag) {
+                                <div class="red-flag-chip">
+                                  <span class="red-flag-chip__icon">⚠️</span>
+                                  <span class="red-flag-chip__text">{{ flag }}</span>
+                                </div>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="disqualified-modal__footer">
+                <button type="button" class="btn-modal-close" (click)="closeDisqualifiedModal()">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      @if (data()) {
+        <div class="fit-page">
+          <header class="fit-page-header">
+            <h1 class="fit-page-header__heading">Analysis results</h1>
+
+            <div class="fit-page-header__button-card">
+              @if (multiUploadSummary()) {
+                <button
+                  class="fit-page-header__button fit-page-header__back-btn"
+                  type="button"
+                  (click)="backToCandidates()"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                  Back to Candidates
+                </button>
+              }
+            <button
+              type="button"
+              class="fit-page-header__button fit-page-header__download-btn"
+              (click)="downloadJdFit()"
+              [disabled]="isDownloading()"
+            >
+              @if (!isDownloading()) {
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                >
+                  <path
+                    d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10"
+                    stroke="#48BB78"
+                    stroke-width="1.33333"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M4.6665 6.66663L7.99984 9.99996L11.3332 6.66663"
+                    stroke="#48BB78"
+                    stroke-width="1.33333"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M8 10V2"
+                    stroke="#48BB78"
+                    stroke-width="1.33333"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                Download Summary
+              } @else {
+                <div class="loader-small"></div>
+                Downloading...
+              }
+            </button>
+
+            <button
+              class="fit-page-header__button fit-page-header__new-analysis-btn"
+              type="button"
+              (click)="onNewAnalysis()"
+            >
+              New Analysis
+            </button>
+          </div>
+        </header>
+        <!-- ══════════════════════════════════
+             IDENTITY BAR
+        ══════════════════════════════════ -->
+        <div class="id-bar">
+          <div class="id-bar__profile">
+            <div class="id-bar__avatar">{{ candidateInitials() }}</div>
+            <div class="id-bar__info">
+              <h1 class="id-bar__name" [style.font-size]="nameFontSize()">
+                {{ candidateName() }}
+              </h1>
+              <!-- <p class="id-bar__role">Senior Product Designer</p> -->
+              <div class="id-bar__applied-container">
+                <p class="id-bar__applied-label">Applied for</p>
+                <p
+                  class="id-bar__applied-value"
+                  [style.font-size]="jobTitleFontSize()"
+                >
+                  {{ data()?.meta?.job_title || "N/A" }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="id-bar__contact">
+            @if (candidateMail()) {
+              <div
+                class="id-bar__contact-item"
+                [style.font-size]="contactFontSize()"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                  ></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                <a [href]="'mailto:' + candidateMail()" target="_blank" rel="noopener noreferrer">{{ candidateMail() }}</a>
+              </div>
+            }
+
+            @if (candidateLinkedin()) {
+              <div
+                class="id-bar__contact-item"
+                [style.font-size]="contactFontSize()"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"
+                  ></path>
+                  <rect x="2" y="9" width="4" height="12"></rect>
+                  <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+                @if (isUrl(candidateLinkedin())) {
+                  <a [href]="ensureUrl(candidateLinkedin())" target="_blank" rel="noopener noreferrer">{{ candidateLinkedin() }}</a>
+                } @else {
+                  <span>{{ candidateLinkedin() }}</span>
+                }
+              </div>
+            }
+
+            @if (candidatePh()) {
+              <div
+                class="id-bar__contact-item"
+                [style.font-size]="contactFontSize()"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                  ></path>
+                </svg>
+                <a [href]="'tel:' + candidatePh()">{{ candidatePh() }}</a>
+              </div>
+            }
+
+            @if (candidateGithub()) {
+              <div
+                class="id-bar__contact-item"
+                [style.font-size]="contactFontSize()"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+                  ></path>
+                </svg>
+                @if (isUrl(candidateGithub())) {
+                  <a [href]="ensureUrl(candidateGithub())" target="_blank" rel="noopener noreferrer">{{ candidateGithub() }}</a>
+                } @else {
+                  <span>{{ candidateGithub() }}</span>
+                }
+              </div>
+            }
+            @if (candidateLocation()) {
+              <div
+                class="id-bar__contact-item"
+                [style.font-size]="contactFontSize()"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                  ></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <span>{{ candidateLocation() }}</span>
+              </div>
+            }
+
+            @if (candidateWebsite()) {
+              <div
+                class="id-bar__contact-item"
+                [style.font-size]="contactFontSize()"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+                  ></path>
+                  <path
+                    d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+                  ></path>
+                </svg>
+                @if (isUrl(candidateWebsite())) {
+                  <a [href]="ensureUrl(candidateWebsite())" target="_blank" rel="noopener noreferrer">{{ candidateWebsite() }}</a>
+                } @else {
+                  <span>{{ candidateWebsite() }}</span>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="id-bar__score-section">
+            <div class="id-bar__score-circle">
+              <!-- Radial Progress Circular Ring -->
+              <svg class="score-ring-svg" viewBox="0 0 100 100">
+                <!-- Background track circle -->
+                <circle class="score-ring-track" cx="50" cy="50" r="42"></circle>
+                <!-- Active progress arc circle -->
+                <circle
+                  class="score-ring-fill"
+                  cx="50" cy="50" r="42"
+                  [attr.stroke]="scorecardColor()"
+                  [style.stroke-dashoffset]="263.89 - (overallScorePercent() / 100) * 263.89"
+                ></circle>
+              </svg>
+              <!-- Info text in the center -->
+              <div class="score-center-info">
+                <span class="score-pct-text">{{ overallScorePercent() }}%</span>
+                
+                <!-- Match suggestion pill -->
+                <div class="match-badge" [ngClass]="tierClass()">
+                  @if (tierClass() === 'hi') {
+                    <svg class="match-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span class="match-badge-text">Strong Match</span>
+                  } @else if (tierClass() === 'mid') {
+                    <svg class="match-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span class="match-badge-text">Partial Match</span>
+                  } @else {
+                    <svg class="match-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="15" y1="9" x2="9" y2="15"></line>
+                      <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    <span class="match-badge-text">Not a Match</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="education-experience-container">
+          <!-- Experience Card -->
+          <div class="education-experience-container__card">
+            <div class="heading">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#536DFE"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+              <span>Experience</span>
+            </div>
+
+            <div class="compare-section-exp-edu">
+              <p class="label">Required</p>
+              <h1 class="value">
+                {{ data()?.experience_comparison?.jd_requires?.years }}
+                {{
+                  data()?.experience_comparison?.jd_requires?.years === 1
+                    ? "year"
+                    : "years"
+                }}
+              </h1>
+            </div>
+
+            <div class="compare-section-exp-edu">
+              <p class="label">Candidate</p>
+              <h1 class="value">
+                {{ data()?.experience_comparison?.candidate_has?.years }}
+                {{
+                  data()?.experience_comparison?.candidate_has?.years === 1
+                    ? "year"
+                    : "years"
+                }}
+              </h1>
+            </div>
+
+            <div class="progress-bar">
+              <div
+                class="progress-bar-fill"
+                [style.width.%]="expCandidateBarWidth()"
+                [style.background-color]="
+                  getMatchColor(experienceScore() / 100)
+                "
+              ></div>
+            </div>
+
+            <p
+              class="match-status"
+              [style.color]="
+                getMatchColor(experienceScore() / 100)
+              "
+            >
+              @if (experienceExcess() > 0) {
+                Candidate exceeds required by
+                {{ experienceExcess() }}
+                {{ experienceExcess() === 1 ? "year" : "years" }}
+              } @else if (experienceExcess() === 0) {
+                Candidate meets requirement
+              } @else {
+                Candidate is {{ -experienceExcess() }}
+                {{ -experienceExcess() === 1 ? "year" : "years" }} below the
+                required experience
+              }
+            </p>
+          </div>
+
+          <!-- Education Card -->
+          <div class="education-experience-container__card">
+            <div class="heading">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#536DFE"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="8" r="7" />
+                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+              </svg>
+              <span>Education</span>
+            </div>
+
+            <div class="compare-section-exp-edu">
+              <p class="label">Required</p>
+              <h1 class="value">
+                {{ data()?.education_comparison?.jd_requires }}
+              </h1>
+            </div>
+
+            <div class="compare-section-exp-edu">
+              <p class="label">Candidate</p>
+              <h1 class="value">
+                {{ data()?.education_comparison?.candidate_has }}
+              </h1>
+              <!-- <p class="sub-info">Anna University, 2018</p> -->
+            </div>
+
+            <div class="status-badge-container">
+              <span
+                class="status-badge"
+                [class.status-badge--met]="
+                  data()?.education_comparison?.status === 'Met'
+                "
+                [class.status-badge--not-met]="
+                  data()?.education_comparison?.status !== 'Met'
+                "
+              >
+                {{ data()?.education_comparison?.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-cards-container">
+          <!-- Mandatory Skills -->
+          <div class="summary-card summary-card--blue">
+            <div class="summary-card__top">
+              <div class="summary-card__icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="26"
+                  height="26"
+                  viewBox="0 0 26 26"
+                  fill="none"
+                >
+                  <path
+                    d="M9.6614 13.6852L12.0768 16.1006L16.1026 10.4646M12.882 2.91125C10.4512 5.21959 7.21403 6.48565 3.86219 6.43887C3.43582 7.73782 3.21912 9.0964 3.22022 10.4635C3.22022 16.4667 7.3254 21.5102 12.882 22.9412C18.4386 21.5112 22.5437 16.4678 22.5437 10.4646C22.5437 9.05828 22.3183 7.70456 21.9018 6.4378H21.7386C18.3076 6.4378 15.1901 5.09803 12.882 2.91125Z"
+                    stroke="#0353FE"
+                    stroke-width="1.3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <div class="summary-card__info">
+                <h3 class="summary-card__title">Mandatory Skills</h3>
+                <p class="summary-card__subtext">{{ mandatoryWeightage() }} weightage</p>
+              </div>
+            </div>
+            <div class="summary-card__progress">
+              <div
+                class="summary-card__progress-fill"
+                [style.width.%]="getSkillProgress('mandatory')"
+              ></div>
+            </div>
+            <p
+              class="summary-card__status"
+              [ngClass]="getStatusColorClass(mandatorySkillsLabel())"
+            >
+              {{ mandatorySkillsLabel() }}
+            </p>
+            <p
+              class="summary-card__status-desc"
+              [ngClass]="getStatusColorClass(mandatorySkillsLabel())"
+            >
+              {{ getSkillMatchText("mandatory") }}
+            </p>
+            <button
+              class="summary-card__button"
+              (click)="openDetailPopup('mandatory')"
+            >
+              View Details
+            </button>
+          </div>
+
+          <!-- Preferred Skills -->
+          <div class="summary-card summary-card--purple">
+            <div class="summary-card__top">
+              <div class="summary-card__icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+              </div>
+              <div class="summary-card__info">
+                <h3 class="summary-card__title">Preferred Skills</h3>
+                <p class="summary-card__subtext">{{ preferredWeightage() }} weightage</p>
+              </div>
+            </div>
+            <div class="summary-card__progress">
+              <div
+                class="summary-card__progress-fill"
+                [style.width.%]="getSkillProgress('preferred')"
+              ></div>
+            </div>
+            <p
+              class="summary-card__status"
+              [ngClass]="getStatusColorClass(preferredSkillsLabel())"
+            >
+              {{ preferredSkillsLabel() }}
+            </p>
+            <p
+              class="summary-card__status-desc"
+              [ngClass]="getStatusColorClass(preferredSkillsLabel())"
+            >
+              {{ getSkillMatchText("preferred") }}
+            </p>
+            <button
+              class="summary-card__button"
+              (click)="openDetailPopup('preferred')"
+            >
+              View Details
+            </button>
+          </div>
+
+          <!-- Better to Have -->
+          <div class="summary-card summary-card--orange">
+            <div class="summary-card__top">
+              <div class="summary-card__icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </div>
+              <div class="summary-card__info">
+                <h3 class="summary-card__title">Better to Have</h3>
+                <p class="summary-card__subtext">{{ betterToHaveWeightage() }} weightage</p>
+              </div>
+            </div>
+            <div class="summary-card__progress">
+              <div
+                class="summary-card__progress-fill"
+                [style.width.%]="getSkillProgress('better')"
+              ></div>
+            </div>
+            <p
+              class="summary-card__status"
+              [ngClass]="getStatusColorClass(niceToHaveSkillsLabel())"
+            >
+              {{ niceToHaveSkillsLabel() }}
+            </p>
+            <p
+              class="summary-card__status-desc"
+              [ngClass]="getStatusColorClass(niceToHaveSkillsLabel())"
+            >
+              {{ getSkillMatchText("better") }}
+            </p>
+            <button
+              class="summary-card__button"
+              (click)="openDetailPopup('better')"
+            >
+              View Details
+            </button>
+          </div>
+
+          <!-- Education & Cert -->
+          <div class="summary-card summary-card--teal">
+            <div class="summary-card__top">
+              <div class="summary-card__icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="26"
+                  height="26"
+                  viewBox="0 0 26 26"
+                  fill="none"
+                >
+                  <path
+                    d="M4.57354 10.8958C4.27823 13.1564 4.10227 15.431 4.04638 17.7101C7.13716 19.0012 10.0965 20.5867 12.8834 22.4448C15.6707 20.5867 18.6304 19.0011 21.7216 17.7101C21.6657 15.431 21.4897 13.1564 21.1944 10.8958M21.1944 10.8958C22.1339 10.5801 23.0862 10.2881 24.0481 10.0218C20.5444 7.56564 16.8043 5.46523 12.8834 3.75183C8.96254 5.46559 5.22244 7.56636 1.71875 10.0229C2.6778 10.2877 3.62939 10.5788 4.57246 10.8958C7.43758 11.859 10.2175 13.0592 12.8834 14.4839C15.549 13.0592 18.3297 11.859 21.1944 10.8958ZM7.24688 16.1061C7.46044 16.1061 7.66525 16.0213 7.81626 15.8703C7.96727 15.7193 8.0521 15.5144 8.0521 15.3009C8.0521 15.0873 7.96727 14.8825 7.81626 14.7315C7.66525 14.5805 7.46044 14.4957 7.24688 14.4957C7.03332 14.4957 6.82851 14.5805 6.6775 14.7315C6.52649 14.8825 6.44166 15.0873 6.44166 15.3009C6.44166 15.5144 6.52649 15.7193 6.6775 15.8703C6.82851 16.0213 7.03332 16.1061 7.24688 16.1061ZM7.24688 16.1061V12.1605C9.06855 11.0282 10.9502 9.99528 12.8834 9.06631M5.36051 21.4668C5.95957 20.8692 6.43461 20.1591 6.75834 19.3773C7.08207 18.5955 7.2481 17.7575 7.24688 16.9113V15.3009"
+                    stroke="#00A2BC"
+                    stroke-width="1.3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <div class="summary-card__info">
+                <h3 class="summary-card__title">Education & Cert</h3>
+                <p class="summary-card__subtext">{{ educationWeightage() }} weightage</p>
+              </div>
+            </div>
+            <div class="summary-card__progress">
+              <div
+                class="summary-card__progress-fill"
+                [style.width.%]="
+                  data()?.education_comparison?.status === 'Met' ? 100 : 10
+                "
+              ></div>
+            </div>
+            <p
+              class="summary-card__status"
+              [ngClass]="
+                getStatusColorClass(
+                  data()?.education_comparison?.status === 'Met'
+                    ? 'Met'
+                    : 'No Match'
+                )
+              "
+            >
+              {{ hasCertGap() ? "No Match" : "Met" }}
+            </p>
+            <button
+              class="summary-card__button"
+              (click)="openDetailPopup('education')"
+            >
+              View Details
+            </button>
+          </div>
+
+          <!-- Experience -->
+          <div class="summary-card summary-card--brown">
+            <div class="summary-card__top">
+              <div class="summary-card__icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="8" r="7"></circle>
+                  <polyline
+                    points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"
+                  ></polyline>
+                </svg>
+              </div>
+              <div class="summary-card__info">
+                <h3 class="summary-card__title">Experience</h3>
+                <p class="summary-card__subtext">{{ experienceWeightage() }} weightage</p>
+              </div>
+            </div>
+            <div class="summary-card__progress">
+              <div
+                class="summary-card__progress-fill"
+                [style.width.%]="expCandidateBarWidth()"
+              ></div>
+            </div>
+            <p
+              class="summary-card__status"
+              [ngClass]="
+                getStatusColorClass(
+                  data()?.experience_comparison?.status || 'Unknown'
+                )
+              "
+            >
+              {{ data()?.experience_comparison?.status || "Unknown" }}
+            </p>
+            <button
+              class="summary-card__button"
+              (click)="openDetailPopup('experience')"
+            >
+              View Details
+            </button>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             RESUME vs JD COMPARISON TABLE
+        ══════════════════════════════════ -->
+        <div class="skills-comparison-container">
+          <!-- Mandatory Skills -->
+          @if (mandatorySkills().length) {
+            <div class="skill-group-card">
+              <div class="skill-group-card__header">MANDATORY SKILLS</div>
+              <div class="skill-group-card__table">
+                <div class="skill-table-header">
+                  <div class="skill-table-header__col">SKILL</div>
+                  <div class="skill-table-header__col">REQUIRED EXPERIENCE</div>
+                  <div class="skill-table-header__col">CURRENT EXPERIENCE</div>
+                  <div class="skill-table-header__col">MATCH</div>
+                </div>
+                @for (skill of mandatorySkills(); track $index) {
+                  <ng-container
+                    *ngTemplateOutlet="skillRow; context: { $implicit: skill }"
+                  ></ng-container>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Preferred Skills -->
+          @if (preferredSkills().length) {
+            <div class="skill-group-card">
+              <div class="skill-group-card__header">PREFERRED SKILLS</div>
+              <div class="skill-group-card__table">
+                <div class="skill-table-header">
+                  <div class="skill-table-header__col">SKILL</div>
+                  <div class="skill-table-header__col">REQUIRED EXPERIENCE</div>
+                  <div class="skill-table-header__col">CURRENT EXPERIENCE</div>
+                  <div class="skill-table-header__col">MATCH</div>
+                </div>
+                @for (skill of preferredSkills(); track $index) {
+                  <ng-container
+                    *ngTemplateOutlet="skillRow; context: { $implicit: skill }"
+                  ></ng-container>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Nice To Have -->
+          @if (niceToHaveSkills().length) {
+            <div class="skill-group-card">
+              <div class="skill-group-card__header">NICE TO HAVE</div>
+              <div class="skill-group-card__table">
+                <div class="skill-table-header">
+                  <div class="skill-table-header__col">SKILL</div>
+                  <div class="skill-table-header__col">REQUIRED EXPERIENCE</div>
+                  <div class="skill-table-header__col">CURRENT EXPERIENCE</div>
+                  <div class="skill-table-header__col">MATCH</div>
+                </div>
+                @for (skill of niceToHaveSkills(); track $index) {
+                  <ng-container
+                    *ngTemplateOutlet="skillRow; context: { $implicit: skill }"
+                  ></ng-container>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Template for Skill Row -->
+          <ng-template #skillRow let-skill>
+            <div class="skill-row">
+              <div
+                class="skill-row__accent"
+                [style.background-color]="getMatchColor(skill.match_score)"
+              ></div>
+              <div class="skill-row__name">{{ skill.skill }}</div>
+              <div class="skill-row__req-exp">
+                {{ skill?.jd_requires?.years || 0 }} yr
+              </div>
+              <div
+                class="skill-row__cur-exp"
+                [style.color]="getMatchColor(skill.match_score)"
+              >
+                {{ formatExp(skill?.candidate_has?.years) }}
+              </div>
+              <div class="skill-row__match">
+                <div class="match-info">
+                  <span
+                    class="match-pct"
+                    [style.color]="getMatchColor(skill.match_score)"
+                  >
+                    {{
+                      skill.match_score > 0
+                        ? (skill.match_score * 100 | number: "1.0-0") + "%"
+                        : "—"
+                    }}
+                  </span>
+                  @if (skill.match_score > 0) {
+                    <div class="match-bar-bg">
+                      <div
+                        class="match-bar-fill"
+                        [style.width.%]="skill.match_score * 100"
+                        [style.background-color]="
+                          getMatchColor(skill.match_score)
+                        "
+                      ></div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+        <hr />
+        <!-- Experience row -->
+
+        <!-- Table summary footer -->
+        <!-- <div class="compare-summary">
+            <div class="compare-summary__stat">
+              <span class="compare-summary__num compare-summary__num--green">
+                {{ matchedCount() }}
+              </span>
+              <span class="compare-summary__label">Matched</span>
+            </div>
+            <div class="compare-summary__divider"></div>
+            <div class="compare-summary__stat">
+              <span class="compare-summary__num compare-summary__num--amber">
+                {{ partialCount() }}
+              </span>
+              <span class="compare-summary__label">Partial</span>
+            </div>
+            <div class="compare-summary__divider"></div>
+            <div class="compare-summary__stat">
+              <span class="compare-summary__num compare-summary__num--red">
+                {{ gapCount() }}
+              </span>
+              <span class="compare-summary__label">Gaps</span>
+            </div>
+            <div class="compare-summary__spacer"></div>
+            <div class="compare-summary__overall">
+              <span class="compare-summary__overall-label"
+                >Overall fit score</span
+              >
+              <span
+                class="compare-summary__overall-val"
+                [ngClass]="'compare-summary__overall-val--' + tierClass()"
+              >
+                {{ overallScorePercent() }}%
+              </span>
+            </div>
+          </div> -->
+
+        <!-- ══════════════════════════════════
+             MAIN GRID
+        ══════════════════════════════════ -->
+        <div class="main-grid">
+          <!-- ALL SKILLS -->
+
+          <!-- CERTIFICATION -->
+          <div class="certification-card">
+            <div class="certification-card__header">CERTIFICATION</div>
+            <div class="certification-card__content">
+              <table class="cert-table">
+                <thead>
+                  <tr>
+                    <th>CERTIFICATION NAME</th>
+                    <th>TYPE</th>
+                    <th>CANDIDATE</th>
+                    <th>STATUS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (cert of certificationDetails(); track cert.name) {
+                    <tr>
+                      <td class="cert-table__name">{{ cert.name }}</td>
+                      <td class="cert-table__type">{{ cert.type }}</td>
+                      <td
+                        class="cert-table__candidate"
+                        [class.not-held]="!cert.held"
+                        [class.held]="cert.held"
+                      >
+                        {{ cert.held ? "Held" : "Not held" }}
+                      </td>
+                      <td>
+                        <span
+                          class="cert-status"
+                          [class.cert-status--present]="cert.held"
+                          [class.cert-status--missing]="!cert.held"
+                        >
+                          {{ cert.status }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                  @if (certificationDetails().length === 0) {
+                    <tr>
+                      <td colspan="4" class="cert-empty">
+                        No certifications listed
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+
+              @if (certificationRecommendation()) {
+                <div class="cert-recommendation">
+                  <div class="cert-recommendation__box">
+                    {{ certificationRecommendation() }}
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- DETAILED FIT ANALYSIS -->
+          <div class="detailed-fit-card">
+            <div class="detailed-fit-card__header">DETAILED FIT ANALYSIS</div>
+            <div class="detailed-fit-card__grid">
+              @for (item of detailedFitAnalysis(); track item.title) {
+                <div class="fit-item">
+                  <div
+                    class="fit-item__icon"
+                    [class.fit-item__icon--gap]="item.status === 'gap'"
+                  >
+                    <app-hr-icon
+                      [name]="
+                        item.status === 'met' ? 'check-circle' : 'alert-circle'
+                      "
+                      width="20"
+                      height="20"
+                    ></app-hr-icon>
+                  </div>
+                  <div class="fit-item__content">
+                    <div class="fit-item__title">{{ item.title }}</div>
+                    <p class="fit-item__description">{{ item.description }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════
+                 DETAIL POPUP MODAL
+           ══════════════════════════════════ -->
+          @if (activePopup() !== null) {
+            <div class="kai-modal-backdrop" (click)="closeDetailPopup()">
+              <div class="kai-modal" (click)="$event.stopPropagation()">
+                <div class="kai-modal__header">
+                  <h2 class="kai-modal__title">{{ getPopupTitle() }}</h2>
+                  <button class="kai-modal__close" (click)="closeDetailPopup()">
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M13 1L1 13M1 1L13 13"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div class="kai-modal__body">
+                  @if (
+                    activePopup() === "mandatory" ||
+                    activePopup() === "preferred" ||
+                    activePopup() === "nice_to_have"
+                  ) {
+                    <div class="modal-summary-banner">
+                      <div class="banner-icon">
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span class="banner-text"
+                        >{{ activeMatchedSkills().length }}/{{
+                          activeTotalSkills()
+                        }}
+                        Skills Matched</span
+                      >
+                    </div>
+
+                    @if (activeMatchedSkills().length > 0) {
+                      <div class="breakdown-section">
+                        <div
+                          class="breakdown-section__header breakdown-section__header--green"
+                        >
+                          <div class="icon-box">
+                            <svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="3"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                          </div>
+                          <div class="text-content">
+                            <h3 class="title">Matched Skills</h3>
+                            <p class="subtitle">
+                              Candidate meets or exceeds the required criteria
+                            </p>
+                          </div>
+                        </div>
+                        <table class="breakdown-table">
+                          <thead>
+                            <tr>
+                              <th class="col-skill">SKILL</th>
+                              <th class="col-req">REQUIRED EXPERIENCE</th>
+                              <th class="col-cur">CURRENT EXPERIENCE</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (
+                              skill of activeMatchedSkills();
+                              track $index
+                            ) {
+                              <tr>
+                                <td class="col-skill">{{ skill.skill }}</td>
+                                <td class="col-req">
+                                  {{ skill?.jd_requires?.years || 0 }} yr
+                                </td>
+                                <td class="col-cur val-green">
+                                  {{ skill?.candidate_has?.years || 0 }} yr
+                                </td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    }
+
+                    <!-- Partially Matched Skills -->
+                    @if (activePartialSkills().length > 0) {
+                      <div class="breakdown-section">
+                        <div class="breakdown-section__header breakdown-section__header--amber">
+                          <div class="icon-box">
+                            <svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="3"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <line x1="12" y1="8" x2="12" y2="12"></line>
+                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                          </div>
+                          <div class="text-content">
+                            <h3 class="title">Partially Matched Skills</h3>
+                            <p class="subtitle">
+                              Candidate partially meets the required criteria
+                            </p>
+                          </div>
+                        </div>
+                        <table class="breakdown-table">
+                          <thead>
+                            <tr>
+                              <th class="col-skill header--amber">SKILL</th>
+                              <th class="col-req header--amber">REQUIRED EXPERIENCE</th>
+                              <th class="col-cur header--amber">CURRENT EXPERIENCE</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (skill of activePartialSkills(); track $index) {
+                              <tr>
+                                <td class="col-skill">{{ skill.skill }}</td>
+                                <td class="col-req">
+                                  {{ skill?.jd_requires?.years || 0 }} yr
+                                </td>
+                                <td class="col-cur val-amber">
+                                  {{ skill?.candidate_has?.years || 0 }} yr
+                                </td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    }
+
+                    @if (activeGapSkills().length > 0) {
+                      <div class="breakdown-section">
+                        <div
+                          class="breakdown-section__header breakdown-section__header--red"
+                        >
+                          <div class="icon-box">
+                            <svg
+                              width="10"
+                              height="10"
+                              viewBox="0 0 14 14"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M13 1L1 13M1 1L13 13"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+                          </div>
+                          <div class="text-content">
+                            <h3 class="title">Not Matched Skills</h3>
+                            <p class="subtitle">
+                              Candidate doesn't meet the required criteria
+                            </p>
+                          </div>
+                        </div>
+                        <table class="breakdown-table">
+                          <thead>
+                            <tr>
+                              <th class="col-skill header--red">SKILL</th>
+                              <th class="col-req header--red">
+                                REQUIRED EXPERIENCE
+                              </th>
+                              <th class="col-cur header--red">
+                                CURRENT EXPERIENCE
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (skill of activeGapSkills(); track $index) {
+                              <tr>
+                                <td class="col-skill">{{ skill.skill }}</td>
+                                <td class="col-req">
+                                  {{ skill?.jd_requires?.years || 0 }} yr
+                                </td>
+                                <td class="col-cur val-red">
+                                  {{ skill?.candidate_has?.years || 0 }} yr
+                                </td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    }
+                  } @else if (activePopup() === 'education') {
+                    <!-- Education Section -->
+                    <div class="edu-section">
+                      <h3 class="edu-section__title">Education</h3>
+                      <div class="edu-card">
+                        <div class="edu-card__field">
+                          <span class="edu-card__label">Required Education</span>
+                          <div class="edu-card__pill">
+                            {{ data()?.education_comparison?.jd_requires || 'Not Specified' }}
+                          </div>
+                        </div>
+                        <div class="edu-card__field">
+                          <span class="edu-card__label">Candidate's Education</span>
+                          <div class="edu-card__pill edu-card__pill--candidate">
+                            {{ data()?.education_comparison?.candidate_has || 'Not Specified' }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Matched Certifications Banner -->
+                    <div class="cert-summary-banner">
+                      <div class="banner-icon">
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span class="banner-text">
+                        {{ matchedCertsCount() }}/{{ totalCertsCount() }} Certifications Matched
+                      </span>
+                    </div>
+
+                    <!-- Certifications Section -->
+                    <div class="cert-section">
+                      <h3 class="cert-section__title">Certifications</h3>
+
+                      <!-- Matched Certifications Table -->
+                      @if (matchedCertifications().length > 0) {
+                        <div class="breakdown-section">
+                          <div class="breakdown-section__header breakdown-section__header--green">
+                            <div class="icon-box">
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="3"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              >
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                            </div>
+                            <div class="text-content">
+                              <h3 class="title">Matched Skills</h3>
+                              <p class="subtitle">
+                                Candidate meets or exceeds the required criteria
+                              </p>
+                            </div>
+                          </div>
+                          <table class="breakdown-table">
+                            <thead>
+                              <tr>
+                                <th class="col-skill">SKILL</th>
+                                <th class="col-req">TYPE</th>
+                                <th class="col-cur">CANDIDATE</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              @for (cert of matchedCertifications(); track cert.name) {
+                                <tr>
+                                  <td class="col-skill">{{ cert.name }}</td>
+                                  <td class="col-req">{{ cert.type }}</td>
+                                  <td class="col-cur val-green">{{ cert.candidateText }}</td>
+                                </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      }
+
+                      <!-- Not Matched Certifications Table -->
+                      @if (notMatchedCertifications().length > 0) {
+                        <div class="breakdown-section">
+                          <div class="breakdown-section__header breakdown-section__header--red">
+                            <div class="icon-box">
+                              <svg
+                                width="10"
+                                height="10"
+                                viewBox="0 0 14 14"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M13 1L1 13M1 1L13 13"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                              </svg>
+                            </div>
+                            <div class="text-content">
+                              <h3 class="title">Not Matched Skills</h3>
+                              <p class="subtitle">
+                                Candidate doesn't meet the required criteria
+                              </p>
+                            </div>
+                          </div>
+                          <table class="breakdown-table">
+                            <thead>
+                              <tr>
+                                <th class="col-skill header--red">SKILL</th>
+                                <th class="col-req header--red">TYPE</th>
+                                <th class="col-cur header--red">CANDIDATE</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              @for (cert of notMatchedCertifications(); track cert.name) {
+                                <tr>
+                                  <td class="col-skill">{{ cert.name }}</td>
+                                  <td class="col-req">{{ cert.type }}</td>
+                                  <td class="col-cur val-red">{{ cert.candidateText }}</td>
+                                </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      }
+                    </div>
+                  } @else if (activePopup() === 'experience') {
+                    <!-- Experience Detail Section -->
+                    <div class="exp-detail-card">
+                      <div class="exp-detail-columns">
+                        <!-- Required Experience -->
+                        <div class="exp-col">
+                          <span class="exp-col__label">Required Experience</span>
+                          <div class="exp-col__value">
+                            <span class="num">{{ data()?.experience_comparison?.jd_requires?.years || 0 }}</span>
+                            <span class="unit">years</span>
+                          </div>
+                        </div>
+
+                        <!-- Candidate Experience -->
+                        <div class="exp-col exp-col--right">
+                          <span class="exp-col__label">Candidate Experience</span>
+                          <div class="exp-col__value" [style.color]="experienceCandidateColor()">
+                            <span class="num">{{ data()?.experience_comparison?.candidate_has?.years || 0 }}</span>
+                            <span class="unit">years</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Progress Bar -->
+                      <div class="exp-progress-container">
+                        <div class="exp-progress-bar-bg">
+                          <div
+                            class="exp-progress-bar-fill"
+                            [style.width.%]="expProgressBarWidth()"
+                          ></div>
+                        </div>
+                      </div>
+
+                      <!-- Status Banner -->
+                      <div class="exp-banner" [ngClass]="experienceStatusClass()">
+                        <div class="banner-icon">
+                          @if (experienceExcess() >= 0) {
+                            <svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="3"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                          } @else {
+                            <svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="3"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <line x1="12" y1="8" x2="12" y2="12"></line>
+                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                          }
+                        </div>
+                        <span class="banner-text">{{ experienceStatusText() }}</span>
+                      </div>
+                    </div>
+                  } @else {
+                    <p class="modal-body__empty-text">
+                      Additional details not currently available for this
+                      section.
+                    </p>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+      }
+    }
+  }
+
+  @case (apiResponse.FAILURE) {
+    <app-error-page
+      [errorMessage]="errorMsg()"
+      (retry)="onRetry()"
+    ></app-error-page>
+  }
+}
+
+<!-- Premium File Preview Modal Overlay -->
+@if (previewFile) {
+  <div class="preview-modal-overlay" (click)="closeFilePreview()">
+    <div class="preview-modal-container" (click)="$event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="preview-modal-header">
+        <div class="preview-file-info">
+          <span class="preview-file-icon">
+            @if (isPreviewImage) {
+              🖼️
+            } @else if (isPreviewPdf) {
+              📄
+            } @else if (isPreviewText) {
+              📝
+            } @else {
+              📦
+            }
+          </span>
+          <span class="preview-file-name" [title]="previewFile.name">{{ previewFile.name }}</span>
+        </div>
+        <div class="preview-modal-actions">
+          @if (previewFileUrl) {
+            <a [href]="previewFileUrl" [download]="previewFile.name" class="action-btn download-btn" title="Download File">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </a>
+          }
+          <button class="action-btn close-btn" (click)="closeFilePreview()" title="Close Preview">
+            &times;
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="preview-modal-body">
+        @if (isPreviewImage) {
+          <div class="preview-content-image">
+            <img [src]="previewFileUrl" alt="Image Preview" />
+          </div>
+        } @else if (isPreviewPdf) {
+          <div class="preview-content-pdf">
+            <iframe [src]="safePreviewUrl" width="100%" height="100%" frameborder="0"></iframe>
+          </div>
+        } @else if (isPreviewText) {
+          <div class="preview-content-text">
+            <pre><code>{{ previewTextContent }}</code></pre>
+          </div>
+        } @else {
+          <div class="preview-content-fallback">
+            <div class="fallback-card">
+              <div class="fallback-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+              </div>
+              <h3>No Preview Available</h3>
+              <p>This file type ({{ getFileExtension(previewFile.name) }}) cannot be previewed inline.</p>
+              @if (previewFileUrl) {
+                <a [href]="previewFileUrl" [download]="previewFile.name" class="premium-download-link">
+                  Download to view
+                </a>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

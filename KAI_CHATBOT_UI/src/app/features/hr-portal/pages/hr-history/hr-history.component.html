@@ -1,0 +1,388 @@
+<div class="history-page">
+  <!-- Page Header -->
+  <h1 class="page-title">History</h1>
+
+  <!-- Outer Card enclosing Filters and Table -->
+  <div class="history-card-container">
+    <!-- Filters Header & Controls -->
+    <section class="filters-section">
+      <h2 class="filters-title">Filters</h2>
+
+      <div class="filters-grid">
+        <!-- Start Date -->
+        <div class="filter-group">
+          <label class="filter-label" for="historyStartDate">Start Date</label>
+          <div class="date-input-wrapper">
+            <svg class="calendar-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="2.5" y="3" width="11" height="10.5" rx="1.5" stroke="currentColor" stroke-width="1.2" />
+              <path d="M2.5 6h11M5 1.5V4M11 1.5V4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+            </svg>
+            <input
+              id="historyStartDate"
+              type="date"
+              class="filter-date-input"
+              [ngModel]="startDate()"
+              (ngModelChange)="startDate.set($event); onFilterChange()"
+            />
+          </div>
+        </div>
+
+        <!-- End Date -->
+        <div class="filter-group">
+          <label class="filter-label" for="historyEndDate">End Date</label>
+          <div class="date-input-wrapper">
+            <svg class="calendar-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="2.5" y="3" width="11" height="10.5" rx="1.5" stroke="currentColor" stroke-width="1.2" />
+              <path d="M2.5 6h11M5 1.5V4M11 1.5V4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+            </svg>
+            <input
+              id="historyEndDate"
+              type="date"
+              class="filter-date-input"
+              [ngModel]="endDate()"
+              (ngModelChange)="endDate.set($event); onFilterChange()"
+            />
+          </div>
+        </div>
+
+        <!-- Select Module -->
+        <div class="filter-group">
+          <label class="filter-label">Select Module</label>
+          <div class="select-wrapper">
+            <select
+              [ngModel]="selectedModule()"
+              (ngModelChange)="selectedModule.set($event); onFilterChange()"
+              class="filter-select"
+            >
+              <option value="all">All Modules</option>
+              @for (opt of moduleOptions(); track opt) {
+                @if (opt !== 'all' && opt !== 'All' && opt !== 'All Modules') {
+                  <option [value]="opt">{{ opt }}</option>
+                }
+              }
+            </select>
+            <svg class="chevron-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Select Process Type -->
+        <div class="filter-group">
+          <label class="filter-label">Select Process Type</label>
+          <div class="select-wrapper">
+            <select
+              [ngModel]="selectedProcessType()"
+              (ngModelChange)="selectedProcessType.set($event); onFilterChange()"
+              class="filter-select"
+            >
+              <option value="all">All Process Types</option>
+              @for (opt of processTypeOptions(); track opt) {
+                @if (opt !== 'all' && opt !== 'All' && opt !== 'All Process Types') {
+                  <option [value]="opt">{{ opt }}</option>
+                }
+              }
+            </select>
+            <svg class="chevron-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Select User -->
+        <div class="filter-group filter-group--user">
+          <label class="filter-label">Select User</label>
+          <app-searchable-select
+            [options]="userOptions()"
+            [selected]="selectedUser()"
+            placeholder="Select User"
+            allOptionLabel="All Users"
+            allOptionValue="all"
+            (selectionChange)="selectedUser.set($event); onFilterChange()"
+          ></app-searchable-select>
+        </div>
+
+        <!-- Reset Filters Button -->
+        <div class="filter-action-group">
+          <button type="button" class="btn-reset-filters" (click)="resetFilters()">
+            <svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M2.5 22v-6h6"/>
+              <path d="M2 11.5a10 10 0 0 1 18.8-4.3L21.5 8M2.5 16l1.2 1.2A10 10 0 0 0 22 12.5"/>
+            </svg>
+            <span>Reset filters</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Inner Table Card -->
+    <section class="table-inner-card">
+      <div class="table-responsive">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th class="col-datetime">Date & Time</th>
+              <th class="col-user">User</th>
+              <th class="col-token">Token Used</th>
+              <th class="col-module">Module</th>
+              <th class="col-process">Process Type</th>
+              <th class="col-uploaded">Uploaded Files</th>
+              <th class="col-url">Download</th>
+              <th class="col-status">Upload Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (isLoading()) {
+              <tr>
+                <td colspan="8" class="table-loading-cell">
+                  <div class="table-loading-spinner"></div>
+                  <span class="table-loading-text">Loading history records...</span>
+                </td>
+              </tr>
+            } @else {
+              @for (rec of paginatedRecords(); track rec.id) {
+                <tr class="history-table-row">
+                  <!-- Date & Time -->
+                  <td class="cell-datetime">
+                    <div class="date-line">{{ rec.date }}</div>
+                    @if (rec.time) {
+                      <div class="time-line">{{ rec.time }}</div>
+                    }
+                  </td>
+
+                  <!-- User -->
+                  <td class="cell-user">
+                    <div class="user-prefix">{{ rec.userPrefix }}</div>
+                    @if (rec.userDomain) {
+                      <div class="user-domain">{{ rec.userDomain }}</div>
+                    }
+                  </td>
+
+                  <!-- Token Used -->
+                  <td class="cell-token">
+                    <span class="token-badge">
+                      <svg class="token-coins-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M5.33301 9.33337C7.54215 9.33337 9.33301 7.54251 9.33301 5.33337C9.33301 3.12424 7.54215 1.33337 5.33301 1.33337C3.12387 1.33337 1.33301 3.12424 1.33301 5.33337C1.33301 7.54251 3.12387 9.33337 5.33301 9.33337Z" stroke="#F59E0B" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12.0602 6.91333C12.6904 7.14828 13.2512 7.53835 13.6907 8.04746C14.1302 8.55657 14.4343 9.16829 14.5747 9.82604C14.7152 10.4838 14.6875 11.1663 14.4943 11.8106C14.301 12.4548 13.9485 13.0399 13.4692 13.5117C12.9899 13.9836 12.3994 14.327 11.7522 14.5101C11.1051 14.6933 10.4222 14.7103 9.76668 14.5596C9.1112 14.4089 8.5043 14.0954 8.00211 13.648C7.49991 13.2006 7.11864 12.6338 6.89355 12" stroke="#F59E0B" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4.66699 4H5.33366V6.66667" stroke="#F59E0B" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M11.1399 9.2533L11.6066 9.72663L9.72656 11.6066" stroke="#F59E0B" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <span class="token-value">{{ rec.tokenUsed }}</span>
+                    </span>
+                  </td>
+
+                  <!-- Module -->
+                  <td class="cell-module">
+                    <span class="cell-text">{{ rec.module }}</span>
+                  </td>
+
+                  <!-- Process Type -->
+                  <td class="cell-process">
+                    <span class="cell-text">{{ rec.processType }}</span>
+                  </td>
+
+                  <!-- Uploaded Files -->
+                  <td class="cell-filename" [title]="rec.uploadedFileName">
+                    @if (rec.uploadedFileName && rec.uploadedFileName !== '-') {
+                      <button
+                        type="button"
+                        class="hr-view-badge-btn"
+                        (click)="openUploadedFilesModal(rec, $event)"
+                        [title]="'View ' + rec.uploadedFileName"
+                      >
+                        <svg
+                          width="57"
+                          height="24"
+                          viewBox="0 0 57 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                        >
+                          <rect width="56.3438" height="24" rx="8" fill="#EBFFF4" />
+                          <path
+                            d="M14.6172 16.1261L18.5002 12.1501"
+                            stroke="#49AB74"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M15.9998 9.00006L11.7928 13.2931C11.6053 13.4806 11.5 13.7349 11.5 14.0001C11.5 14.2652 11.6053 14.5195 11.7928 14.7071C11.9803 14.8945 12.2346 14.9998 12.4998 14.9998C12.7649 14.9998 13.0192 14.8945 13.2068 14.7071L17.4138 10.4141C17.7887 10.039 17.9993 9.53039 17.9993 9.00006C17.9993 8.46973 17.7887 7.96112 17.4138 7.58606C17.0387 7.21112 16.5301 7.00049 15.9998 7.00049C15.4694 7.00049 14.9608 7.21112 14.5858 7.58606L10.3783 11.8786C9.81561 12.4412 9.49951 13.2043 9.49951 14.0001C9.49951 14.7958 9.81561 15.5589 10.3783 16.1216C10.9409 16.6842 11.704 17.0003 12.4998 17.0003C13.2955 17.0003 14.0586 16.6842 14.6213 16.1216"
+                            stroke="#49AB74"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M25.2743 16.6667L22.3823 8.02666H23.4923L26.0063 15.5327L28.5443 8.02666H29.6543L26.7623 16.6667H25.2743ZM30.4424 9.04066V7.93666H31.5104V9.04066H30.4424ZM30.4424 16.6667V10.1867H31.5104V16.6667H30.4424ZM36.1187 16.8467C35.4827 16.8467 34.9267 16.7067 34.4507 16.4267C33.9787 16.1427 33.6107 15.7487 33.3467 15.2447C33.0827 14.7367 32.9507 14.1447 32.9507 13.4687C32.9507 12.7607 33.0807 12.1487 33.3407 11.6327C33.6007 11.1127 33.9627 10.7127 34.4267 10.4327C34.8947 10.1487 35.4427 10.0067 36.0707 10.0067C36.7227 10.0067 37.2767 10.1567 37.7327 10.4567C38.1927 10.7567 38.5367 11.1847 38.7647 11.7407C38.9967 12.2967 39.0967 12.9587 39.0647 13.7267H37.9847V13.3427C37.9727 12.5467 37.8107 11.9527 37.4987 11.5607C37.1867 11.1647 36.7227 10.9667 36.1067 10.9667C35.4467 10.9667 34.9447 11.1787 34.6007 11.6027C34.2567 12.0267 34.0847 12.6347 34.0847 13.4267C34.0847 14.1907 34.2567 14.7827 34.6007 15.2027C34.9447 15.6227 35.4347 15.8327 36.0707 15.8327C36.4987 15.8327 36.8707 15.7347 37.1867 15.5387C37.5027 15.3427 37.7507 15.0607 37.9307 14.6927L38.9567 15.0467C38.7047 15.6187 38.3247 16.0627 37.8167 16.3787C37.3127 16.6907 36.7467 16.8467 36.1187 16.8467ZM33.7247 13.7267V12.8687H38.5127V13.7267H33.7247ZM41.5462 16.6667L39.5662 10.1807L40.6282 10.1867L42.0742 14.9267L43.5322 10.1867H44.4742L45.9262 14.9267L47.3782 10.1867H48.4342L46.4542 16.6667H45.5662L44.0002 11.7407L42.4342 16.6667H41.5462Z"
+                            fill="#49AB74"
+                          />
+                        </svg>
+                      </button>
+                    } @else {
+                      <span class="cell-text">-</span>
+                    }
+                  </td>
+
+                  <!-- Download -->
+                  <td class="cell-url">
+                    @if (rec.downloadUrl) {
+                      <button
+                        type="button"
+                        class="hr-download-badge-btn"
+                        [class.is-downloading]="downloadingRecordId() === rec.id"
+                        (click)="downloadRecord(rec, $event)"
+                        title="Download"
+                      >
+                        @if (downloadingRecordId() === rec.id) {
+                          <span class="loader-tiny"></span>
+                          <span>Downloading...</span>
+                        } @else {
+                          <svg
+                            class="hr-download-icon"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#49AB74"
+                            stroke-width="2.2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                          >
+                            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"></path>
+                            <polyline points="7 11 12 16 17 11"></polyline>
+                            <line x1="12" y1="4" x2="12" y2="16"></line>
+                          </svg>
+                          <span>Download</span>
+                        }
+                      </button>
+                    } @else {
+                      <span class="status-na">-</span>
+                    }
+                  </td>
+
+                  <!-- Upload Resume Status -->
+                  <td class="cell-status">
+                    <span
+                      class="status-text"
+                      [class.status-success]="rec.uploadStatus === 'Success'"
+                      [class.status-failed]="rec.uploadStatus === 'Failed'"
+                    >
+                      {{ rec.uploadStatus }}
+                    </span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="8" class="empty-state">
+                    No history records found matching your active filters.
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Footer (Token Usage Monitoring Design) -->
+      @if (totalPages() > 1 || records().length > 0) {
+        <div class="token-usage-pagination">
+          <button
+            type="button"
+            class="token-usage-pagination__nav"
+            [disabled]="currentPage() <= 1 || isLoading()"
+            (click)="prevPage()"
+          >
+            &lt; Back
+          </button>
+
+          @for (page of pageNumbers(); track $index) {
+            @if (page === '...') {
+              <span class="token-usage-pagination__ellipsis">...</span>
+            } @else {
+              <button
+                type="button"
+                class="token-usage-pagination__page"
+                [class.token-usage-pagination__page--active]="page === currentPage()"
+                [disabled]="isLoading()"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+            }
+          }
+
+          <button
+            type="button"
+            class="token-usage-pagination__nav"
+            [disabled]="currentPage() >= totalPages() || isLoading()"
+            (click)="nextPage()"
+          >
+            Next &gt;
+          </button>
+        </div>
+      }
+    </section>
+  </div>
+
+  <!-- Uploaded Files Modal Popup -->
+  @if (isUploadedFilesModalOpen()) {
+    <div class="uploaded-files-modal-overlay" (click)="closeUploadedFilesModal()">
+      <div class="uploaded-files-modal-card" (click)="$event.stopPropagation()">
+        <!-- Modal Header -->
+        <div class="uploaded-files-modal-header">
+          <div class="modal-title-group">
+            <div class="modal-header-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#49AB74" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </div>
+            <div>
+              <h3 class="modal-title">Uploaded Files</h3>
+              <span class="modal-count-pill">{{ previewUploadedFiles().length }} {{ previewUploadedFiles().length === 1 ? 'file' : 'files' }}</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="modal-close-btn"
+            (click)="closeUploadedFilesModal()"
+            title="Close"
+          >
+            &times;
+          </button>
+        </div>
+
+        <!-- Modal Body: Only file names -->
+        <div class="uploaded-files-modal-body">
+          <div class="files-list">
+            @for (fileName of previewUploadedFiles(); track $index) {
+              <div class="file-item-card">
+                <div class="file-item-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#49AB74" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
+                <span class="file-item-name" [title]="fileName">{{ fileName }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="uploaded-files-modal-footer">
+          <button
+            type="button"
+            class="btn-modal-close"
+            (click)="closeUploadedFilesModal()"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

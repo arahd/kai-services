@@ -1,0 +1,113 @@
+/* SHIMMER BASE */
+
+.skeleton {
+  background: linear-gradient(90deg, #eeeeee 25%, #f5f5f5 37%, #eeeeee 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 6px;
+}
+
+/* SIZES */
+
+.title {
+  height: 26px;
+  width: 200px;
+  margin-bottom: 10px;
+}
+
+.text {
+  height: 14px;
+  width: 90%;
+  margin-bottom: 8px;
+}
+
+.text.small {
+  width: 60%;
+}
+
+.progress {
+  height: 8px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.badge {
+  height: 14px;
+  width: 50px;
+  border-radius: 20px;
+}
+
+.box {
+  height: 40px;
+  width: 140px;
+}
+
+/* ROW LAYOUT */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.grid {
+  display: grid;
+
+  grid-template-columns: 30% 30% 37%;
+
+  grid-template-areas:
+    "overall overall gaps"
+    "strengths smallgap gaps"
+    "strengths nice experience";
+
+  gap: 16px;
+}
+
+.skeleton-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+/* CARD */
+
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 18px;
+  border: 1px solid #e6e8ef;
+}
+
+.overall {
+  grid-area: overall;
+}
+
+.gaps-big {
+  grid-area: gaps;
+}
+
+.strengths {
+  grid-area: strengths;
+}
+
+.gaps-small {
+  grid-area: smallgap;
+}
+
+.nice {
+  grid-area: nice;
+}
+
+.experience {
+  grid-area: experience;
+}
+
+/* SHIMMER ANIMATION */
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}

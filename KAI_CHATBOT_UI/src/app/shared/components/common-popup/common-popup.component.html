@@ -1,0 +1,61 @@
+@if (show) {
+<div class="popup-overlay" (click)="close()">
+  <div class="popup-box" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="popup-header">
+      <h2>{{ title }}</h2>
+      <button class="close-btn" (click)="close()">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div class="popup-body">
+      @if (message) {
+      <p>{{ message }}</p>
+      }
+
+      @if (htmlContent) {
+      <div [innerHTML]="htmlContent"></div>
+      }
+
+      @if (items.length) {
+      @for (item of items; track $index) {
+      <div class="popup-item">
+        <div>
+          <strong>Source:</strong>
+          <h4 class="break-word">
+            @if(item.source) {
+            <a [href]="item.source" target="_blank" rel="noopener noreferrer">
+              {{ item.source }}
+            </a>
+            } 
+            @else {
+            <span>Nil</span>
+            }
+          </h4>
+        </div>
+
+        <p><strong>Type:</strong> {{ item.type || 'Nil' }}</p>
+
+        <!-- ✅ Loop through all keys dynamically for context fields -->
+        <div class="context-group">
+          @for (key of objectKeys(item); track key) {
+          @if (key.startsWith('context_')) {
+          <p class="context">
+            <strong>{{ key.replace('context_', 'Context ') }}:</strong>
+            {{ item[key] || 'Nil' }}
+          </p>
+          }
+          }
+        </div>
+      </div>
+      }
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="popup-footer">
+      <button class="btn-close" (click)="close()">Close</button>
+    </div>
+  </div>
+</div>
+}

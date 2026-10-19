@@ -1,0 +1,1593 @@
+<aside
+  class="sidenav"
+  [class.collapsed]="collapsed && !isMobile"
+  aria-label="Chat sidebar"
+>
+  <div class="sidenav-header" [class.is-collapsed]="collapsed && !isMobile">
+    @if (!collapsed || isMobile) {
+      <div class="brand">
+        <div class="bot-avatar">
+          <img src="./kumaran-lg.png" alt="KAI" width="28" height="28" />
+        </div>
+        <span class="brand-text">K-AI</span>
+      </div>
+      <button
+        id="tour-sidenav-toggle"
+        class="sidebar-toggle-btn"
+        (click)="toggleCollapse()"
+        [attr.aria-expanded]="!collapsed"
+        appTooltip="Toggle Sidebar"
+      >
+        <app-sidenav-icon
+          name="sidebar-toggle"
+          width="21"
+          height="21"
+        ></app-sidenav-icon>
+      </button>
+    } @else {
+      <div class="collapsed-header-stack">
+        <button
+          id="tour-sidenav-toggle"
+          class="sidebar-toggle-btn"
+          (click)="toggleCollapse()"
+          [attr.aria-expanded]="!collapsed"
+          appTooltip="Toggle Sidebar"
+        >
+          <app-sidenav-icon
+            name="sidebar-toggle"
+            width="21"
+            height="21"
+          ></app-sidenav-icon>
+        </button>
+        <div class="brand collapsed-logo" aria-hidden="true">
+          <div class="bot-avatar">
+            <img src="./kumaran-lg.png" alt="KAI" width="28" height="28" />
+          </div>
+        </div>
+      </div>
+    }
+    <button
+      class="mobile-close-btn"
+      (click)="closeMobileSidebar.emit()"
+      appTooltip="Close sidebar"
+    >
+      <app-sidenav-icon name="close" width="20" height="20"></app-sidenav-icon>
+    </button>
+  </div>
+
+  @if (isChatbotActive()) {
+    <div
+      class="new-chat-sticky-wrap"
+      [class.collapsed]="collapsed && !isMobile"
+    >
+      <!-- New Chat Button -->
+      <div
+        id="tour-new-chat"
+        class="action-item new-chat-btn"
+        [class.collapsed]="collapsed && !isMobile"
+        (click)="newChat()"
+        appTooltip="New Chat (Ctrl+Shift+O)"
+      >
+        <!-- <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+          fill="none"
+        >
+          <path
+            d="M7.49984 10.0003H9.99984M9.99984 10.0003H12.4998M9.99984 10.0003V7.50033M9.99984 10.0003V12.5003M9.99984 18.3337C14.6023 18.3337 18.3332 14.6028 18.3332 10.0003C18.3332 5.39783 14.6023 1.66699 9.99984 1.66699C5.39734 1.66699 1.6665 5.39783 1.6665 10.0003C1.6665 11.5178 2.07234 12.942 2.7815 14.167L2.08317 17.917L5.83317 17.2187C7.09953 17.951 8.53696 18.3357 9.99984 18.3337Z"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg> -->
+        <app-sidenav-icon
+          name="new-chat"
+          width="18"
+          height="18"
+        ></app-sidenav-icon>
+        @if (!collapsed || isMobile) {
+          <span>New Chat</span>
+        }
+      </div>
+    </div>
+  }
+
+  <section
+    class="side-nav-section"
+    #scrollContainer
+    (scroll)="onScroll($event)"
+  >
+    <div
+      class="top-actions-group"
+      [class.top-action-collapsed]="collapsed && !isMobile"
+    >
+      @if (isChatbotActive()) {
+        <!-- Search Chats class:search-trigger-->
+        <div
+          id="tour-search-chats"
+          class="action-item"
+          (click)="openSearchModal()"
+          appTooltip="Search Chats (Ctrl+K)"
+        >
+          <app-sidenav-icon
+            name="search"
+            width="20"
+            height="20"
+          ></app-sidenav-icon>
+          @if (!collapsed || isMobile) {
+            <span>Search Chats</span>
+          }
+        </div>
+      } @else {
+        <!-- Chatbot Navigation Button -->
+        <div
+          class="action-item"
+          (click)="safeNavigate('/chatbot')"
+          title="Chatbot"
+        >
+          <app-sidenav-icon
+            name="chatbot"
+            width="20"
+            height="20"
+          ></app-sidenav-icon>
+          @if (!collapsed || isMobile) {
+            <span>Chatbot</span>
+          }
+        </div>
+
+        @if (!collapsed || isMobile) {
+          <div class="nav-divider"></div>
+        }
+      }
+
+      <!-- Projects Section -->
+      <div
+        id="tour-projects"
+        class="action-item"
+        [class.active]="
+          ('/projects' | isRouteActive: currentUrl()) &&
+          (!projectsMenuExpanded || collapsed)
+        "
+        (click)="onProjectsRowClick($event)"
+        title="Projects"
+      >
+        <div class="action-icon-wrap">
+          <app-sidenav-icon
+            name="folder"
+            width="20"
+            height="20"
+          ></app-sidenav-icon>
+          @if (collapsed && !isMobile) {
+            <span class="collapsed-new-dot" title="New Feature"></span>
+          }
+        </div>
+        @if (!collapsed || isMobile) {
+          <span class="projects-label">
+            <span>Projects</span>
+            <button
+              type="button"
+              class="admin-expand-btn"
+              (click)="toggleProjectsMenu($event)"
+              [attr.aria-expanded]="projectsMenuExpanded"
+              aria-label="Toggle Projects menu"
+              title="Expand/Collapse"
+            >
+              <app-sidenav-icon
+                name="chevron-right"
+                class="admin-expand-icon"
+                [class.is-open]="projectsMenuExpanded"
+                width="16"
+                height="16"
+              ></app-sidenav-icon>
+            </button>
+          </span>
+        }
+      </div>
+
+      @if (!collapsed && projectsMenuExpanded) {
+        <div class="projects-submenu-actions">
+          <!-- Create project row -->
+          <div
+            class="sub-action-item sub-action-item--project"
+            (click)="openCreateProjectModal()"
+            title="Create project"
+          >
+            <app-sidenav-icon
+              name="folder-plus"
+              class="sub-action-icon"
+              width="18"
+              height="18"
+            ></app-sidenav-icon>
+            <span>Create project</span>
+          </div>
+
+          <!-- List of projects (up to 5) -->
+          @for (project of displayedProjects(); track project.project_id) {
+            <div
+              class="sub-action-item sub-action-item--project"
+              [class.active]="isProjectActive(project.project_id)"
+              [class.pinned]="projectState.isProjectPinned(project.project_id)"
+              [class.active-options]="selectedProjectForMenu()?.project_id === project.project_id"
+              (click)="openProject(project)"
+              (contextmenu)="onProjectRightClick(project, $event)"
+              [title]="project.project_name"
+            >
+              <app-sidenav-icon
+                name="folder"
+                class="sub-action-icon"
+                width="18"
+                height="18"
+              ></app-sidenav-icon>
+              <span class="project-name-text">{{ project.project_name }}</span>
+
+              @if (projectState.isProjectPinned(project.project_id)) {
+                <div class="pin-indicator">
+                  <app-sidenav-icon
+                    name="pin"
+                    width="14"
+                    height="14"
+                  ></app-sidenav-icon>
+                </div>
+              }
+
+              <div class="options-menu">
+                <button
+                  type="button"
+                  (click)="toggleProjectOptions(project, $event)"
+                  aria-label="More project options"
+                  title="More options"
+                >
+                  <app-sidenav-icon
+                    name="more-horizontal"
+                    width="16"
+                    height="16"
+                  ></app-sidenav-icon>
+                </button>
+              </div>
+            </div>
+          }
+
+          <!-- Show more row (clicking navigates to /projects where table is shown) -->
+          <div
+            class="sub-action-item sub-action-item--project sub-action-item--show-more"
+            [class.active]="isProjectsTableActive()"
+            (click)="safeNavigate('/projects')"
+            title="Show more"
+          >
+            <app-sidenav-icon
+              name="more-horizontal"
+              class="sub-action-icon"
+              width="18"
+              height="18"
+            ></app-sidenav-icon>
+            <span>Show more</span>
+          </div>
+        </div>
+      }
+
+      <!-- Product Navigation Button -->
+      @if (showProductMenu) {
+        @if (isProductAdmin) {
+          <div
+            class="action-item"
+            [class.active]="
+              ('/product' | isRouteActive: currentUrl()) &&
+              (!productMenuExpanded || collapsed)
+            "
+            (click)="openProductSection()"
+            title="Product"
+          >
+            <app-sidenav-icon
+              name="product"
+              width="20"
+              height="20"
+            ></app-sidenav-icon>
+            @if (!collapsed || isMobile) {
+              <span class="hr-label">
+                <span class="side-nav-hr-portal">
+                  <span>Product</span>
+                </span>
+                <button
+                  type="button"
+                  class="admin-expand-btn"
+                  (click)="toggleProductMenu($event)"
+                  [attr.aria-expanded]="productMenuExpanded"
+                  aria-label="Toggle Product menu"
+                  title="Expand/Collapse"
+                >
+                  <app-sidenav-icon
+                    name="chevron-right"
+                    class="admin-expand-icon"
+                    [class.is-open]="productMenuExpanded"
+                    width="16"
+                    height="16"
+                  ></app-sidenav-icon>
+                </button>
+              </span>
+            }
+          </div>
+
+          @if (!collapsed && productMenuExpanded) {
+            <div class="hr-submenu-actions">
+              <div
+                class="sub-action-item sub-action-item--with-rail sub-action-item--hr"
+                [class.active]="currentUrl() === '/product'"
+                (click)="safeNavigate('/product')"
+                title="Capabilities"
+              >
+                <span>Capabilities</span>
+              </div>
+              <div
+                class="sub-action-item sub-action-item--with-rail sub-action-item--hr"
+                [class.active]="'/product/admin' | isRouteActive: currentUrl()"
+                (click)="safeNavigate('/product/admin')"
+                title="Product Access"
+              >
+                <span>Product Access</span>
+              </div>
+            </div>
+          }
+        } @else {
+          <div
+            class="action-item"
+            [class.active]="'/product' | isRouteActive: currentUrl()"
+            (click)="safeNavigate('/product')"
+            title="Product"
+          >
+            <app-sidenav-icon
+              name="product"
+              width="20"
+              height="20"
+            ></app-sidenav-icon>
+            @if (!collapsed || isMobile) {
+              <span>Product</span>
+            }
+          </div>
+        }
+      }
+
+      @if (isHrAdmin) {
+        <div
+          class="action-item"
+          [class.active]="
+            ('/hrportal' | isRouteActive: currentUrl()) &&
+            (!hrMenuExpanded || collapsed)
+          "
+          (click)="openHrSection()"
+          title="HR Portal"
+        >
+          <app-sidenav-icon
+            name="hr-portal"
+            width="20"
+            height="20"
+          ></app-sidenav-icon>
+
+          @if (!collapsed || isMobile) {
+            <span class="hr-label">
+              <span class="side-nav-hr-portal">
+                <span>HR Portal</span>
+                <!-- <span class="badge-new">New</span> -->
+              </span>
+              <button
+                type="button"
+                class="admin-expand-btn"
+                (click)="toggleHrMenu($event)"
+                [attr.aria-expanded]="hrMenuExpanded"
+                aria-label="Toggle HR Portal menu"
+                title="Expand/Collapse"
+              >
+                <app-sidenav-icon
+                  name="chevron-right"
+                  class="admin-expand-icon"
+                  [class.is-open]="hrMenuExpanded"
+                  width="16"
+                  height="16"
+                ></app-sidenav-icon>
+              </button>
+            </span>
+          }
+        </div>
+
+        @if (!collapsed && hrMenuExpanded) {
+          <div class="hr-submenu-actions">
+            <div
+              class="sub-action-item sub-action-item--with-rail sub-action-item--hr"
+              [class.active]="'/hrportal/jd' | isRouteActive: currentUrl()"
+              (click)="safeNavigate('/hrportal/jd')"
+              title="JD Analysis"
+            >
+              <img
+                class="sub-action-icon"
+                src="assets/HR portal/jd-analysis-submenu.png"
+                alt=""
+                aria-hidden="true"
+              />
+              <span>JD Analysis</span>
+            </div>
+            @if (isResumeAccessible()) {
+              <div
+                class="sub-action-item sub-action-item--with-rail sub-action-item--hr"
+                [class.active]="
+                  '/hrportal/resume-standardizer' | isRouteActive: currentUrl()
+                "
+                (click)="safeNavigate('/hrportal/resume-standardizer')"
+                title="Resume Standardizer"
+              >
+                <app-sidenav-icon
+                  name="resume-standardizer"
+                  class="sub-action-icon"
+                  width="20"
+                  height="20"
+                ></app-sidenav-icon>
+                <span>Resume Standardizer</span>
+              </div>
+            }
+            @if (isVisaAccessible()) {
+              <div
+                class="sub-action-item sub-action-item--with-rail sub-action-item--hr"
+                [class.active]="
+                  '/hrportal/visa-process' | isRouteActive: currentUrl()
+                "
+                (click)="safeNavigate('/hrportal/visa-process')"
+                title="Visa Process Check"
+              >
+                <app-sidenav-icon
+                  name="visa-process"
+                  class="sub-action-icon"
+                  width="20"
+                  height="20"
+                ></app-sidenav-icon>
+                <span>Visa Process Check</span>
+              </div>
+            }
+            <div
+              class="sub-action-item sub-action-item--with-rail sub-action-item--hr"
+              [class.active]="
+                '/hrportal/recent-activity' | isRouteActive: currentUrl()
+              "
+              (click)="safeNavigate('/hrportal/recent-activity')"
+              title="Recent Activity"
+            >
+              <app-sidenav-icon
+                name="recent-activity"
+                class="sub-action-icon"
+                width="20"
+                height="20"
+              ></app-sidenav-icon>
+              <span>Recent Activity</span>
+            </div>
+
+            @if (isHrAdminAccess()) {
+              <div
+                class="sub-action-item sub-action-item--with-rail sub-action-item--hr"
+                [class.active]="
+                  '/hrportal/analytics' | isRouteActive: currentUrl()
+                "
+                (click)="safeNavigate('/hrportal/analytics')"
+                title="HR Analytics"
+              >
+                <app-sidenav-icon
+                  name="analytics"
+                  class="sub-action-icon"
+                  width="20"
+                  height="20"
+                ></app-sidenav-icon>
+                <span>HR Analytics</span>
+              </div>
+
+              <div
+                class="sub-action-item sub-action-item--with-rail sub-action-item--hr"
+                [class.active]="
+                  '/hrportal/history' | isRouteActive: currentUrl()
+                "
+                (click)="safeNavigate('/hrportal/history')"
+                title="HR History"
+              >
+                <app-sidenav-icon
+                  name="history"
+                  class="sub-action-icon"
+                  width="20"
+                  height="20"
+                ></app-sidenav-icon>
+                <span>HR History</span>
+              </div>
+
+              <div
+                class="sub-action-item sub-action-item--with-rail sub-action-item--hr"
+                [class.active]="
+                  '/hrportal/admin-control' | isRouteActive: currentUrl()
+                "
+                (click)="safeNavigate('/hrportal/admin-control')"
+                title="Admin Control"
+              >
+                <app-sidenav-icon
+                  name="hr-admin-control"
+                  class="sub-action-icon"
+                  width="20"
+                  height="20"
+                ></app-sidenav-icon>
+                <span>Admin Control</span>
+              </div>
+            }
+            <!-- <div
+              class="sub-action-item sub-action-item--with-rail sub-action-item--hr sub-action-item--hr-linkedin"
+              [class.active]="'/hrportal/linkedin-analysis' | isRouteActive: currentUrl()"
+              (click)="safeNavigate('/hrportal/linkedin-analysis')"
+              title="LinkedIn Analysis"
+            >
+              <svg
+                class="sub-action-icon sub-action-icon--linkedin"
+                width="19"
+                height="19"
+                viewBox="0 0 19 19"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M14.5086 2.29257C14.9137 2.29257 15.3021 2.45348 15.5886 2.7399C15.875 3.02631 16.0359 3.41478 16.0359 3.81983V14.5107C16.0359 14.9157 15.875 15.3042 15.5886 15.5906C15.3021 15.877 14.9137 16.0379 14.5086 16.0379H3.81779C3.41273 16.0379 3.02427 15.877 2.73785 15.5906C2.45143 15.3042 2.29053 14.9157 2.29053 14.5107V3.81983C2.29053 3.41478 2.45143 3.02631 2.73785 2.7399C3.02427 2.45348 3.41273 2.29257 3.81779 2.29257H14.5086ZM14.1268 14.1289V10.0816C14.1268 9.42137 13.8645 8.78817 13.3977 8.32131C12.9308 7.85445 12.2976 7.59217 11.6374 7.59217C10.9883 7.59217 10.2323 7.98926 9.86575 8.58489V7.73726H7.73522V14.1289H9.86575V10.3642C9.86575 9.77616 10.3392 9.29507 10.9272 9.29507C11.2107 9.29507 11.4827 9.4077 11.6832 9.6082C11.8836 9.80869 11.9963 10.0806 11.9963 10.3642V14.1289H14.1268ZM5.25342 6.53836C5.59366 6.53836 5.91997 6.4032 6.16056 6.16261C6.40115 5.92202 6.53632 5.59571 6.53632 5.25546C6.53632 4.54528 5.96359 3.96492 5.25342 3.96492C4.91114 3.96492 4.58289 4.10089 4.34087 4.34291C4.09885 4.58494 3.96288 4.91319 3.96288 5.25546C3.96288 5.96564 4.54324 6.53836 5.25342 6.53836ZM6.31486 14.1289V7.73726H4.19961V14.1289H6.31486Z"
+                  fill="#1F2937"
+                />
+              </svg>
+              <span>LinkedIn Analysis</span>
+            </div> -->
+          </div>
+        }
+      }
+
+      <!-- Agents Navigation Section -->
+      @if (isAgentsAccessible()) {
+        <div
+          class="action-item"
+          [class.active]="
+            ('/agents' | isRouteActive: currentUrl()) &&
+            (!agentsMenuExpanded || collapsed)
+          "
+          (click)="openAgentsSection()"
+          title="AI Agents"
+        >
+          <app-sidenav-icon
+            name="agent-bot"
+            width="20"
+            height="20"
+          ></app-sidenav-icon>
+
+          @if (!collapsed || isMobile) {
+            <span class="hr-label">
+              <span class="side-nav-hr-portal">
+                <span>Agents</span>
+                @if (agentCount() > 0) {
+                  <span class="badge-count">{{ agentCount() }}</span>
+                }
+              </span>
+              <button
+                type="button"
+                class="admin-expand-btn"
+                (click)="toggleAgentsMenu($event)"
+                [attr.aria-expanded]="agentsMenuExpanded"
+                aria-label="Toggle Agents menu"
+                title="Expand/Collapse"
+              >
+                <app-sidenav-icon
+                  name="chevron-right"
+                  class="admin-expand-icon"
+                  [class.is-open]="agentsMenuExpanded"
+                  width="16"
+                  height="16"
+                ></app-sidenav-icon>
+              </button>
+            </span>
+          }
+        </div>
+
+        @if (!collapsed && agentsMenuExpanded) {
+          <div class="admin-submenu-actions agent-submenu-actions">
+            <!-- All Agents Hub Link -->
+            <div
+              class="sub-action-item"
+              [class.active]="currentUrl() === '/agents'"
+              (click)="safeNavigate('/agents')"
+              title="Explore All Agents"
+            >
+              <app-sidenav-icon
+                name="search"
+                class="sub-action-icon"
+                width="20"
+                height="20"
+              ></app-sidenav-icon>
+              <span>All Agents ({{ agentCount() }})</span>
+            </div>
+
+            <!-- My Agents Group -->
+            @if (privateAgents().length > 0) {
+              <div
+                class="sub-action-item"
+                (click)="togglePrivateAgents($event)"
+                title="My Agents"
+              >
+                <app-sidenav-icon
+                  name="user"
+                  class="sub-action-icon"
+                  width="20"
+                  height="20"
+                ></app-sidenav-icon>
+                <span class="sub-action-label-row">
+                  <span>My Agents ({{ privateAgents().length }})</span>
+                  <app-sidenav-icon
+                    name="chevron-right"
+                    class="admin-expand-icon"
+                    [class.is-open]="privateAgentsExpanded"
+                    width="14"
+                    height="14"
+                  ></app-sidenav-icon>
+                </span>
+              </div>
+
+              @if (privateAgentsExpanded) {
+                @for (agent of privateAgents(); track agent.id) {
+                  <div
+                    class="sub-action-item agent-item-nested"
+                    [class.active]="selectedAgentId() === agent.id"
+                    (click)="selectAgent(agent)"
+                    [title]="agent.agent_name"
+                  >
+                    <span
+                      class="agent-pill-type agent-pill-type--{{ agent.agent_type.toLowerCase() }}"
+                    >
+                      {{ agent.agent_type[0] }}
+                    </span>
+                    <span class="agent-name-text">{{ agent.agent_name }}</span>
+                  </div>
+                }
+              }
+            }
+
+            <!-- Group Agents -->
+            @if (groupAgents().length > 0) {
+              <div
+                class="sub-action-item"
+                (click)="toggleGroupAgents($event)"
+                title="Group Agents"
+              >
+                <app-sidenav-icon
+                  name="group"
+                  class="sub-action-icon"
+                  width="20"
+                  height="20"
+                ></app-sidenav-icon>
+                <span class="sub-action-label-row">
+                  <span>Group ({{ groupAgents().length }})</span>
+                  <app-sidenav-icon
+                    name="chevron-right"
+                    class="admin-expand-icon"
+                    [class.is-open]="groupAgentsExpanded"
+                    width="14"
+                    height="14"
+                  ></app-sidenav-icon>
+                </span>
+              </div>
+
+              @if (groupAgentsExpanded) {
+                @for (agent of groupAgents(); track agent.id) {
+                  <div
+                    class="sub-action-item agent-item-nested"
+                    [class.active]="selectedAgentId() === agent.id"
+                    (click)="selectAgent(agent)"
+                    [title]="agent.agent_name"
+                  >
+                    <span
+                      class="agent-pill-type agent-pill-type--{{ agent.agent_type.toLowerCase() }}"
+                    >
+                      {{ agent.agent_type[0] }}
+                    </span>
+                    <span class="agent-name-text">{{ agent.agent_name }}</span>
+                  </div>
+                }
+              }
+            }
+
+            <!-- Public Agents -->
+            @if (publicAgents().length > 0) {
+              <div
+                class="sub-action-item"
+                (click)="togglePublicAgents($event)"
+                title="Public Agents"
+              >
+                <app-sidenav-icon
+                  name="globe"
+                  class="sub-action-icon"
+                  width="20"
+                  height="20"
+                ></app-sidenav-icon>
+                <span class="sub-action-label-row">
+                  <span>Public ({{ publicAgents().length }})</span>
+                  <app-sidenav-icon
+                    name="chevron-right"
+                    class="admin-expand-icon"
+                    [class.is-open]="publicAgentsExpanded"
+                    width="14"
+                    height="14"
+                  ></app-sidenav-icon>
+                </span>
+              </div>
+
+              @if (publicAgentsExpanded) {
+                @for (agent of publicAgents(); track agent.id) {
+                  <div
+                    class="sub-action-item agent-item-nested"
+                    [class.active]="selectedAgentId() === agent.id"
+                    (click)="selectAgent(agent)"
+                    [title]="agent.agent_name"
+                  >
+                    <span
+                      class="agent-pill-type agent-pill-type--{{ agent.agent_type.toLowerCase() }}"
+                    >
+                      {{ agent.agent_type[0] }}
+                    </span>
+                    <span class="agent-name-text">{{ agent.agent_name }}</span>
+                  </div>
+                }
+              }
+            }
+          </div>
+        }
+      }
+
+      @if (isAdmin) {
+        <div
+          class="action-item action-item--admin"
+          [class.action-item--admin--after-hr-expanded]="
+            isHrAdmin && hrMenuExpanded && !collapsed
+          "
+          [class.active]="
+            ('/admin' | isRouteActive: currentUrl()) &&
+            (!adminMenuExpanded || collapsed)
+          "
+          (click)="openAdminSection()"
+          title="Admin"
+        >
+          <app-sidenav-icon
+            name="admin"
+            width="20"
+            height="20"
+          ></app-sidenav-icon>
+          @if (!collapsed || isMobile) {
+            <span class="admin-label">
+              <span>Admin</span>
+              <button
+                type="button"
+                class="admin-expand-btn"
+                (click)="toggleAdminMenu($event)"
+                [attr.aria-expanded]="adminMenuExpanded"
+                aria-label="Toggle admin menu"
+                title="Expand/Collapse"
+              >
+                <app-sidenav-icon
+                  name="chevron-right"
+                  class="admin-expand-icon"
+                  [class.is-open]="adminMenuExpanded"
+                  width="16"
+                  height="16"
+                ></app-sidenav-icon>
+              </button>
+            </span>
+          }
+        </div>
+
+        @if (!collapsed && adminMenuExpanded) {
+          <div class="admin-submenu-actions">
+            <div
+              class="sub-action-item"
+              [class.active]="'/admin/analytics' | isRouteActive: currentUrl()"
+              (click)="safeNavigate('/admin/analytics')"
+              title="Analytics"
+            >
+              <app-sidenav-icon
+                name="analytics"
+                class="sub-action-icon"
+                width="20"
+                height="20"
+              ></app-sidenav-icon>
+              <span>Analytics</span>
+            </div>
+            <div
+              class="sub-action-item"
+              [class.active]="
+                '/admin/user-management' | isRouteActive: currentUrl()
+              "
+              (click)="safeNavigate('/admin/user-management')"
+              title="User Management"
+            >
+              <app-sidenav-icon
+                name="user-management"
+                class="sub-action-icon"
+                width="20"
+                height="20"
+              ></app-sidenav-icon>
+              <span>User Management</span>
+            </div>  
+            <div
+              class="sub-action-item sub-action-item--admin-service-user"
+              [class.active]="
+                '/admin/service-user-analytics' | isRouteActive: currentUrl()
+              "
+              (click)="safeNavigate('/admin/service-user-analytics')"
+              title="Service User Analytics"
+            >
+              <app-sidenav-icon
+                name="service-user"
+                class="sub-action-icon"
+                width="20"
+                height="20"
+              ></app-sidenav-icon>
+              <span>Service User Analytics</span>
+            </div>
+            <div
+              class="sub-action-item"
+              [class.active]="
+                '/admin/bug-reports' | isRouteActive: currentUrl()
+              "
+              (click)="safeNavigate('/admin/bug-reports')"
+              title="Bugs Dashboard"
+            >
+              <app-sidenav-icon
+                name="bug"
+                class="sub-action-icon"
+                width="20"
+                height="20"
+              ></app-sidenav-icon>
+              <span>Bug Reports</span>
+            </div>
+          </div>
+        }
+      }
+
+      <!-- @if (!collapsed) {
+      <div class="section-label">Projects</div>
+    } -->
+
+      <!-- Dummy placeholders for Projects -->
+      <!-- <div class="action-item" title="New Project">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+        <line x1="12" y1="11" x2="12" y2="17"></line>
+        <line x1="9" y1="14" x2="15" y2="14"></line>
+      </svg>
+      @if (!collapsed) {
+        <span>New Project</span>
+      }
+    </div> -->
+
+      <!-- <div class="action-item" title="PMO">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+      </svg>
+      @if (!collapsed) {
+        <span>PMO</span>
+      }
+    </div> -->
+    </div>
+    @if (shouldShowRecents()) {
+      @if (!collapsed || isMobile) {
+        <div class="history-label" (click)="showHistory()">
+          <span>Recents</span>
+          <button
+            class="history-toggle-btn"
+            [class.collapsed]="!showHistorySection"
+            aria-label="Toggle history section"
+          >
+            <app-sidenav-icon
+              name="chevron-down"
+              class="history-toggle-icon"
+              width="18"
+              height="18"
+            ></app-sidenav-icon>
+          </button>
+        </div>
+      }
+
+      <nav id="tour-recent-chats" class="chats" role="navigation">
+        @if ((!collapsed || isMobile) && showHistorySection) {
+          <ul>
+            @for (c of chats; track trackByChat($index, c); let i = $index) {
+              <li
+                class="chat-item"
+                [class.active]="isActiveChat(c)"
+                [class.pinned]="c.is_pinned"
+                [class.active-options]="activeOptionsIndex === i"
+                (click)="openChat(i)"
+                (contextmenu)="onRightClick(i, $event)"
+              >
+                <!-- Chat Title -->
+                @if (!collapsed || isMobile) {
+                  <div class="chat-title">
+                    {{ getDisplayTitle(c) }}
+                  </div>
+                  @if (c.is_pinned || c.pinned) {
+                    <div class="pin-indicator">
+                      <app-sidenav-icon
+                        name="pin"
+                        width="16"
+                        height="16"
+                      ></app-sidenav-icon>
+                    </div>
+                  }
+                  @if (isGenerating(c, i)) {
+                    <div
+                      class="generating-indicator"
+                      appTooltip="Generating response..."
+                    >
+                      <span class="blue-loader"></span>
+                    </div>
+                  }
+                }
+                <div id="tour-pin-delete" class="options-menu">
+                  <button
+                    (click)="
+                      isActionDisabled(c) ? null : toggleChatOptions(i, $event)
+                    "
+                    [appTooltip]="getDisabledTooltip(c)"
+                    [disabled]="isActionDisabled(c)"
+                    [class.disabled]="isActionDisabled(c)"
+                  >
+                    <app-sidenav-icon
+                      name="more-horizontal"
+                      width="18"
+                      height="18"
+                    ></app-sidenav-icon>
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+        <!-- Skeleton Loading Indicator for infinite scroll -->
+        @if (loadingChats && (!collapsed || isMobile)) {
+          <div class="chat-skeleton-loader">
+            <div class="skeleton-item"></div>
+            <div class="skeleton-item" style="width: 85%"></div>
+            <div class="skeleton-item" style="width: 70%"></div>
+          </div>
+        }
+      </nav>
+    }
+  </section>
+
+  <div id="tour-user-profile" class="sidenav-footer">
+    <app-sidenav-profile
+      [userInitial]="userInitial"
+      [userInfo]="userInfo"
+      [collapsed]="collapsed"
+      [popoverOpen]="popoverOpen"
+      [popoverPosition]="popoverPosition"
+      [streaming]="streaming"
+      [models]="layoutBridge.models()"
+      (togglePopoverEvt)="togglePopover($event)"
+      (streamingToggleEvt)="onStreamingToggle($event)"
+      (logoutEvt)="logout()"
+      (openSettingsEvt)="openSettingsModal()"
+    ></app-sidenav-profile>
+  </div>
+
+  @if (activeOptionsIndex !== null) {
+    <app-chat-context-menu
+      [menuPosition]="menuPosition"
+      [isPinned]="
+        chats[activeOptionsIndex].is_pinned || chats[activeOptionsIndex].pinned
+      "
+      [disabled]="isActionDisabled(chats[activeOptionsIndex])"
+      [disabledTooltip]="getDisabledTooltip(chats[activeOptionsIndex])"
+      (shareEvt)="
+        !isActionDisabled(chats[activeOptionsIndex])
+          ? shareChat(activeOptionsIndex)
+          : null
+      "
+      (pinEvt)="
+        !isActionDisabled(chats[activeOptionsIndex])
+          ? pinChat(activeOptionsIndex)
+          : null
+      "
+      (deleteEvt)="
+        !isActionDisabled(chats[activeOptionsIndex])
+          ? confirmDelete(activeOptionsIndex, $event)
+          : null
+      "
+      (renameEvt)="
+        !isActionDisabled(chats[activeOptionsIndex])
+          ? openRenameModal(activeOptionsIndex)
+          : null
+      "
+      [showMoveToProject]="true"
+      (moveToProjectEvt)="
+        !isActionDisabled(chats[activeOptionsIndex])
+          ? openMoveToProjectModal(activeOptionsIndex)
+          : null
+      "
+    ></app-chat-context-menu>
+  }
+
+  @if (selectedProjectForMenu()) {
+    <app-chat-context-menu
+      [menuPosition]="projectMenuPosition"
+      [isPinned]="projectState.isProjectPinned(selectedProjectForMenu()!.project_id)"
+      [showShare]="false"
+      [showPin]="true"
+      [showRename]="true"
+      [showDelete]="true"
+      [disabled]="false"
+      [disabledTooltip]="''"
+      (pinEvt)="onMenuPinProject()"
+      (renameEvt)="onMenuRenameProject()"
+      (deleteEvt)="onMenuDeleteProject($event)"
+    ></app-chat-context-menu>
+  }
+
+  <!-- Simple confirmation popup -->
+  @if (showConfirm) {
+    <div class="confirm-overlay" (click)="cancelDelete()">
+      <div class="confirm-box confirm-box--delete" (click)="$event.stopPropagation()">
+        <div class="confirm-header">
+          <h4>Delete Chat</h4>
+          <button class="confirm-close-btn" (click)="cancelDelete()" aria-label="Close">
+            <app-sidenav-icon name="close" width="18" height="18"></app-sidenav-icon>
+          </button>
+        </div>
+        <div class="confirm-divider confirm-divider--spaced"></div>
+        <div class="confirm-body">
+          <p>This will delete the chat permanently.</p>
+          <div class="buttons">
+            <button class="cancel-btn" (click)="cancelDelete()">Cancel</button>
+            <button class="delete-btn" (click)="deleteChat()">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Rename confirmation popup -->
+  @if (showRenameModal) {
+    <div class="confirm-overlay" (click)="cancelRename()">
+      <div class="confirm-box" (click)="$event.stopPropagation()">
+        <div class="confirm-header">
+          <h4>Rename this chat</h4>
+          <button class="confirm-close-btn" (click)="cancelRename()" aria-label="Close">
+            <app-sidenav-icon name="close" width="18" height="18"></app-sidenav-icon>
+          </button>
+        </div>
+        <div class="confirm-divider"></div>
+        <div class="confirm-body">
+          <div class="rename-input-group">
+            <input
+              type="text"
+              class="rename-input"
+              [(ngModel)]="renameValue"
+              placeholder="New name..."
+              (keyup.enter)="confirmRename()"
+              autofocus
+            />
+          </div>
+        </div>
+        <div class="confirm-divider"></div>
+        <div class="confirm-footer">
+          <div class="buttons">
+            <button class="cancel-btn" (click)="cancelRename()">Cancel</button>
+            <button class="rename-btn" (click)="confirmRename()">Rename</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Project Delete confirmation popup -->
+  @if (showProjectConfirm()) {
+    <div class="confirm-overlay" (click)="cancelProjectDelete()">
+      <div class="confirm-box confirm-box--delete" (click)="$event.stopPropagation()">
+        <div class="confirm-header">
+          <h4>Delete Project</h4>
+          <button class="confirm-close-btn" (click)="cancelProjectDelete()" aria-label="Close">
+            <app-sidenav-icon name="close" width="18" height="18"></app-sidenav-icon>
+          </button>
+        </div>
+        <div class="confirm-divider confirm-divider--spaced"></div>
+        <div class="confirm-body">
+          <p>This will delete "{{ projectToDelete()?.project_name }}" and its conversations permanently.</p>
+          <div class="buttons">
+            <button class="cancel-btn" (click)="cancelProjectDelete()">Cancel</button>
+            <button class="delete-btn" (click)="confirmProjectDelete()">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Project Rename confirmation popup -->
+  @if (showProjectRenameModal()) {
+    <div class="confirm-overlay" (click)="cancelProjectRename()">
+      <div class="confirm-box" (click)="$event.stopPropagation()">
+        <div class="confirm-header">
+          <h4>Rename project</h4>
+          <button class="confirm-close-btn" (click)="cancelProjectRename()" aria-label="Close">
+            <app-sidenav-icon name="close" width="18" height="18"></app-sidenav-icon>
+          </button>
+        </div>
+        <div class="confirm-divider"></div>
+        <div class="confirm-body">
+          <div class="rename-input-group">
+            <input
+              type="text"
+              class="rename-input"
+              [(ngModel)]="projectRenameValue"
+              placeholder="New project name..."
+              (keyup.enter)="confirmProjectRename()"
+              autofocus
+            />
+          </div>
+        </div>
+        <div class="confirm-divider"></div>
+        <div class="confirm-footer">
+          <div class="buttons">
+            <button class="cancel-btn" (click)="cancelProjectRename()">Cancel</button>
+            <button class="rename-btn" (click)="confirmProjectRename()">Rename</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+
+  <!-- Share popup -->
+  @if (showShareModal) {
+    <div class="share-modal-overlay" (click)="closeShareModal()">
+      <div class="share-modal" (click)="$event.stopPropagation()">
+        <div class="share-modal-header">
+          <h4>{{ shareTitle }}</h4>
+          <button
+            class="share-modal-close"
+            (click)="closeShareModal()"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="share-modal-divider"></div>
+
+        @if (shareLoading) {
+          <div class="share-modal-loading">
+            <span class="share-spinner"></span>
+            <span>Generating share link...</span>
+          </div>
+        } @else if (shareUrl) {
+          <div class="share-modal-body">
+            <div class="share-content-preview">
+              @for (pair of shareConversationPairs; track $index) {
+                <div class="share-qa-pair">
+                  <div class="share-msg share-msg-user">
+                    <span class="share-msg-label">You</span>
+                    <p>{{ pair.question }}</p>
+                  </div>
+                  @if (pair.answer) {
+                    <div class="share-msg share-msg-bot">
+                      <span class="share-msg-label">KAI</span>
+                      <p>{{ pair.answer }}</p>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="share-actions">
+              <!-- Copy Link -->
+              <button
+                class="share-icon-btn share-link-btn"
+                (click)="copyShareLink()"
+                [appTooltip]="shareLinkCopied ? 'Copied!' : 'Copy link'"
+              >
+                <app-sidenav-icon
+                  name="copy-link"
+                  width="22"
+                  height="22"
+                ></app-sidenav-icon>
+              </button>
+              <!-- Teams -->
+              <button
+                class="share-icon-btn share-teams-btn"
+                (click)="openSocialShare('teams')"
+                appTooltip="Share on Teams"
+              >
+                <!-- <app-sidenav-icon name="share-teams" width="20" height="20"></app-sidenav-icon> -->
+                <img
+                  src="./teams_logo.png"
+                  alt="Teams"
+                  width="20"
+                  height="20"
+                  class="btn-icon"
+                />
+              </button>
+              <!-- Outlook -->
+              <button
+                class="share-icon-btn share-outlook-btn"
+                (click)="openSocialShare('outlook')"
+                appTooltip="Share on Outlook"
+              >
+                <!-- <app-sidenav-icon name="share-outlook" width="20" height="20"></app-sidenav-icon> -->
+                <img
+                  src="./outlook_logo.png"
+                  alt="Outlook"
+                  width="20"
+                  height="20"
+                  class="btn-icon"
+                />
+              </button>
+            </div>
+          </div>
+        } @else {
+          <div class="share-modal-error">
+            <p>Failed to generate share link. Please try again.</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ✅ SEARCH MODAL -->
+  @if (showSearchModal) {
+    <div class="search-modal-overlay" (click)="closeSearchModal()">
+      <div class="search-modal-container" (click)="$event.stopPropagation()">
+        <div class="search-input-wrapper">
+          <input
+            type="text"
+            [(ngModel)]="searchText"
+            placeholder="Search chats..."
+            (ngModelChange)="triggerSearch()"
+            #searchInput
+            autofocus
+          />
+          <button
+            class="modal-close-x"
+            (click)="closeSearchModal()"
+            aria-label="Close search"
+            appTooltip="Close"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="search-results-area">
+          <button class="search-new-chat" (click)="newChat()">
+            <span class="search-new-chat-plus" aria-hidden="true">+</span>
+            <span class="search-new-chat-text">New chat</span>
+          </button>
+
+          @if (isSearchLoading) {
+            <div class="search-loading">
+              <span class="spinner"></span>
+              Searching...
+            </div>
+          } @else if (searchModalSections.length > 0) {
+            <div class="search-section-list">
+              @for (sec of searchModalSections; track sec.label) {
+                <div class="search-section">
+                  <div class="search-section-title">{{ sec.label }}</div>
+                  <ul class="search-item-list">
+                    @for (item of sec.items; track item.key) {
+                      <li
+                        class="search-item"
+                        [class.search-item--question]="
+                          item.category === 'question'
+                        "
+                        (click)="onSearchModalItemClick(item)"
+                      >
+                        <!-- Conversation icon (chat bubble) -->
+                        @if (item.category !== "question") {
+                          <app-sidenav-icon
+                            name="chat-bubble"
+                            class="chat-item-icon"
+                            width="20"
+                            height="20"
+                          ></app-sidenav-icon>
+                        }
+                        <!-- Question icon (question mark in circle) -->
+                        @if (item.category === "question") {
+                          <app-sidenav-icon
+                            name="question-circle"
+                            class="chat-item-icon chat-item-icon--question"
+                            width="20"
+                            height="20"
+                          ></app-sidenav-icon>
+                        }
+                        <div class="search-item-content">
+                          <span class="search-item-text">{{ item.title }}</span>
+                          @if (item.subtitle) {
+                            <span class="search-item-subtitle">{{
+                              item.subtitle
+                            }}</span>
+                          }
+                        </div>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="search-placeholder-tip">
+              <p>Type to search through your chat history</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Premium Chat settings Modal -->
+  @if (showSettingsModal) {
+    <div class="settings-modal-backdrop" (click)="closeSettingsModal()">
+      <div class="settings-modal" (click)="$event.stopPropagation()">
+        <!-- Modal Header -->
+        <div class="settings-modal-header">
+          <h3>Chat settings</h3>
+          <button
+            class="close-x-btn"
+            (click)="closeSettingsModal()"
+            aria-label="Close settings"
+          >
+            <app-sidenav-icon
+              name="close"
+              width="20"
+              height="20"
+            ></app-sidenav-icon>
+          </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="settings-modal-body">
+          <div class="settings-pane">
+            <div class="pane-section">
+              <!-- Streaming Toggle -->
+              <!-- <div class="setting-row">
+                <div class="setting-row-label">
+                  <h4>Streaming</h4>
+                  <p>Receive responses character by character in real-time</p>
+                </div>
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    [checked]="streaming"
+                    (change)="onStreamingToggleInsideSettings($event)"
+                  />
+                  <span class="slider"></span>
+                </label>
+              </div> -->
+
+              <!-- Appearance Section -->
+              <div class="pane-subsection">
+                <h3>Appearance</h3>
+                <div class="appearance-cards">
+                  <!-- Use System Settings -->
+                  <div
+                    class="appearance-card"
+                    [class.active]="theme === 'system'"
+                    (click)="setTheme('system')"
+                  >
+                    <div class="appearance-preview system-preview">
+                      <div class="preview-sidebar"></div>
+                      <div class="preview-main">
+                        <div class="preview-header"></div>
+                        <div class="preview-bubbles">
+                          <div class="preview-bubble light"></div>
+                          <div class="preview-bubble dark"></div>
+                        </div>
+                      </div>
+                      @if (theme === "system") {
+                        <div class="active-badge">
+                          <app-sidenav-icon
+                            name="check-white"
+                            width="10"
+                            height="10"
+                          ></app-sidenav-icon>
+                        </div>
+                      }
+                    </div>
+                    <span class="appearance-label">Use system settings</span>
+                  </div>
+
+                  <!-- Light Mode -->
+                  <div
+                    class="appearance-card"
+                    [class.active]="theme === 'light'"
+                    (click)="setTheme('light')"
+                  >
+                    <div class="appearance-preview light-preview">
+                      <div class="preview-sidebar"></div>
+                      <div class="preview-main">
+                        <div class="preview-header"></div>
+                        <div class="preview-bubbles">
+                          <div class="preview-bubble light"></div>
+                          <div class="preview-bubble light"></div>
+                        </div>
+                      </div>
+                      @if (theme === "light") {
+                        <div class="active-badge">
+                          <app-sidenav-icon
+                            name="check-white"
+                            width="10"
+                            height="10"
+                          ></app-sidenav-icon>
+                        </div>
+                      }
+                    </div>
+                    <span class="appearance-label">Light</span>
+                  </div>
+
+                  <!-- Dark Mode -->
+                  <div
+                    class="appearance-card"
+                    [class.active]="theme === 'dark'"
+                    (click)="setTheme('dark')"
+                  >
+                    <div class="appearance-preview dark-preview">
+                      <div class="preview-sidebar"></div>
+                      <div class="preview-main">
+                        <div class="preview-header"></div>
+                        <div class="preview-bubbles">
+                          <div class="preview-bubble dark"></div>
+                          <div class="preview-bubble dark"></div>
+                        </div>
+                      </div>
+                      @if (theme === "dark") {
+                        <div class="active-badge">
+                          <app-sidenav-icon
+                            name="check-white"
+                            width="10"
+                            height="10"
+                          ></app-sidenav-icon>
+                        </div>
+                      }
+                    </div>
+                    <span class="appearance-label">Dark</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Color Accent Section -->
+              <div class="pane-subsection">
+                <h3>Color Palette</h3>
+                <div class="color-palette-list">
+                  @for (ct of colorThemes; track ct.key) {
+                    <button
+                      class="color-palette-swatch"
+                      [class.active]="colorTheme === ct.key"
+                      [style.--swatch-color]="ct.accent"
+                      (click)="setColorTheme(ct.key)"
+                      [attr.aria-label]="ct.label + ' theme'"
+                      [appTooltip]="ct.label"
+                      type="button"
+                    >
+                      @if (colorTheme === ct.key) {
+                        <app-sidenav-icon
+                          name="check-white"
+                          width="10"
+                          height="10"
+                        ></app-sidenav-icon>
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <!-- Font Family Section -->
+              <div class="pane-subsection">
+                <h3>Font Family</h3>
+                <div class="font-dropdown-custom">
+                  <button
+                    class="font-dropdown-trigger"
+                    (click)="toggleFontDropdown($event)"
+                    type="button"
+                  >
+                    <span [style.font-family]="getSelectedFontFamilyCSS()">{{
+                      getSelectedFontLabel()
+                    }}</span>
+                    <app-sidenav-icon
+                      name="chevron-down"
+                      class="chevron-icon"
+                      [class.rotated]="fontDropdownOpen"
+                      width="16"
+                      height="16"
+                    ></app-sidenav-icon>
+                  </button>
+                  @if (fontDropdownOpen) {
+                    <div class="font-dropdown-menu">
+                      <div
+                        class="font-dropdown-search-wrapper"
+                        (click)="$event.stopPropagation()"
+                      >
+                        <app-sidenav-icon
+                          name="search"
+                          class="search-icon"
+                          width="14"
+                          height="14"
+                        ></app-sidenav-icon>
+                        <input
+                          type="text"
+                          class="font-dropdown-search-input"
+                          [(ngModel)]="fontSearchQuery"
+                          placeholder="Search fonts..."
+                          (keydown)="$event.stopPropagation()"
+                        />
+                        @if (fontSearchQuery) {
+                          <button
+                            class="search-clear-btn"
+                            (click)="
+                              fontSearchQuery = ''; $event.stopPropagation()
+                            "
+                            type="button"
+                          >
+                            <app-sidenav-icon
+                              name="close"
+                              width="12"
+                              height="12"
+                            ></app-sidenav-icon>
+                          </button>
+                        }
+                      </div>
+
+                      <div class="font-dropdown-scrollable">
+                        @for (font of filteredFontFamilies; track font.key) {
+                          <button
+                            class="font-dropdown-item"
+                            [class.active]="fontFamily === font.key"
+                            [style.font-family]="font.family"
+                            (click)="selectFontFamily(font.key)"
+                            type="button"
+                          >
+                            <span class="font-item-label">{{
+                              font.label
+                            }}</span>
+                            @if (fontFamily === font.key) {
+                              <span class="font-active-indicator">
+                                <app-sidenav-icon
+                                  name="check"
+                                  width="12"
+                                  height="12"
+                                ></app-sidenav-icon>
+                              </span>
+                            }
+                          </button>
+                        }
+
+                        @if (filteredFontFamilies.length === 0) {
+                          <div class="font-dropdown-no-results">
+                            No fonts match "{{ fontSearchQuery }}"
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showCreateProjectModal()) {
+    <app-create-project-modal
+      (closed)="closeCreateProjectModal()"
+      (projectCreated)="onProjectCreated($event)"
+    ></app-create-project-modal>
+  }
+
+  @if (showMoveToProjectModal() && chatToMove()) {
+    <app-move-to-project-modal
+      [conversationId]="chatToMove()!.conversationID"
+      [conversationTitle]="getDisplayTitle(chatToMove()!)"
+      (close)="closeMoveToProjectModal()"
+      (moved)="onConversationMoved($event)"
+      (createProjectRequested)="onRequestCreateProjectFromMove()"
+    ></app-move-to-project-modal>
+  }
+</aside>

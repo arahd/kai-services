@@ -1,0 +1,78 @@
+<div class="modal-backdrop" (click)="close()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">Create project</h2>
+      <button
+        type="button"
+        class="modal-close-btn"
+        (click)="close()"
+        aria-label="Close modal"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <label class="form-label" for="project-name-input">Project name</label>
+      <div class="input-container" [class.has-error]="errorMessage()">
+        <span class="input-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
+          </svg>
+        </span>
+        <input
+          #nameInput
+          id="project-name-input"
+          type="text"
+          class="form-input"
+          placeholder="e.g. Travel Planning"
+          [(ngModel)]="projectName"
+          (keydown.enter)="onSubmit()"
+          [disabled]="isSubmitting()"
+        />
+      </div>
+
+      @if (errorMessage()) {
+        <div class="error-text">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <div class="info-tip">
+        <span class="info-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+        </span>
+        <span class="info-text">
+          Projects keep related chats, files, and instructions together in one place.
+        </span>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="submit-btn"
+        [disabled]="!projectName.trim() || isSubmitting()"
+        (click)="onSubmit()"
+      >
+        @if (isSubmitting()) {
+          <span class="btn-spinner"></span>
+          <span>Creating...</span>
+        } @else {
+          <span>Create project</span>
+        }
+      </button>
+    </div>
+  </div>
+</div>
+

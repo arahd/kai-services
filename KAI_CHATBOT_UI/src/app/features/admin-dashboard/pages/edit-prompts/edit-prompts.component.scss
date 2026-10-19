@@ -1,0 +1,232 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 10000;
+}
+
+.panel {
+  width: min(980px, 100%);
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(17, 24, 39, 0.06);
+}
+
+.panel-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.close-btn {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  opacity: 0.9;
+}
+
+.panel-body {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  min-height: 420px;
+}
+
+.prompt-types {
+  background: #f8fafc;
+  padding: 12px 12px 16px 12px;
+  border-right: 1px solid rgba(17, 24, 39, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(17, 24, 39, 0.45);
+  margin-bottom: 10px;
+}
+
+.prompt-type {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 10px 12px;
+  border-radius: 6px;
+  color: #374151;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.prompt-type__label {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prompt-type.active {
+  background: #4bbf7a;
+  color: #ffffff;
+}
+
+.prompt-type:not(.active):hover {
+  background: rgba(17, 24, 39, 0.05);
+}
+
+.editor {
+  padding: 18px 18px 18px 18px;
+}
+
+.editor-content {
+  position: relative;
+  min-height: 320px;
+}
+
+.prompt-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 320px;
+  border-radius: 6px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  background: #f9fafb;
+}
+
+.prompt-loader__spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #4bbf7a;
+  border-radius: 50%;
+  animation: prompt-loader-spin 0.8s linear infinite;
+}
+
+.prompt-loader__text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+@keyframes prompt-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.editor-heading {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  padding-left: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.unsaved-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: #fef3c7;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.btn.btn-secondary {
+  background: #ffffff;
+  color: #374151;
+}
+
+.btn.btn-primary {
+  border-color: #4bbf7a;
+  background: #4bbf7a;
+  color: #ffffff;
+}
+
+.btn-edit-prompt {
+  font-weight: 500;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.system-prompt-input {
+  width: 100%;
+  height: 320px;
+  resize: none;
+  border-radius: 6px;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  padding: 14px 12px;
+  outline: none;
+  background: #ebfff3;
+  color: #111827;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: pre;
+  overflow: auto;
+}
+
+.system-prompt-input.readonly {
+  background: #f3f4f6;
+  border-color: rgba(17, 24, 39, 0.12);
+  color: rgba(17, 24, 39, 0.8);
+}
+

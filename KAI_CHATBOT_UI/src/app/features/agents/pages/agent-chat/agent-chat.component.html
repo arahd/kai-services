@@ -1,0 +1,129 @@
+<div class="agent-chat-wrapper">
+  <!-- Top Agent Solid Green Header -->
+  <header class="chat-header">
+    <div class="header-left">
+      <a routerLink="/agents" class="btn-back" title="Back to All Agents">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+      </a>
+
+      <div class="agent-avatar">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </div>
+
+      <div class="agent-info">
+        <div class="agent-title-row">
+          <h2 class="agent-name">{{ agent()?.agent_name || 'Loading Agent...' }}</h2>
+          @if (agent()) {
+            <span class="pill-type pill-type--{{ agent()!.agent_type.toLowerCase() }}">
+              {{ agent()!.agent_type }}
+            </span>
+            <span class="pill-access pill-access--{{ agent()!.agent_access.toLowerCase() }}">
+              {{ agent()!.agent_access }}
+            </span>
+          }
+        </div>
+        <p class="agent-desc">{{ agent()?.description || 'AI Powered Assistant' }}</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="btn-action-icon" (click)="clearChat()" title="Clear Chat History">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+        </svg>
+        <span>Reset</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Message Thread Container -->
+  <div class="messages-container" #messagesContainer>
+    <div class="messages-list">
+      @for (msg of messages(); track msg.id) {
+        <div class="message-wrapper" [class.message-wrapper--user]="msg.sender === 'user'">
+          <!-- Message Bubble -->
+          <div class="message-bubble" [class.message-bubble--user]="msg.sender === 'user'">
+            <div class="message-content">
+              <div class="message-text" [innerHTML]="msg.message | markdown"></div>
+            </div>
+
+            @if (msg.sender !== 'user') {
+              <div class="message-actions">
+                <button
+                  type="button"
+                  class="btn-copy"
+                  (click)="copyMessage(msg.message)"
+                  title="Copy Message"
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                  </svg>
+                  <span>Copy</span>
+                </button>
+              </div>
+            }
+          </div>
+
+          <!-- Timestamp Placed Below the Bubble -->
+          <div class="message-timestamp-below">
+            {{ msg.timestamp | date: 'shortTime' }}
+          </div>
+        </div>
+      }
+
+      @if (isSending()) {
+        <div class="message-wrapper message-wrapper--loading">
+          <div class="message-bubble message-bubble--loading">
+            <div class="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <span class="typing-label">{{ agent()?.agent_name }} is thinking...</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Chat Input Composer -->
+  <footer class="chat-composer">
+    <div class="composer-container">
+      <textarea
+        #promptInput
+        class="composer-input"
+        [(ngModel)]="userPrompt"
+        (input)="onInput()"
+        (keydown)="onKeyDown($event)"
+        placeholder="Type your message..."
+        rows="1"
+        [disabled]="isSending()"
+      ></textarea>
+
+      <button
+        type="button"
+        class="btn-send"
+        (click)="sendMessage()"
+        [disabled]="!userPrompt.trim() || isSending()"
+        title="Send Message"
+      >
+        @if (isSending()) {
+          <div class="send-spinner"></div>
+        } @else {
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
+        }
+      </button>
+    </div>
+    <div class="composer-footer-text">
+      <span>AI responses may vary. Built with K-Platform Agent Engine.</span>
+    </div>
+  </footer>
+</div>

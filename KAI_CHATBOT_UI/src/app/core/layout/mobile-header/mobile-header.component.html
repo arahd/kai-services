@@ -1,0 +1,61 @@
+<header class="mobile-global-header">
+  <button
+    class="mobile-hamburger-btn"
+    (click)="openSidebar()"
+    aria-label="Open sidebar"
+    type="button"
+  >
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
+
+  @if (showModelSelector()) {
+    <!-- Model Selector Pill on Mobile Header (Welcome & Project Detail Pages) -->
+    <div
+      class="mobile-model-pill"
+      [class.open]="mobileModelDropdownOpen"
+      [class.model-locked]="isModelLocked"
+      [attr.title]="isModelLocked ? 'Model locked for this conversation. Start a new chat to switch.' : 'Select Model'"
+      (click)="toggleModelDropdown($event)"
+      role="button"
+      tabindex="0"
+      aria-haspopup="listbox"
+      [attr.aria-expanded]="mobileModelDropdownOpen"
+    >
+      <span class="model-name">{{ selectedModelLabel }}</span>
+      @if (!isModelLocked) {
+        <svg class="chevron-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      }
+
+      <!-- Dropdown Menu -->
+      @if (mobileModelDropdownOpen) {
+        <div class="mobile-model-dropdown" (click)="$event.stopPropagation()">
+          @for (model of availableModels; track model.value) {
+            <div
+              class="mobile-model-option"
+              [class.selected]="model.value === selectedModel"
+              (click)="selectModel(model, $event)"
+            >
+              <div class="option-text">
+                <span class="option-title">{{ model.label }}</span>
+                @if (model.description) {
+                  <span class="option-desc">{{ model.description }}</span>
+                }
+              </div>
+              @if (model.value === selectedModel) {
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</header>

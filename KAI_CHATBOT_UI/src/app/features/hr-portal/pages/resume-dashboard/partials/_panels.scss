@@ -1,0 +1,60 @@
+// ══════════════════════════════════════════════════════════
+//  PANEL
+// ══════════════════════════════════════════════════════════
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--bdr);
+  border-radius: var(--rl);
+  box-shadow: var(--shadow);
+  overflow: auto;
+  animation: fadeUp .3s ease both;
+  min-height: 250px;
+  max-height: 250px;
+  
+  flex: 1 1 calc(50% - 14px);
+  min-width: 400px;
+  
+  @media (max-width: 900px) {
+    min-width: 100%;
+  }
+
+  &:nth-child(1) { animation-delay: .04s; }
+  &:nth-child(2) { animation-delay: .08s; }
+  &:nth-child(3) { animation-delay: .12s; }
+  &:nth-child(4) { animation-delay: .16s; }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--bg-strip);
+    border-bottom: 1px solid var(--bdr);
+  }
+
+  &__title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    color: var(--t3);
+  }
+}
+
+// Two-column panel (strengths + gaps side by side)
+.two-col-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+
+  @media (max-width: 640px) { grid-template-columns: 1fr; }
+}
+
+.sub-panel {
+  display: flex;
+  flex-direction: column;
+
+  &:first-child { border-right: 1px solid var(--bdr); }
+
+  .panel__head { border-radius: 0; }
+}
+

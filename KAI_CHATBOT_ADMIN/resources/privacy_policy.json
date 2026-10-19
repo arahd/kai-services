@@ -1,0 +1,145 @@
+{
+  "policy": {
+    "title": "Privacy & Usage Policy",
+    "updated_date": "September 23, 2026",
+    "intro": [
+      "KAI is an AI-powered platform that helps you work with conversations, documents, images, and enterprise workflows.",
+      "This policy explains what information you can provide to KAI, how it may be used, and what you should avoid sharing.",
+      "You are responsible for making sure that anything you provide to KAI is appropriate, authorized, and follows your organization's policies."
+    ]
+  },
+  "sections": [
+    {
+      "order": 1,
+      "title": "Information You Provide",
+      "description": "KAI may process information you provide through:",
+      "items": [
+        "Chat messages and prompts",
+        "Documents and files",
+        "Images and screenshots",
+        "Information contained in uploaded content",
+        "Feedback and corrections",
+        "Approved business workflows"
+      ],
+      "note": "Provide only the information needed to complete your task."
+    },
+    {
+      "order": 2,
+      "title": "File Uploads",
+      "description": "KAI supports file uploads for tasks such as analyzing, summarizing, comparing, extracting, and transforming information.",
+      "items": [
+        "The file uses a supported format",
+        "The file is within the allowed size limit",
+        "You have permission to use the file",
+        "The file is relevant to your task",
+        "The file follows your organization's data-handling requirements"
+      ],
+      "note": "KAI may reject files that are too large, unsupported, corrupted, malicious, or outside permitted limits."
+    },
+    {
+      "order": 3,
+      "title": "Image Uploads",
+      "description": "Images and screenshots can be used when supported by the selected KAI feature.",
+      "items": [
+        "Remove unnecessary sensitive information where possible",
+        "Crop or blur sensitive details before uploading",
+        "Do not upload passwords, OTPs, API keys, access tokens, private security credentials, or unauthorized information"
+      ]
+    },
+    {
+      "order": 4,
+      "title": "Information You Should Not Share",
+      "description": "Do not provide sensitive information unless it is specifically required and authorized for an approved workflow.",
+      "items": [
+        "Passwords",
+        "OTPs and authentication codes",
+        "API keys and access tokens",
+        "Private encryption keys",
+        "Banking or payment credentials",
+        "Highly restricted organizational information",
+        "Confidential third-party information without authorization"
+      ],
+      "note": "KAI does not require passwords, OTPs, or private security credentials for normal AI-assisted tasks."
+    },
+    {
+      "order": 5,
+      "title": "How KAI Uses Your Information",
+      "description": "KAI uses the information you provide to understand your request and perform the requested task.",
+      "items": [
+        "Generate responses",
+        "Analyze documents",
+        "Extract information",
+        "Compare content",
+        "Create summaries",
+        "Transform content",
+        "Generate structured outputs",
+        "Support approved business workflows",
+        "Maintain relevant context during an interaction"
+      ],
+      "note": "How information is handled may depend on the feature, product configuration, organizational policies, and applicable data-retention requirements."
+    },
+    {
+      "order": 6,
+      "title": "AI-Generated Content",
+      "description": "KAI uses AI to generate responses, suggestions, summaries, analysis, and other content.",
+      "items": [
+        "AI-generated content may sometimes be incomplete",
+        "AI-generated content may be inaccurate",
+        "AI-generated content may be outdated",
+        "AI-generated content may be based on an incorrect interpretation of provided information"
+      ],
+      "note": "Always review important outputs before using them, especially for business-critical decisions. Human and organizational review should be used wherever required."
+    },
+    {
+      "order": 7,
+      "title": "Responsible Use",
+      "description": "KAI should only be used for authorized and responsible purposes.",
+      "items": [
+        "Perform illegal activities",
+        "Access systems or information without authorization",
+        "Bypass security controls",
+        "Generate or distribute malware",
+        "Steal credentials or confidential information",
+        "Impersonate or intentionally deceive others",
+        "Violate privacy rights",
+        "Misuse copyrighted or protected content",
+        "Generate prohibited or harmful content"
+      ],
+      "note": "Requests that violate applicable restrictions may be limited or blocked."
+    },
+    {
+      "order": 8,
+      "title": "Access, Security & Data Handling",
+      "description": "Your access to KAI features may depend on your role, permissions, organizational settings, and security requirements.",
+      "items": [
+        "Share only the information needed",
+        "Protect confidential information",
+        "Follow your organization's data-classification requirements",
+        "Use approved workflows for sensitive information",
+        "Report suspected security issues through the appropriate support channel"
+      ],
+      "note": "Do not attempt to bypass access restrictions. Important business records should be stored in the appropriate approved organizational system."
+    },
+    {
+      "order": 9,
+      "title": "Your Responsibilities",
+      "description": "When using KAI, you are responsible for:",
+      "items": [
+        "Providing information you are authorized to use",
+        "Checking files before uploading",
+        "Protecting confidential information",
+        "Following organizational policies",
+        "Reviewing AI-generated content",
+        "Using KAI only for approved purposes",
+        "Reporting unexpected or inappropriate behavior",
+        "Completing required human review before important actions"
+      ]
+    },
+    {
+      "order": 10,
+      "title": "Policy Updates",
+      "description": "This policy may be updated as KAI introduces new features, supported file types, AI capabilities, or security and privacy requirements.",
+      "note": "The Updated date at the top of this page shows when the policy was most recently revised."
+    }
+  ]
+}

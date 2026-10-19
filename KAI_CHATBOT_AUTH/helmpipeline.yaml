@@ -1,0 +1,83 @@
+trigger:
+  - release
+
+resources:
+  - repo: self
+
+name: $(Build.BuildId)-$(Date:yyyyMMdd)-$(Rev:r)
+
+variables:
+  # Static Values
+  dockerRegistryServiceConnection: 'ACR_Dev_Connection'
+  containerRegistry: 'kumaranchatbotazcontainerregistry.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  tag: '$(Build.BuildId)'
+  kubernetesServiceConnectiondev: 'devcluster-kumaranchatbotdev'
+  kubernetesServiceConnectionsbx: 'devcluster-kumaranchatbotsbx'
+  namespace-dev: 'kumaranchatbotdev'
+  namespace-sbx: 'kumaranchatbotsbx'
+  vmImageName: 'ubuntu-latest'
+
+  # Respective to pipeline
+  sbx-app-name: authservice-sbx
+  prd-app-name: chatbotauthserviceprod
+  imageRepository: 'ocp_auth'
+
+stages:
+  # 1. Build and Push Docker Image to ACR
+  - stage: Build_and_Push
+    displayName: Build and Push Docker Image
+    jobs:
+      - job: Build_and_Push
+        displayName: Build and Push Job
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - checkout: self
+            persistCredentials: true
+            clean: true
+
+          - script: |
+              git tag dev_$(Build.BuildId)
+              git push origin dev_$(Build.BuildId)
+            workingDirectory: $(Build.SourcesDirectory)
+            displayName: Git Tagging
+            continueOnError: true
+
+
+  # 2. Deploy to OpenShift Development Environment
+  - stage: Development_Deployment
+    displayName: Deploy to OpenShift (Development)
+    jobs:
+      - job: Development_Deployment
+        displayName: Development Deployment
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+
+          - task: PowerShell@2
+            inputs:
+              targetType: 'inline'
+              script: "sed -i 's/tag/$(tag)/g' ./ocp/dev/deployment.yaml"
+
+          - task: HelmInstaller@1
+            inputs:
+              helmVersionToInstall: 'latest'
+
+          - task: HelmDeploy@1
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceConnection: 'devcluster-kumaranchatbotdev'
+              namespace: 'kumaranchatbotdev'
+              command: 'install'
+              chartType: 'Name'
+              chartName: 'chatbot-auth'
+
+          - task: HelmDeploy@1
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceConnection: 'devcluster-kumaranchatbotdev'
+              namespace: 'kumaranchatbotdev'
+              command: 'upgrade'
+              chartType: 'Name'
+              chartName: 'chatbot-auth'

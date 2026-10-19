@@ -1,0 +1,1506 @@
+<div class="analytics">
+  <div class="analytics__header">
+    <div class="analytics__title">Analytics</div>
+
+    <div class="analytics__actions">
+      <button
+        class="btn btn--export"
+        type="button"
+        (click)="exportAllUsers()"
+        [disabled]="submittingExport()"
+      >
+        <span class="btn__icon" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path
+              d="M10 3v8M6.5 8.5 10 12l3.5-3.5"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M4 15.5h12"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+        Export Users
+      </button>
+
+      <button
+        class="btn btn--filters"
+        type="button"
+        (click)="toggleFiltersPanel()"
+      >
+        <span class="btn__icon" aria-hidden="true">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M6.66659 13.3333C6.66653 13.4572 6.701 13.5787 6.76612 13.6841C6.83124 13.7895 6.92443 13.8746 7.03526 13.93L8.36859 14.5967C8.47025 14.6475 8.58322 14.6714 8.69675 14.6663C8.81029 14.6612 8.92062 14.6271 9.01728 14.5673C9.11393 14.5075 9.1937 14.424 9.249 14.3247C9.30431 14.2254 9.33331 14.1137 9.33326 14V9.33333C9.33341 9.00292 9.45623 8.68433 9.67792 8.43933L14.4933 3.11333C14.5796 3.01771 14.6363 2.89912 14.6567 2.77192C14.677 2.64472 14.66 2.51435 14.6079 2.39658C14.5557 2.27881 14.4705 2.17868 14.3626 2.1083C14.2547 2.03792 14.1287 2.0003 13.9999 2H1.99992C1.87099 2.00005 1.74484 2.03748 1.63676 2.10776C1.52867 2.17804 1.44328 2.27815 1.39093 2.39598C1.33858 2.5138 1.32151 2.64427 1.34181 2.77159C1.3621 2.89892 1.41887 3.01762 1.50526 3.11333L6.32192 8.43933C6.54361 8.68433 6.66644 9.00292 6.66659 9.33333V13.3333Z"
+              stroke="currentColor"
+              stroke-width="0.933333"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+        Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpis">
+    @if (loadingMain()) {
+      @for (i of [1, 2, 3, 4, 5, 6]; track $index) {
+        <div class="kpi kpi--skeleton"></div>
+      }
+    } @else {
+      <div class="kpi">
+        <div class="kpi__icon kpi__icon--conversation" aria-hidden="true">
+          <svg
+            width="46"
+            height="46"
+            viewBox="0 0 46 46"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              width="45.2028"
+              height="45.2028"
+              rx="11.3764"
+              fill="#EDF7F1"
+            />
+            <path
+              d="M26.3431 31.0202V29.1493C26.3431 28.157 25.9488 27.2053 25.2471 26.5036C24.5454 25.8019 23.5937 25.4077 22.6014 25.4077H16.9889C15.9965 25.4077 15.0448 25.8019 14.3431 26.5036C13.6414 27.2053 13.2472 28.157 13.2472 29.1493V31.0202"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M26.343 14.3024C27.1454 14.5104 27.856 14.9789 28.3632 15.6345C28.8705 16.29 29.1457 17.0954 29.1457 17.9243C29.1457 18.7532 28.8705 19.5586 28.3632 20.2142C27.856 20.8697 27.1454 21.3382 26.343 21.5462"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M31.9555 31.0201V29.1493C31.9549 28.3203 31.679 27.5149 31.1711 26.8597C30.6631 26.2045 29.952 25.7365 29.1493 25.5293"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M19.7951 21.666C21.8616 21.666 23.5368 19.9908 23.5368 17.9243C23.5368 15.8578 21.8616 14.1826 19.7951 14.1826C17.7287 14.1826 16.0535 15.8578 16.0535 17.9243C16.0535 19.9908 17.7287 21.666 19.7951 21.666Z"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div class="kpi__meta">
+          <div class="kpi__label">Active Users</div>
+          <div class="kpi__value">
+            @if (loadingMain()) {
+              —
+            } @else {
+              {{ activeUsersCount != null ? (activeUsersCount | number) : "—" }}
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi__icon kpi__icon--conversation" aria-hidden="true">
+          <svg
+            width="45"
+            height="45"
+            viewBox="0 0 45 45"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              width="45.0028"
+              height="45.0028"
+              rx="11.3764"
+              fill="#EDF7F1"
+            />
+            <path
+              d="M14.2374 27.6087C14.3169 27.2474 14.2865 26.8707 14.1502 26.5268C13.2016 24.5586 12.9786 22.3185 13.5206 20.2019C14.0626 18.0853 15.3348 16.2281 17.1127 14.958C18.8905 13.688 21.0598 13.0866 23.2378 13.2601C25.4159 13.4336 27.4626 14.3708 29.017 15.9063C30.5714 17.4418 31.5335 19.477 31.7336 21.6527C31.9336 23.8284 31.3589 26.0049 30.1106 27.7982C28.8624 29.5914 27.0209 30.8862 24.911 31.454C22.8012 32.0218 20.5586 31.8262 18.5789 30.9017C18.254 30.7783 17.9009 30.7488 17.56 30.8164L14.3959 31.7416C14.2433 31.7821 14.0828 31.783 13.9298 31.7441C13.7767 31.7052 13.6361 31.6279 13.5213 31.5194C13.4066 31.4109 13.3214 31.2749 13.2739 31.1243C13.2264 30.9737 13.2182 30.8135 13.25 30.6588L14.2374 27.6087Z"
+              stroke="#49AB74"
+              stroke-width="1.85417"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div class="kpi__meta">
+          <div class="kpi__label">Total Conversations</div>
+          <div class="kpi__value">
+            {{
+              mainAnalytics?.total_conversations != null
+                ? (mainAnalytics.total_conversations | number)
+                : "—"
+            }}
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi__icon kpi__icon--conversation" aria-hidden="true">
+          <svg
+            width="46"
+            height="46"
+            viewBox="0 0 46 46"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              width="45.2028"
+              height="45.2028"
+              rx="11.3764"
+              fill="#EDF7F1"
+            />
+            <path
+              d="M20.7306 21.666C22.797 21.666 24.4722 19.9908 24.4722 17.9243C24.4722 15.8578 22.797 14.1826 20.7306 14.1826C18.6641 14.1826 16.9889 15.8578 16.9889 17.9243C16.9889 19.9908 18.6641 21.666 20.7306 21.666Z"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M21.0112 25.4077H17.9243C16.9319 25.4077 15.9802 25.8019 15.2785 26.5036C14.5768 27.2053 14.1826 28.157 14.1826 29.1493V31.0202"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M27.2785 30.0847C28.8283 30.0847 30.0847 28.8283 30.0847 27.2785C30.0847 25.7286 28.8283 24.4722 27.2785 24.4722C25.7286 24.4722 24.4722 25.7286 24.4722 27.2785C24.4722 28.8283 25.7286 30.0847 27.2785 30.0847Z"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M31.0201 31.0202L29.2428 29.2429"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div class="kpi__meta">
+          <div class="kpi__label">Total Questions</div>
+          <div class="kpi__value">
+            {{
+              mainAnalytics?.total_questions != null
+                ? (mainAnalytics.total_questions | number)
+                : "—"
+            }}
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi__icon kpi__icon--conversation" aria-hidden="true">
+          <svg
+            width="46"
+            height="46"
+            viewBox="0 0 46 46"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              width="45.2028"
+              height="45.2028"
+              rx="11.3764"
+              fill="#EDF7F1"
+            />
+            <path
+              d="M25.8755 18.392L28.0269 20.5435C28.2018 20.7149 28.4369 20.8109 28.6817 20.8109C28.9266 20.8109 29.1617 20.7149 29.3365 20.5435L31.3009 18.5791C31.4723 18.4042 31.5683 18.1691 31.5683 17.9243C31.5683 17.6794 31.4723 17.4444 31.3009 17.2695L29.1494 15.118"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M31.0202 13.2472L22.0402 22.2272"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M18.3921 31.0201C21.2335 31.0201 23.5369 28.7167 23.5369 25.8753C23.5369 23.0339 21.2335 20.7305 18.3921 20.7305C15.5507 20.7305 13.2473 23.0339 13.2473 25.8753C13.2473 28.7167 15.5507 31.0201 18.3921 31.0201Z"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div class="kpi__meta">
+          <div class="kpi__label">Total Tokens</div>
+          <div class="kpi__value">
+            {{
+              mainAnalytics?.total_tokens != null
+                ? (mainAnalytics.total_tokens | number)
+                : "—"
+            }}
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi__icon kpi__icon--conversation" aria-hidden="true">
+          <svg
+            width="46"
+            height="46"
+            viewBox="0 0 46 46"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              width="45.2028"
+              height="45.2028"
+              rx="11.3764"
+              fill="#EDF7F1"
+            />
+            <path
+              d="M22.6015 18.8597C27.251 18.8597 31.0202 17.6033 31.0202 16.0535C31.0202 14.5036 27.251 13.2472 22.6015 13.2472C17.9519 13.2472 14.1827 14.5036 14.1827 16.0535C14.1827 17.6033 17.9519 18.8597 22.6015 18.8597Z"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M14.1827 16.0535V29.1493C14.1827 29.8936 15.0697 30.6074 16.6485 31.1336C18.2274 31.6599 20.3687 31.9556 22.6015 31.9556C24.8343 31.9556 26.9756 31.6599 28.5544 31.1336C30.1333 30.6074 31.0202 29.8936 31.0202 29.1493V16.0535"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M14.1827 22.6014C14.1827 23.3457 15.0697 24.0595 16.6485 24.5857C18.2274 25.112 20.3687 25.4077 22.6015 25.4077C24.8343 25.4077 26.9756 25.112 28.5544 24.5857C30.1333 24.0595 31.0202 23.3457 31.0202 22.6014"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div class="kpi__meta">
+          <div class="kpi__label">Avg Input Tokens</div>
+          <div class="kpi__value">
+            {{
+              mainAnalytics?.average_input_tokens != null
+                ? (mainAnalytics.average_input_tokens | number)
+                : "—"
+            }}
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi__icon kpi__icon--conversation" aria-hidden="true">
+          <svg
+            width="46"
+            height="46"
+            viewBox="0 0 46 46"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              width="45.2028"
+              height="45.2028"
+              rx="11.3764"
+              fill="#EDF7F1"
+            />
+            <path
+              d="M14.1827 14.1826V29.1493C14.1827 29.6455 14.3798 30.1213 14.7307 30.4722C15.0815 30.823 15.5574 31.0201 16.0536 31.0201H31.0202"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M29.1493 19.7952L24.4722 24.4722L20.7306 20.7306L17.9243 23.5368"
+              stroke="#49AB74"
+              stroke-width="1.87083"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div class="kpi__meta">
+          <div class="kpi__label">Avg Output Tokens</div>
+          <div class="kpi__value">
+            {{
+              mainAnalytics?.average_output_tokens != null
+                ? (mainAnalytics.average_output_tokens | number)
+                : "—"
+            }}
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <app-token-usage-monitoring (activeUserCountChange)="onActiveUserCountChange($event)" />
+
+  <!-- Daily Activity: total questions/day from /reporting/get/model/usage (last 8 days) -->
+  <section class="card card--wide card--daily-activity">
+    <div class="card__header card__header--split">
+      <div class="card__title">Daily Activity Overview</div>
+      <div class="activity-legend" aria-hidden="true">
+        <span class="legend-dot activity-legend__dot"></span>
+        <span class="activity-legend__label">Questions</span>
+      </div>
+    </div>
+
+    @if (loadingDailyActivity()) {
+      <div class="empty activity__loading">Loading activity…</div>
+    } @else {
+      <div class="activity activity--chart">
+        <apx-chart
+          [series]="dailyActivitySeries"
+          [chart]="dailyActivityChart"
+          [xaxis]="dailyActivityXAxis"
+          [yaxis]="dailyActivityYAxis"
+          [stroke]="dailyActivityStroke"
+          [colors]="dailyActivityColors"
+          [legend]="dailyActivityLegend"
+          [grid]="dailyActivityGrid"
+          [tooltip]="dailyActivityTooltip"
+          [markers]="dailyActivityMarkers"
+          [dataLabels]="dailyActivityDataLabels"
+        ></apx-chart>
+      </div>
+    }
+  </section>
+
+  <!-- Row 1 -->
+  <div class="grid grid--2">
+    <section class="card">
+      <div class="card__header">
+        <div class="card__title">Response Types</div>
+      </div>
+
+      @if (mainAnalytics) {
+        @let pairs = responseTypePairs(mainAnalytics.reponse_types);
+        @let totalResponses = calcTotalResponses(pairs);
+
+        <div class="response-types">
+          @for (p of pairs; track p.key) {
+            <div class="rt">
+              <div class="rt__head">
+                <span class="rt__name">{{ p.key }}</span>
+                <span class="rt__pct">{{ pct(p.value, totalResponses) }}%</span>
+              </div>
+              <div class="rt__bar">
+                <div
+                  class="rt__fill"
+                  [style.width]="responseTypeFillWidth(p, totalResponses)"
+                  [style.background]="responseTypeBarColor(p.key)"
+                ></div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty">No response data yet</div>
+      }
+    </section>
+
+    <section class="card">
+      <div class="card__header">
+        <div class="card__title">Model Distribution</div>
+      </div>
+
+      @if (regionalSeries.length) {
+        <div class="regional">
+          <div class="regional__chart">
+            <apx-chart
+              [series]="regionalSeries"
+              [chart]="regionalChart"
+              [labels]="regionalLabels"
+              [colors]="regionalColors"
+              [stroke]="regionalStroke"
+              [plotOptions]="regionalPlotOptions"
+              [dataLabels]="regionalDataLabels"
+              [legend]="regionalLegend"
+            ></apx-chart>
+          </div>
+
+          <div class="regional__legend">
+            @for (l of regionalLabels; track $index) {
+              <div class="legend-item">
+                <span
+                  class="legend-dot"
+                  [style.background]="
+                    regionalColors[$index % regionalColors.length]
+                  "
+                ></span>
+                <span class="legend-name">{{ l }}</span>
+                <span class="legend-val">{{ regionalSeries[$index] }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="empty">No distribution data yet</div>
+      }
+    </section>
+  </div>
+
+  <!-- Leaderboard -->
+  <section class="card card--wide card--leaderboard">
+    <div class="card__header">
+      <div class="card__title">Leaderboard</div>
+      <div
+        #leaderboardMetricDropdown
+        class="leaderboard-metric-dropdown"
+        [class.is-open]="leaderboardMetricMenuOpen()"
+      >
+        <button
+          type="button"
+          id="leaderboard-metric"
+          class="leaderboard-metric-select"
+          [disabled]="loadingLeaderboardCard"
+          [attr.aria-expanded]="leaderboardMetricMenuOpen()"
+          aria-haspopup="listbox"
+          aria-label="Leaderboard sort"
+          (click)="toggleLeaderboardMetricMenu()"
+        >
+          <span class="leaderboard-metric-select__label">{{
+            leaderboardMetricLabel()
+          }}</span>
+          <svg
+            class="leaderboard-metric-select__chevron"
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M4 6L8 10L12 6"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+        @if (leaderboardMetricMenuOpen()) {
+          <ul
+            class="leaderboard-metric-menu"
+            role="listbox"
+            aria-label="Leaderboard sort options"
+          >
+            @for (opt of leaderboardMetricOptions; track opt.value) {
+              <li role="presentation">
+                <button
+                  type="button"
+                  class="leaderboard-metric-option"
+                  role="option"
+                  [attr.aria-selected]="leaderboardMetric === opt.value"
+                  [class.is-selected]="leaderboardMetric === opt.value"
+                  (click)="selectLeaderboardMetric(opt.value)"
+                >
+                  {{ opt.label }}
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+
+    <div class="table">
+      <div class="table__head">
+        <div class="table__col table__col--rank">RANK</div>
+        <div class="table__col table__col--users">USERS</div>
+        <div class="table__col table__col--tokens">
+          @if (leaderboardMetric === "tokens") {
+            <span class="table__tokens-label">
+              <svg
+                class="table__coin"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5.33325 9.3335C7.54239 9.3335 9.33325 7.54264 9.33325 5.3335C9.33325 3.12436 7.54239 1.3335 5.33325 1.3335C3.12411 1.3335 1.33325 3.12436 1.33325 5.3335C1.33325 7.54264 3.12411 9.3335 5.33325 9.3335Z"
+                  stroke="#F59E0B"
+                  stroke-width="1.33333"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M12.06 6.91357C12.6902 7.14853 13.251 7.53859 13.6905 8.04771C14.13 8.55682 14.434 9.16854 14.5745 9.82629C14.7149 10.484 14.6872 11.1666 14.494 11.8108C14.3008 12.455 13.9482 13.0401 13.4689 13.512C12.9896 13.9838 12.3991 14.3272 11.752 14.5104C11.1048 14.6936 10.4219 14.7106 9.76643 14.5599C9.11095 14.4092 8.50405 14.0956 8.00186 13.6482C7.49967 13.2008 7.1184 12.634 6.89331 12.0002"
+                  stroke="#F59E0B"
+                  stroke-width="1.33333"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M4.66675 4H5.33341V6.66667"
+                  stroke="#F59E0B"
+                  stroke-width="1.33333"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M11.1399 9.25342L11.6066 9.72675L9.72656 11.6068"
+                  stroke="#F59E0B"
+                  stroke-width="1.33333"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <span>{{ leaderboardMetricColumnLabel() }}</span>
+            </span>
+          } @else {
+            <span class="table__count-label">{{
+              leaderboardMetricColumnLabel()
+            }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="table__body">
+        @if (loadingLeaderboardCard) {
+          <div class="table__row table__row--leaderboard-loading">
+            <div class="table__col table__col--leaderboard-loading-msg">
+              <span class="loader pagination-loader" aria-hidden="true"></span>
+              <span>Loading leaderboard…</span>
+            </div>
+          </div>
+        } @else if (leaderboardCardRows.length > 0) {
+          @for (row of leaderboardCardRows; track row.rank + row.user) {
+            <div class="table__row">
+              <div class="table__col table__col--rank">{{ row.rank }}</div>
+              <div class="table__col table__col--users user">
+                {{ row.user }}
+              </div>
+              <div class="table__col table__col--tokens">
+                @if (leaderboardMetric === "tokens") {
+                  <span class="table__tokens-value">
+                    <svg
+                      class="table__coin"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M5.33325 9.3335C7.54239 9.3335 9.33325 7.54264 9.33325 5.3335C9.33325 3.12436 7.54239 1.3335 5.33325 1.3335C3.12411 1.3335 1.33325 3.12436 1.33325 5.3335C1.33325 7.54264 3.12411 9.3335 5.33325 9.3335Z"
+                        stroke="#F59E0B"
+                        stroke-width="1.33333"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M12.06 6.91357C12.6902 7.14853 13.251 7.53859 13.6905 8.04771C14.13 8.55682 14.434 9.16854 14.5745 9.82629C14.7149 10.484 14.6872 11.1666 14.494 11.8108C14.3008 12.455 13.9482 13.0401 13.4689 13.512C12.9896 13.9838 12.3991 14.3272 11.752 14.5104C11.1048 14.6936 10.4219 14.7106 9.76643 14.5599C9.11095 14.4092 8.50405 14.0956 8.00186 13.6482C7.49967 13.2008 7.1184 12.634 6.89331 12.0002"
+                        stroke="#F59E0B"
+                        stroke-width="1.33333"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M4.66675 4H5.33341V6.66667"
+                        stroke="#F59E0B"
+                        stroke-width="1.33333"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M11.1399 9.25342L11.6066 9.72675L9.72656 11.6068"
+                        stroke="#F59E0B"
+                        stroke-width="1.33333"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                    <span class="tokens">{{
+                      row.tokens | number: "1.0-0"
+                    }}</span>
+                  </span>
+                } @else {
+                  <span class="table__count-value">{{
+                    row.tokens | number: "1.0-0"
+                  }}</span>
+                }
+              </div>
+            </div>
+          }
+        } @else {
+          <div class="empty">No leaderboard data yet</div>
+        }
+      </div>
+    </div>
+
+    @if (showLeaderboardFooter()) {
+      <div class="card__footer card__footer--leaderboard">
+        <button
+          class="btn btn--leaderboard-view"
+          type="button"
+          (click)="openLeaderboardModal()"
+        >
+          View full Leaderboard
+          <span class="btn__icon btn__icon--right" aria-hidden="true">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18 8L22 12L18 16"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M2 12H22"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+        </button>
+
+        <div class="table-pagination leaderboard-pagination">
+          <button
+            type="button"
+            class="btn secondary pagination-btn"
+            [disabled]="
+              leaderboardPage <= 1 ||
+              loadingLeaderboard ||
+              leaderboardPageLoading ||
+              loadingLeaderboardCard
+            "
+            (click)="goToLeaderboardPage(leaderboardPage - 1)"
+          >
+            Previous
+          </button>
+          <span class="pagination-meta">
+            Page
+            <input
+              type="number"
+              class="pagination-input"
+              [(ngModel)]="leaderboardPageInput"
+              (keyup.enter)="onLeaderboardPageInputSubmit()"
+              (blur)="onLeaderboardPageInputSubmit()"
+              [max]="leaderboardTotalPages"
+              min="1"
+            />
+            of {{ leaderboardTotalPages }}
+            <span class="pagination-range">
+              ({{ leaderboardRangeStart() | number }}–{{
+                leaderboardRangeEnd() | number
+              }}
+              of {{ leaderboardRowCount | number }})
+            </span>
+            @if (leaderboardPageLoading) {
+              <span class="loader pagination-loader" aria-hidden="true"></span>
+            }
+          </span>
+          <button
+            type="button"
+            class="btn secondary pagination-btn"
+            [disabled]="
+              leaderboardPage >= leaderboardTotalPages ||
+              loadingLeaderboard ||
+              leaderboardPageLoading ||
+              loadingLeaderboardCard
+            "
+            (click)="goToLeaderboardPage(leaderboardPage + 1)"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    }
+  </section>
+
+  @if (showLeaderboardModal()) {
+    <div
+      class="modal-backdrop modal-backdrop--leaderboard"
+      (click)="closeLeaderboardModal()"
+    ></div>
+    <div
+      class="leaderboard-modal"
+      role="dialog"
+      aria-labelledby="leaderboard-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="leaderboard-modal__header">
+        <h2 id="leaderboard-modal-title" class="leaderboard-modal__title">
+          Leaderboard
+        </h2>
+        <button
+          class="leaderboard-modal__close"
+          type="button"
+          (click)="closeLeaderboardModal()"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+      <div class="leaderboard-modal__body">
+        @if (loadingLeaderboard) {
+          <div class="loading-row">
+            <div class="spinner"></div>
+            <span>Loading leaderboard…</span>
+          </div>
+        } @else if (leaderboardModalRows.length === 0) {
+          <div class="empty">No leaderboard data on this page.</div>
+        } @else {
+          <div class="table leaderboard-modal__table">
+            <div class="table__head">
+              <div class="table__col table__col--rank">RANK</div>
+              <div class="table__col table__col--users">USERS</div>
+              <div class="table__col table__col--tokens">
+                @if (leaderboardMetric === "tokens") {
+                  <span class="table__tokens-label">
+                    <svg
+                      class="table__coin"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M5.33325 9.3335C7.54239 9.3335 9.33325 7.54264 9.33325 5.3335C9.33325 3.12436 7.54239 1.3335 5.33325 1.3335C3.12411 1.3335 1.33325 3.12436 1.33325 5.3335C1.33325 7.54264 3.12411 9.3335 5.33325 9.3335Z"
+                        stroke="#F59E0B"
+                        stroke-width="1.33333"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M12.06 6.91357C12.6902 7.14853 13.251 7.53859 13.6905 8.04771C14.13 8.55682 14.434 9.16854 14.5745 9.82629C14.7149 10.484 14.6872 11.1666 14.494 11.8108C14.3008 12.455 13.9482 13.0401 13.4689 13.512C12.9896 13.9838 12.3991 14.3272 11.752 14.5104C11.1048 14.6936 10.4219 14.7106 9.76643 14.5599C9.11095 14.4092 8.50405 14.0956 8.00186 13.6482C7.49967 13.2008 7.1184 12.634 6.89331 12.0002"
+                        stroke="#F59E0B"
+                        stroke-width="1.33333"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M4.66675 4H5.33341V6.66667"
+                        stroke="#F59E0B"
+                        stroke-width="1.33333"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M11.1399 9.25342L11.6066 9.72675L9.72656 11.6068"
+                        stroke="#F59E0B"
+                        stroke-width="1.33333"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                    <span>{{ leaderboardMetricColumnLabel() }}</span>
+                  </span>
+                } @else {
+                  <span class="table__count-label">{{
+                    leaderboardMetricColumnLabel()
+                  }}</span>
+                }
+              </div>
+            </div>
+            <div class="table__body">
+              @for (row of leaderboardModalRows; track row.rank + row.user) {
+                <div class="table__row">
+                  <div class="table__col table__col--rank">{{ row.rank }}</div>
+                  <div class="table__col table__col--users user">
+                    {{ row.user }}
+                  </div>
+                  <div class="table__col table__col--tokens">
+                    @if (leaderboardMetric === "tokens") {
+                      <span class="table__tokens-value">
+                        <svg
+                          class="table__coin"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M5.33325 9.3335C7.54239 9.3335 9.33325 7.54264 9.33325 5.3335C9.33325 3.12436 7.54239 1.3335 5.33325 1.3335C3.12411 1.3335 1.33325 3.12436 1.33325 5.3335C1.33325 7.54264 3.12411 9.3335 5.33325 9.3335Z"
+                            stroke="#F59E0B"
+                            stroke-width="1.33333"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M12.06 6.91357C12.6902 7.14853 13.251 7.53859 13.6905 8.04771C14.13 8.55682 14.434 9.16854 14.5745 9.82629C14.7149 10.484 14.6872 11.1666 14.494 11.8108C14.3008 12.455 13.9482 13.0401 13.4689 13.512C12.9896 13.9838 12.3991 14.3272 11.752 14.5104C11.1048 14.6936 10.4219 14.7106 9.76643 14.5599C9.11095 14.4092 8.50405 14.0956 8.00186 13.6482C7.49967 13.2008 7.1184 12.634 6.89331 12.0002"
+                            stroke="#F59E0B"
+                            stroke-width="1.33333"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M4.66675 4H5.33341V6.66667"
+                            stroke="#F59E0B"
+                            stroke-width="1.33333"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M11.1399 9.25342L11.6066 9.72675L9.72656 11.6068"
+                            stroke="#F59E0B"
+                            stroke-width="1.33333"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                        <span class="tokens">{{
+                          row.tokens | number: "1.0-0"
+                        }}</span>
+                      </span>
+                    } @else {
+                      <span class="table__count-value">{{
+                        row.tokens | number: "1.0-0"
+                      }}</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Filters modal (Figma) -->
+  @if (showFiltersPanel()) {
+    <div
+      class="modal-backdrop modal-backdrop--filters"
+      (click)="toggleFiltersPanel()"
+    ></div>
+    <div
+      class="filter-modal"
+      role="dialog"
+      aria-labelledby="filter-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+      <form
+        class="filter-modal__form"
+        [formGroup]="filterForm"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="filter-modal__header">
+          <span class="filter-modal__header-icon" aria-hidden="true">
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M 3.75 5.5 H 16.25 L 11.05 10.75 V 15.25 L 8.95 16.45 V 10.75 L 3.75 5.5 Z"
+                stroke="#49AB74"
+                stroke-width="1.45"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <h2 id="filter-modal-title" class="filter-modal__title">Filters</h2>
+          <button
+            class="filter-modal__close"
+            type="button"
+            (click)="toggleFiltersPanel()"
+            aria-label="Close"
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <rect
+                width="24"
+                height="24"
+                rx="12"
+                fill="#49AB74"
+                fill-opacity="0.1"
+              />
+              <path
+                d="M16 8L8 16"
+                stroke="#49AB74"
+                stroke-width="1.33333"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M8 8L16 16"
+                stroke="#49AB74"
+                stroke-width="1.33333"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div class="filter-modal__body">
+          <div class="filter-group">
+            <label class="filter-label" for="filter-username">Usernames</label>
+            <div class="username-search-container">
+              <input
+                id="filter-username"
+                type="text"
+                [value]="userSearchInput"
+                (input)="onUsernameSearchInput($event)"
+                placeholder="Type to search and add users..."
+                class="filter-input filter-input--plain"
+              />
+              @if (userSearchResults.length) {
+                <div class="autocomplete">
+                  @for (u of userSearchResults; track $index) {
+                    <div class="autocomplete-item" (click)="addUsername(u)">
+                      {{ u }}
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            @let selectedUsers = filterForm.get("usernames")?.value ?? [];
+            @if (selectedUsers.length > 0) {
+              <div class="username-chips">
+                @for (u of selectedUsers; track u) {
+                  <span class="username-chip">
+                    <span class="username-chip__text">{{ u }}</span>
+                    <button
+                      type="button"
+                      class="username-chip__remove"
+                      (click)="removeUsername(u)"
+                      aria-label="Remove username"
+                    >
+                      &times;
+                    </button>
+                  </span>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Model</span>
+            <div class="filter-model-grid">
+              <label class="filter-model-tile">
+                <input
+                  type="checkbox"
+                  formControlName="modelMatchAll"
+                  class="filter-model-tile__input"
+                  (change)="onModelMatchAllChange()"
+                />
+                <span class="filter-model-tile__face">
+                  <span
+                    class="filter-model-tile__checkbox"
+                    aria-hidden="true"
+                  ></span>
+                  <span class="filter-model-tile__label">All models</span>
+                </span>
+              </label>
+              @if (loadingModels()) {
+                <p class="filter-model-status">Loading models…</p>
+              } @else if (!filterModelRadios().length) {
+                <p class="filter-model-status">No models available</p>
+              } @else {
+                @for (opt of filterModelRadios(); track opt.value) {
+                  <label class="filter-model-tile">
+                    <input
+                      type="checkbox"
+                      class="filter-model-tile__input"
+                      [checked]="isModelSelected(opt.value)"
+                      (change)="toggleModel(opt.value, $event)"
+                    />
+                    <span class="filter-model-tile__face">
+                      <span
+                        class="filter-model-tile__checkbox"
+                        aria-hidden="true"
+                      ></span>
+                      <span class="filter-model-tile__label">{{
+                        opt.label
+                      }}</span>
+                    </span>
+                  </label>
+                }
+              }
+            </div>
+          </div>
+
+          <div class="filter-row-2col">
+            <div class="filter-group">
+              <label class="filter-label" for="filter-start">Start Date</label>
+              <div class="input-wrap input-wrap--date">
+                <svg
+                  class="input-icon input-icon--calendar"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <rect
+                    x="2.5"
+                    y="3"
+                    width="11"
+                    height="10.5"
+                    rx="1.5"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                  />
+                  <path
+                    d="M2.5 6h11M5 1.5V4M11 1.5V4"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+                <input
+                  id="filter-start"
+                  type="date"
+                  class="filter-input filter-input--date"
+                  formControlName="startDate"
+                />
+              </div>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label" for="filter-end">End Date</label>
+              <div class="input-wrap input-wrap--date">
+                <svg
+                  class="input-icon input-icon--calendar"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <rect
+                    x="2.5"
+                    y="3"
+                    width="11"
+                    height="10.5"
+                    rx="1.5"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                  />
+                  <path
+                    d="M2.5 6h11M5 1.5V4M11 1.5V4"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+                <input
+                  id="filter-end"
+                  type="date"
+                  class="filter-input filter-input--date"
+                  formControlName="endDate"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-modal__footer">
+          <button
+            class="filter-modal__btn filter-modal__btn--apply"
+            type="button"
+            (click)="applyFiltersFromModal()"
+            [disabled]="loadingUser()"
+          >
+            <span class="filter-modal__btn-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M 3.75 5.5 H 16.25 L 11.05 10.75 V 15.25 L 8.95 16.45 V 10.75 L 3.75 5.5 Z"
+                  stroke="currentColor"
+                  stroke-width="1.45"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+            Apply Filters
+          </button>
+          <button
+            class="filter-modal__btn filter-modal__btn--clear"
+            type="button"
+            (click)="clearFilters()"
+          >
+            <span class="filter-modal__btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none">
+                <path
+                  d="M6 6l8 8M14 6l-8 8"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </span>
+            Clear Filters
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- User analytics modal (after Apply Filters) -->
+  @if (showUserModal()) {
+    <div
+      class="modal-backdrop modal-backdrop--user"
+      (click)="closeUserModal()"
+    ></div>
+    <div
+      class="user-modal"
+      role="dialog"
+      aria-labelledby="user-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="user-modal__header">
+        <div id="user-modal-title" class="user-modal__title">
+          Showing : {{ getSelectedUsernamesString() }}
+        </div>
+        <div class="user-modal__header-actions">
+          <button
+            class="user-modal__export"
+            type="button"
+            (click)="exportQuestions()"
+            [disabled]="submittingExport()"
+          >
+            <span class="user-modal__export-icon" aria-hidden="true">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 11V12.5C2 12.8978 2.15804 13.2794 2.43934 13.5607C2.72064 13.842 3.10218 14 3.5 14H12.5C12.8978 14 13.2794 13.842 13.5607 13.5607C13.842 13.2794 14 12.8978 14 12.5V11M5 8L8 11L11 8M8 11V2"
+                  stroke="#2C2C2C"
+                  stroke-opacity="0.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+            Export Questions
+          </button>
+          <button
+            class="user-modal__close"
+            type="button"
+            (click)="closeUserModal()"
+            aria-label="Close"
+          >
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 28 28"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <rect width="28" height="28" rx="14" fill="#D5D5D5" />
+              <path
+                d="M19 9L9 19"
+                stroke="#2C2C2C"
+                stroke-width="1.66667"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M9 9L19 19"
+                stroke="#2C2C2C"
+                stroke-width="1.66667"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="user-modal__body">
+        @if (loadingUser()) {
+          <div class="loading-row">
+            <div class="spinner"></div>
+            <span>Loading user data…</span>
+          </div>
+        } @else if (userAnalytics) {
+          <div class="user-modal__kpis">
+            <div class="user-modal__kpi">
+              <div class="user-modal__kpi-icon" aria-hidden="true">
+                <svg
+                  width="45"
+                  height="45"
+                  viewBox="0 0 45 45"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <rect
+                    width="45"
+                    height="45.0001"
+                    rx="12.2727"
+                    fill="#EDF7F1"
+                  />
+                  <path
+                    d="M13.2871 26.9406C13.4374 27.3199 13.4709 27.7356 13.3832 28.1341L12.294 31.4989C12.2589 31.6695 12.268 31.8463 12.3203 32.0124C12.3727 32.1786 12.4667 32.3286 12.5933 32.4482C12.7199 32.5679 12.875 32.6532 13.0439 32.6961C13.2127 32.739 13.3897 32.7381 13.5581 32.6934L17.0486 31.6727C17.4247 31.5981 17.8142 31.6308 18.1726 31.7668C20.3565 32.7867 22.8305 33.0025 25.158 32.3761C27.4855 31.7497 29.517 30.3214 30.894 28.3431C32.271 26.3649 32.9051 23.9638 32.6844 21.5636C32.4637 19.1635 31.4023 16.9183 29.6876 15.2244C27.9728 13.5305 25.7149 12.4967 23.3122 12.3053C20.9095 12.1139 18.5164 12.7772 16.5551 14.1783C14.5938 15.5794 13.1904 17.6282 12.5925 19.9632C11.9946 22.2982 12.2406 24.7693 13.2871 26.9406Z"
+                    stroke="#49AB74"
+                    stroke-width="2.04545"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <div class="user-modal__kpi-label">Total Conversations</div>
+              <div class="user-modal__kpi-value">
+                {{
+                  userAnalytics?.total_conversations != null
+                    ? (userAnalytics.total_conversations | number)
+                    : "—"
+                }}
+              </div>
+            </div>
+            <div class="user-modal__kpi">
+              <div class="user-modal__kpi-icon" aria-hidden="true">
+                <svg
+                  width="45"
+                  height="45"
+                  viewBox="0 0 45 45"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <rect width="45" height="45" rx="11.3764" fill="#EDF7F1" />
+                  <path
+                    d="M22.5 31.7698C27.6194 31.7698 31.7696 27.6196 31.7696 22.5001C31.7696 17.3806 27.6194 13.2305 22.5 13.2305C17.3805 13.2305 13.2303 17.3806 13.2303 22.5001C13.2303 27.6196 17.3805 31.7698 22.5 31.7698Z"
+                    stroke="#49AB74"
+                    stroke-width="1.85393"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M19.8026 19.7194C20.0205 19.0999 20.4506 18.5775 21.0168 18.2447C21.583 17.912 22.2487 17.7903 22.896 17.9014C23.5433 18.0124 24.1304 18.3489 24.5533 18.8513C24.9763 19.3538 25.2077 19.9896 25.2068 20.6464C25.2068 22.5003 22.4259 23.4273 22.4259 23.4273"
+                    stroke="#49AB74"
+                    stroke-width="1.85393"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M22.4999 27.1348H22.5099"
+                    stroke="#49AB74"
+                    stroke-width="1.85393"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <div class="user-modal__kpi-label">Total Questions</div>
+              <div class="user-modal__kpi-value">
+                {{
+                  userAnalytics?.total_questions != null
+                    ? (userAnalytics.total_questions | number)
+                    : "—"
+                }}
+              </div>
+            </div>
+            <div class="user-modal__kpi">
+              <div class="user-modal__kpi-icon" aria-hidden="true">
+                <svg
+                  width="45"
+                  height="45"
+                  viewBox="0 0 45 45"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <rect
+                    width="45"
+                    height="45"
+                    rx="11.3764"
+                    fill="#EDF7F1"
+                  />
+                  <g transform="translate(11, 11)" clip-path="url(#clip0_5497_67495)">
+                    <path
+                      d="M7.41602 12.9792C10.4881 12.9792 12.9785 10.4888 12.9785 7.41669C12.9785 4.3446 10.4881 1.85419 7.41602 1.85419C4.34393 1.85419 1.85352 4.3446 1.85352 7.41669C1.85352 10.4888 4.34393 12.9792 7.41602 12.9792Z"
+                      stroke="#49AB74"
+                      stroke-width="1.85417"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M16.7708 9.61386C17.6472 9.94059 18.4271 10.483 19.0382 11.191C19.6494 11.899 20.0722 12.7497 20.2676 13.6644C20.4629 14.579 20.4244 15.5282 20.1557 16.4241C19.8869 17.3199 19.3967 18.1336 18.7302 18.7898C18.0637 19.446 17.2425 19.9235 16.3425 20.1782C15.4426 20.4329 14.4929 20.4566 13.5814 20.247C12.6698 20.0374 11.8259 19.6014 11.1275 18.9793C10.4292 18.3571 9.89895 17.5689 9.58594 16.6875"
+                      stroke="#49AB74"
+                      stroke-width="1.85417"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M6.49023 5.5625H7.41732V9.27083"
+                      stroke="#49AB74"
+                      stroke-width="1.85417"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M15.4918 12.8679L16.1407 13.5261L13.5264 16.1405"
+                      stroke="#49AB74"
+                      stroke-width="1.85417"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_5497_67495">
+                      <rect width="22.25" height="22.25" fill="white" />
+                    </clipPath>
+                  </defs>
+                </svg>
+              </div>
+              <div class="user-modal__kpi-label">Total Tokens</div>
+              <div class="user-modal__kpi-value">
+                {{
+                  userAnalytics?.total_tokens != null
+                    ? (userAnalytics.total_tokens | number)
+                    : "—"
+                }}
+              </div>
+            </div>
+          </div>
+
+          <div class="user-modal__grid">
+            <div class="user-modal__card">
+              <div class="user-modal__card-title">Response Types</div>
+              @let upairs = userResponseTypePairs();
+              @let totalUpairs = calcTotalResponses(upairs);
+              <div
+                class="response-types response-types--compact user-modal__response"
+              >
+                @for (p of upairs; track p.key) {
+                  <div class="rt">
+                    <div class="rt__head">
+                      <span class="rt__name">{{ p.key }}</span>
+                      <span class="rt__pct"
+                        >{{ pct(p.value, totalUpairs) }}%</span
+                      >
+                    </div>
+                    <div class="rt__bar">
+                      <div
+                        class="rt__fill"
+                        [style.width]="responseTypeFillWidth(p, totalUpairs)"
+                        [style.background]="responseTypeBarColor(p.key)"
+                      ></div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="user-modal__card">
+              <div class="user-modal__card-title">Model Usage</div>
+              @if (userModalPieSeries.length) {
+                <div class="user-modal__pie regional">
+                  <div class="regional__chart">
+                    <apx-chart
+                      #userModalPieApex
+                      [series]="userModalPieSeries"
+                      [chart]="userModalPieChart"
+                      [labels]="userModalPieLabels"
+                      [colors]="userModalPieColors"
+                      [stroke]="userModalPieStroke"
+                      [dataLabels]="userModalPieDataLabels"
+                      [legend]="userModalPieLegend"
+                      [plotOptions]="userModalPiePlotOptions"
+                      [tooltip]="userModalPieTooltip"
+                      [states]="userModalPieStates"
+                    ></apx-chart>
+                  </div>
+                  <div class="regional__legend">
+                    @for (l of userModalPieLabels; track $index) {
+                      <div class="legend-item">
+                        <span
+                          class="legend-dot"
+                          [style.background]="
+                            userModalPieColors[
+                              $index % userModalPieColors.length
+                            ]
+                          "
+                        ></span>
+                        <span class="legend-name">{{ l }}</span>
+                        <span class="legend-val">{{
+                          userModalPieSeries[$index]
+                        }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              } @else {
+                <div class="user-modal__empty">
+                  No model usage breakdown for this user.
+                </div>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="user-modal__empty">No data loaded.</div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (modelUsage && modelUsage.length > 0) {
+    <section class="card card--wide">
+      <div class="card__header">
+        <div class="card__title">Model Usage Over Time</div>
+      </div>
+
+      <apx-chart
+        [series]="modelUsageSeries"
+        [chart]="modelUsageChart"
+        [xaxis]="modelUsageXAxis"
+        [yaxis]="modelUsageYAxis"
+        [stroke]="modelUsageStroke"
+        [dataLabels]="modelUsageDataLabels"
+        [tooltip]="modelUsageTooltip"
+        [colors]="modelUsageColors"
+        [grid]="modelUsageGrid"
+        [plotOptions]="modelUsagePlotOptions"
+        [fill]="modelUsageFill"
+      ></apx-chart>
+    </section>
+  }
+</div>

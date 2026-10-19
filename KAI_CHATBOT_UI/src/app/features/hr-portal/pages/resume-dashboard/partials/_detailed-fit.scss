@@ -1,0 +1,73 @@
+// ══════════════════════════════════════════════════════════
+//  DETAILED FIT ANALYSIS
+// ══════════════════════════════════════════════════════════
+
+.detailed-fit-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  font-family: 'Manrope', sans-serif;
+  // margin: 0 24px; // Align with other cards
+
+  &__header {
+    padding: 16px 24px;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 24px 32px;
+    gap: 32px 60px;
+  }
+}
+
+.fit-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+
+  &__icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: #10b981; // Brand green
+
+    &--gap {
+      color: #f59e0b; // Brand amber
+    }
+  }
+
+  &__content {
+    flex: 1;
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 4px;
+  }
+
+  &__description {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+// Responsive
+@media (max-width: 1024px) {
+  .detailed-fit-card__grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}

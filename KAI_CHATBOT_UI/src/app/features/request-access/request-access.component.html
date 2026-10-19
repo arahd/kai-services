@@ -1,0 +1,60 @@
+<div class="access-wrapper">
+
+    @switch (status()) {
+
+    @case ('form') {
+
+    <h2>Request Access</h2>
+
+    <div class="form-group">
+        <label>Email (must be a kumaran email)</label>
+        <input type="email" [(ngModel)]="userName" />
+    </div>
+
+    <div class="form-group">
+        <label>Select Models</label>
+
+        @if (models().length === 0) {
+        <p>Loading models...</p>
+        } @else {
+        <div class="checkbox-list">
+            @for (model of models(); track model) {
+            <label class="checkbox-item">
+                <input type="checkbox" [checked]="selectedModels().includes(model)" (change)="toggleModel(model)" />
+                {{ model }}
+            </label>
+            }
+        </div>
+        }
+    </div>
+
+    <button class="btn" [disabled]="isSubmitting()" (click)="submitRequest()">
+
+        @if (isSubmitting()) {
+        <span class="loader"></span> Submitting...
+        } @else {
+        Submit Request
+        }
+
+    </button>
+    }
+
+    @case ('sent') {
+    <div class="message success">
+        <h3>Request Sent Successfully</h3>
+        <p> Your access request has been raised successfully. The administrator will
+            review your submission and provide access shortly. You will be notified once
+            your chatbot access is enabled.</p>
+    </div>
+    }
+
+    @case ('approved') {
+    <div class="message approved">
+        <h3>Already Approved</h3>
+        <p>You already have access. Please proceed to login.</p>
+    </div>
+    }
+
+    }
+
+</div>

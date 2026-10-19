@@ -1,0 +1,101 @@
+@use "../../../../styles/mixins" as *;
+
+/* Header & Brand */
+.sidenav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 15px;
+
+  &.is-collapsed {
+    justify-content: center;
+    padding: 12px 0.5rem;
+
+    .collapsed-header-stack {
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .collapsed-logo {
+      justify-content: center;
+
+      .bot-avatar {
+        margin-top: 0;
+      }
+    }
+
+    .sidebar-toggle-btn {
+      flex-shrink: 0;
+    }
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+
+    .bot-avatar {
+      @include avatar-circle;
+      margin-top: 0.25rem;
+
+      img {
+        width: 65%;
+        height: 65%;
+        object-fit: contain;
+      }
+    }
+
+    .brand-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--px-text);
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .sidebar-toggle-btn {
+    background: transparent;
+    border: none;
+    outline: none;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--px-text);
+    transition: all 0.2s ease;
+    padding: 0;
+
+    &:hover {
+      background: var(--px-hover);
+      color: var(--px-text);
+      border-color: var(--px-border);
+    }
+  }
+
+  .mobile-close-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    color: var(--px-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+
+    &:hover {
+      background: var(--px-hover);
+      color: var(--px-text);
+      border-color: var(--px-border);
+    }
+  }
+}

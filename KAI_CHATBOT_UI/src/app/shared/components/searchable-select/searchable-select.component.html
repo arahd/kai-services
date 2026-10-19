@@ -1,0 +1,75 @@
+<div class="searchable-select-container">
+  <button
+    type="button"
+    class="select-trigger"
+    [class.is-open]="isOpen()"
+    (click)="toggleOpen()"
+  >
+    <span class="selected-value" [title]="displayValue">{{ displayValue }}</span>
+    <svg class="chevron-icon" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+    </svg>
+  </button>
+
+  @if (isOpen()) {
+    <div class="select-dropdown" [class.align-right]="dropdownAlign === 'right'">
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search..."
+          [ngModel]="searchQuery()"
+          (input)="onSearch($event)"
+          (click)="$event.stopPropagation()"
+          autofocus
+        />
+        @if (searchQuery()) {
+          <button type="button" class="clear-search-btn" (click)="clearSearch()">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+            </svg>
+          </button>
+        }
+      </div>
+
+      <ul class="options-list">
+        <!-- All Option -->
+        <li
+          class="option-item"
+          [class.is-selected]="selected === allOptionValue"
+          (click)="selectOption(allOptionValue)"
+        >
+          <span class="option-text">{{ allOptionLabel }}</span>
+          @if (selected === allOptionValue) {
+            <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+            </svg>
+          }
+        </li>
+
+        <!-- Filtered Options -->
+        @for (opt of filteredOptions(); track opt) {
+          <li
+            class="option-item"
+            [class.is-selected]="selected === opt"
+            (click)="selectOption(opt)"
+          >
+            <span class="option-text" [title]="opt">{{ opt }}</span>
+            @if (selected === opt) {
+              <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+              </svg>
+            }
+          </li>
+        }
+
+        @if (filteredOptions().length === 0) {
+          <li class="no-options">No users found</li>
+        }
+      </ul>
+    </div>
+  }
+</div>

@@ -1,0 +1,521 @@
+@use '../../styles/theme';
+
+.consistency-page {
+  padding: 24px;
+  background: #f8f9f7;
+  color: #2c3e50;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+// ── HEADER ──
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  background: #fff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+
+  &__left {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.candidate-box {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+
+  .avatar {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #1a4fa8, #0d2b5c);
+    color: white;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  .candidate-info {
+    .candidate-name {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 4px;
+      color: #1a1a1a;
+    }
+    .candidate-title {
+      font-size: 15px;
+      color: #64748b;
+      margin: 0 0 6px;
+    }
+    .candidate-loc {
+      font-size: 13px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+  }
+}
+
+.trust-score {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-left: 24px;
+  border-left: 1px solid #edf2f7;
+
+  .score-ring {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    &__inner {
+      width: 58px;
+      height: 58px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &__val {
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    &__unit {
+      font-size: 10px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+  }
+
+  .score-meta {
+    display: flex;
+    flex-direction: column;
+
+    .score-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 0.05em;
+    }
+
+    .score-status {
+      font-size: 16px;
+      font-weight: 700;
+      
+      &--hi { color: #2d9e62; }
+      &--mid { color: #e08530; }
+      &--lo { color: #d14343; }
+    }
+  }
+}
+
+// ── INSIGHT STRIP ──
+.insight-strip {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 12px 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+
+  .insight-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+// ── MAIN GRID ──
+.main-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.grid-col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// ── PANELS ──
+.panel {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border: 1px solid #f1f5f9;
+
+  &__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f8fafc;
+  }
+
+  &__title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #64748b;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+}
+
+.count-badge {
+  font-size: 11px;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 20px;
+
+  &--red {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+}
+
+.status-pill {
+  font-size: 12px;
+  font-weight: 700;
+  background: #f0fdf4;
+  color: #166534;
+  padding: 4px 10px;
+  border-radius: 8px;
+
+  &--warn {
+    background: #fff7ed;
+    color: #9a3412;
+  }
+}
+
+// ── DISCREPANCIES ──
+.discrepancy-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.disc-card {
+  padding: 16px;
+  border-radius: 12px;
+  border-left: 4px solid #e2e8f0;
+  background: #fcfcfc;
+
+  &--high { border-left-color: #ef4444; background: #fef2f2; }
+  &--medium { border-left-color: #f59e0b; background: #fffbeb; }
+  &--low { border-left-color: #3b82f6; background: #eff6ff; }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  
+  .disc-category {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #94a3b8;
+  }
+
+  .sev-pill {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 1px 6px;
+    border-radius: 4px;
+    
+    &--high { background: #ef4444; color: #fff; }
+    &--medium { background: #f59e0b; color: #fff; }
+    &--low { background: #3b82f6; color: #fff; }
+  }
+
+  .disc-item {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: #1a1a1a;
+  }
+
+  .comparison-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .compare-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    
+    .compare-label { font-size: 8px; font-weight: 700; color: #94a3b8; margin-bottom: 2px; }
+    .compare-val { font-size: 11px; font-weight: 600; color: #475569; }
+  }
+
+  .compare-sep { color: #cbd5e1; }
+
+  .disc-action {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 8px;
+    border-top: 1px dashed #e2e8f0;
+  }
+}
+
+// ── RECS ──
+.rec-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rec-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: #fdfdfd;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  line-height: 1.4;
+
+  app-hr-icon { color: #f59e0b; flex-shrink: 0; margin-top: 2px; }
+}
+
+// ── TIMELINE (Employment) ──
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-left: 20px;
+  border-left: 1px solid #f1f5f9;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 32px;
+  padding-left: 24px;
+
+  &:last-child { padding-bottom: 0; }
+
+  .status-marker {
+    position: absolute;
+    left: -26px;
+    top: 5px;
+    width: 10px;
+    height: 10px;
+    background: #2d9e62;
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px #2d9e62;
+    
+    &--warn {
+      background: #e08530;
+      box-shadow: 0 0 0 1px #e08530;
+    }
+  }
+
+  .timeline-meta {
+    margin-bottom: 12px;
+    .timeline-score {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+  }
+
+  .timeline-content {
+    background: #fcfcfc;
+    border: 1px solid #f1f5f9;
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    h3 { font-size: 16px; font-weight: 700; margin: 0; color: #1e293b; }
+    .timeline-loc { font-size: 12px; color: #94a3b8; font-weight: 500; }
+  }
+}
+
+.job-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  padding: 16px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+}
+
+.job-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .job-tag {
+    font-size: 8px;
+    font-weight: 800;
+    width: fit-content;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #f1f5f9;
+    color: #64748b;
+    
+    &--blue { background: #eff6ff; color: #2563eb; }
+  }
+
+  .job-title { font-size: 14px; font-weight: 700; color: #334155; display: block; }
+  .job-date { font-size: 12px; color: #64748b; font-weight: 500; }
+}
+
+.job-notes {
+  margin-top: 16px;
+  padding: 12px;
+  background: #fff7ed;
+  border-radius: 8px;
+  
+  p {
+    margin: 0;
+    font-size: 12px;
+    color: #9a3412;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+// ── SKILLS ──
+.sub-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.skills-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.skill-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+}
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.skill-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  
+  &--resume { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+  &--linkedin { background: #eff6ff; color: #1e40af; border: 1px solid #dbeafe; }
+}
+
+// ── CHECKS ──
+.check-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #fcfcfc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+
+  .check-icon {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    
+    &--pass { background: #2d9e62; }
+    &--warn { background: #e08530; }
+    &--fail { background: #d14343; }
+  }
+
+  .check-info {
+    display: flex;
+    flex-direction: column;
+    .check-label { font-size: 13px; font-weight: 700; color: #334155; }
+    .check-val { font-size: 11px; color: #94a3b8; font-weight: 600; }
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+  color: #94a3b8;
+  text-align: center;
+  
+  p { margin: 12px 0 0; font-size: 14px; font-weight: 500; }
+  app-hr-icon { color: #e2e8f0; }
+}
+
+.full-match {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px;
+  background: #f0fdf4;
+  color: #166534;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  justify-content: center;
+}

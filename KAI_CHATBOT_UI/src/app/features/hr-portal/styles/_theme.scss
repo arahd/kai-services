@@ -1,0 +1,54 @@
+// ══════════════════════════════════════════════════════
+//  HR PORTAL: SHARED THEME VARIABLES
+// ══════════════════════════════════════════════════════
+
+// Import custom fonts (Instrument Sans / Serif, Fira Code)
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif&family=Fira+Code:wght@400;500&display=swap');
+
+:host {
+  // Typography
+  --font:        'Instrument Sans', sans-serif;
+  --serif:       'Instrument Serif', serif;
+  --mono:        'Fira Code', monospace;
+
+  // Backgrounds
+  --bg:          #f5f4f0;
+  --bg-card:     #fefefe;
+  --bg-strip:    #f0efeb;
+  --bg-inset:    #eceae4;
+
+  // Borders
+  --bdr:         #dddbd3;
+  --bdr-md:      #c9c7be;
+
+  // Text colors
+  --t1:          #18181a;
+  --t2:          #4a4a52;
+  --t3:          #151515;
+  --t4:          #000000;
+
+  // Brand/Status colors
+  --indigo:      #4f46e5;
+  --indigo-dark: #4338ca;
+  --indigo-bg:   #eef2ff;
+  --indigo-bdr:  #c7d2fe;
+  --indigo-text: #3730a3;
+
+  --green:      #1a7a4a;
+  --green-bg:   #e8f5ed;
+  --green-bar:  #2d9e62;
+  --amber:      #a05c10;
+  --amber-bg:   #fdf0dd;
+  --amber-bar:  #e08530;
+  --red:        #c0292e;
+  --red-bg:     #fceaea;
+  --blue:       #1a4fa8;
+  --blue-bg:    #e6eefb;
+  --orange:     #b84d00;
+  --orange-bg:  #feebd8;
+
+  // Spacing & Geometry
+  --r:           8px;
+  --rl:          12px;
+  --shadow:      0 1px 2px rgba(0,0,0,.05), 0 0 0 1px rgba(0,0,0,.04);
+}

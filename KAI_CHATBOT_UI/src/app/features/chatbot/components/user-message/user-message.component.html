@@ -1,0 +1,88 @@
+<!-- User Message Bubble — Figma layout: avatar on left, content right -->
+<div class="user-message-container">
+  <!-- <div class="user-avatar-wrapper">
+    @if (userAvatar) {
+      <img [src]="userAvatar" class="user-avatar-img" alt="User" />
+    } @else {
+      <div class="user-avatar-fallback">{{ userInitial }}</div>
+    }
+  </div> -->
+
+  <div class="user-content-wrapper">
+    <div class="user-bubble">
+      <!-- Sent Attachments -->
+      @if (msg.attachments && msg.attachments.length > 0) {
+      <div class="sent-attachments">
+        @for (fp of msg.attachments; track $index) {
+        <div
+          class="sent-file-card clickable"
+          style="cursor: pointer;"
+          [class.is-image]="isImageFile(fp.name)"
+          [class.is-pdf]="isPdfFile(fp.name)"
+          [class.is-word]="isWordFile(fp.name)"
+          [class.is-spreadsheet]="isSpreadsheetFile(fp.name)"
+          (click)="previewFile.emit({file: fp})"
+        >
+          <div class="file-card-icon">
+            @if (isImageFile(fp.name)) {
+            @if (fp.previewUrl) {
+            <img [src]="fp.previewUrl" alt="Preview" class="image-thumbnail" />
+            } @else {
+            <div class="image-placeholder">
+              <app-chat-icon name="image-placeholder" width="14" height="14"></app-chat-icon>
+            </div>
+            }
+            } @else {
+            <app-chat-icon [name]="getFileIconName(fp.name)" width="18" height="18"></app-chat-icon>
+            }
+          </div>
+          <div class="file-card-info">
+            <span class="file-card-name">{{ fp.name }}</span>
+            <span class="file-card-type">{{ fp.name | fileType }}</span>
+          </div>
+        </div>
+        }
+      </div>
+      }
+
+      @if (!msg.editable && msg.message) {
+      <div class="user-text-wrapper" [class.collapsed]="msg.canCollapse && msg.collapsed">
+        <span class="user-text">{{ msg.message }}</span>
+      </div>
+      @if (msg.canCollapse && msg.collapsed) {
+      <div class="show-more-wrapper" (click)="toggleCollapse.emit()">
+        <button class="show-more-btn">
+          <span>Show more</span>
+          <app-chat-icon name="chevron-down" width="14" height="14"></app-chat-icon>
+        </button>
+      </div>
+      }
+      @if (msg.canCollapse && !msg.collapsed) {
+      <div class="show-more-wrapper less" (click)="toggleCollapse.emit()">
+        <button class="show-more-btn">
+          <span>Show less</span>
+          <app-chat-icon name="chevron-up" width="14" height="14"></app-chat-icon>
+        </button>
+      </div>
+      }
+      }
+    </div>
+
+    @if (!msg.editable) {
+    <div class="user-actions">
+      <span class="icon-btn" [class.copied]="copied" (click)="copyMessage.emit()" appTooltip="Copy question">
+        @if (!copied) {
+        <app-chat-icon name="copy" width="17" height="17"></app-chat-icon>
+        } @else {
+        <app-chat-icon name="check-circle" width="18" height="18" class="tick-icon"></app-chat-icon>
+        }
+      </span>
+      @if (showEdit) {
+        <span class="icon-btn" (click)="editMessage.emit()" appTooltip="Edit question">
+          <app-chat-icon name="edit" width="18" height="18"></app-chat-icon>
+        </span>
+      }
+    </div>
+    }
+  </div>
+</div>

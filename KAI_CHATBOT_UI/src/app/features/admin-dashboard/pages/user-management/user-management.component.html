@@ -1,0 +1,891 @@
+<div class="user-management-page">
+  <!-- ───── Page Header ───── -->
+  <header class="page-header">
+    <div class="header-titles">
+      <h1 class="page-title">User & Team Management</h1>
+      <p class="page-subtitle">
+        Govern enterprise access controls, configure input/output token limits, and manage team workspaces.
+      </p>
+    </div>
+
+    @if (activeTab() === 'teams') {
+      <div class="header-actions">
+        <button class="btn-primary" (click)="openCreateTeamModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Create Team</span>
+        </button>
+      </div>
+    }
+  </header>
+
+  <!-- ───── Navigation Tabs ───── -->
+  <div class="tabs-nav-bar">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'users'"
+      (click)="setActiveTab('users')"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <span>All Users</span>
+      <span class="tab-count-pill">{{ totalUsersCount() }}</span>
+    </button>
+
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'teams'"
+      (click)="setActiveTab('teams')"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
+      <span>Teams & Workgroups</span>
+      <span class="tab-count-pill">{{ totalTeamsCount() }}</span>
+    </button>
+  </div>
+
+  <!-- ───── Enterprise KPI Metric Cards ───── -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon-wrap user-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      </div>
+      <div class="metric-content">
+        <span class="metric-label">Total Users</span>
+        <div class="metric-value">{{ formatNumber(totalUsersCount()) }}</div>
+        <span class="metric-subtext">Registered corporate accounts</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon-wrap access-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <polyline points="9 12 11 14 15 10"></polyline>
+        </svg>
+      </div>
+      <div class="metric-content">
+        <span class="metric-label">Disabled Access</span>
+        <div class="metric-value">{{ formatNumber(disabledUsersCount()) }}</div>
+        <span class="metric-subtext">Restricted or disabled accounts</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon-wrap token-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+      </div>
+      <div class="metric-content">
+        <span class="metric-label">Daily Tokens Consumed</span>
+        <div class="metric-value">{{ formatNumber(totalDailyTokensUsed()) }}</div>
+        <span class="metric-subtext">Cumulative daily usage</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon-wrap team-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+      </div>
+      <div class="metric-content">
+        <span class="metric-label">Workgroup Teams</span>
+        <div class="metric-value">{{ formatNumber(totalTeamsCount()) }}</div>
+        <span class="metric-subtext">{{ formatNumber(totalTeamMembersCount()) }} members allocated</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- TAB 1: ALL USERS DIRECTORY                                         -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  @if (activeTab() === 'users') {
+    <div class="card main-table-card">
+      <!-- Filter Controls Header -->
+      <div class="card-header">
+        <div class="header-left">
+          <span class="card-header-label">ALL USERS</span>
+          @if (totalRecords() > 0) {
+            <span class="total-records-count">({{ totalRecords() }})</span>
+          }
+        </div>
+
+        <div class="header-controls">
+          <!-- Search -->
+          <div class="search-wrapper">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Search users by name or email..."
+              [ngModel]="searchTerm()"
+              (ngModelChange)="onSearchChange($event)"
+            />
+          </div>
+
+          <!-- Reload Button -->
+          <button class="btn-icon" (click)="loadUsers()" title="Refresh users list">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 4v6h-6"></path>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="table-container">
+        @if (loading()) {
+          <div class="table-loading-state">
+            <div class="spinner"></div>
+            <span>Loading user management directory...</span>
+          </div>
+        } @else if (pagedUsers().length === 0) {
+          <div class="table-empty-state">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <p class="empty-title">No users found</p>
+            <p class="empty-desc">No user records matched your search query or filter selection.</p>
+          </div>
+        } @else {
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>USER</th>
+                <th>INPUT LIMIT</th>
+                <th>OUTPUT LIMIT</th>
+                <th>DAILY USAGE</th>
+                <th class="text-right">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of pagedUsers(); track user.email) {
+                <tr>
+                  <td class="cell-email">
+                    <div class="user-avatar-meta">
+                      <div class="user-avatar-circle" [attr.data-role]="user.role">
+                        {{ getInitials(user.username || user.email) }}
+                      </div>
+                      <div class="user-meta">
+                        @if (user.username) {
+                          <span class="user-username">{{ user.username }}</span>
+                          <span class="user-email-sub">{{ user.email }}</span>
+                        } @else {
+                          <span class="user-email-main">{{ user.email }}</span>
+                        }
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="usage-progress-col">
+                      <div class="usage-mini-meta">
+                        <span [title]="'Input limit: ' + formatNumber(user.input_token_limit)">{{ formatNumber(user.input_tokens_used ?? 0) }}</span>
+                        <span class="usage-percent-text">{{ calculateInputUsagePercent(user) }}%</span>
+                      </div>
+                      <div class="mini-progress-track">
+                        <div
+                          class="mini-progress-fill"
+                          [class.warn]="calculateInputUsagePercent(user) >= 75 && calculateInputUsagePercent(user) < 90"
+                          [class.danger]="calculateInputUsagePercent(user) >= 90"
+                          [style.width.%]="calculateInputUsagePercent(user)"
+                        ></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="usage-progress-col">
+                      <div class="usage-mini-meta">
+                        <span [title]="'Output limit: ' + formatNumber(user.output_token_limit)">{{ formatNumber(user.output_tokens_used ?? 0) }}</span>
+                        <span class="usage-percent-text">{{ calculateOutputUsagePercent(user) }}%</span>
+                      </div>
+                      <div class="mini-progress-track">
+                        <div
+                          class="mini-progress-fill"
+                          [class.warn]="calculateOutputUsagePercent(user) >= 75 && calculateOutputUsagePercent(user) < 90"
+                          [class.danger]="calculateOutputUsagePercent(user) >= 90"
+                          [style.width.%]="calculateOutputUsagePercent(user)"
+                        ></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="usage-progress-col">
+                      <div class="usage-mini-meta">
+                        <span>{{ formatNumber(user.total_daily_usage) }}</span>
+                        <span class="usage-percent-text">{{ calculateUserUsagePercent(user) }}%</span>
+                      </div>
+                      <div class="mini-progress-track">
+                        <div
+                          class="mini-progress-fill"
+                          [class.warn]="calculateUserUsagePercent(user) >= 75 && calculateUserUsagePercent(user) < 90"
+                          [class.danger]="calculateUserUsagePercent(user) >= 90"
+                          [style.width.%]="calculateUserUsagePercent(user)"
+                        ></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-right">
+                    <button class="btn-manage" (click)="openManagePanel(user)">
+                      Manage Access &rsaquo;
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+
+      <!-- Pagination -->
+      @if (!loading() && totalRecords() > 0) {
+        <div class="pagination-bar">
+          <button class="pagination-btn nav-btn" [disabled]="currentPage() === 1" (click)="prevPage()">
+            &lsaquo; Back
+          </button>
+
+          @for (page of paginationPages(); track $index) {
+            @if (page === '...') {
+              <span class="pagination-ellipsis">…</span>
+            } @else {
+              <button
+                class="pagination-btn"
+                [class.active]="page === currentPage()"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+            }
+          }
+
+          <button class="pagination-btn nav-btn" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
+            Next &rsaquo;
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- TAB 2: TEAMS & WORKGROUPS DASHBOARD (Task 915)                     -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  @if (activeTab() === 'teams') {
+    <div class="card main-table-card">
+      <!-- Teams Header Controls -->
+      <div class="card-header">
+        <div class="header-left">
+          <span class="card-header-label">ALL TEAMS</span>
+          @if (teams().length > 0) {
+            <span class="total-records-count">({{ filteredTeams().length }})</span>
+          }
+        </div>
+
+        <div class="header-controls">
+          <div class="search-wrapper">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Search team name or group ID..."
+              [ngModel]="teamsSearchTerm()"
+              (ngModelChange)="teamsSearchTerm.set($event)"
+            />
+          </div>
+
+          <button class="btn-icon" (click)="loadTeams()" title="Refresh teams list">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 4v6h-6"></path>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Teams Table -->
+      <div class="table-container">
+        @if (teamsLoading()) {
+          <div class="table-loading-state">
+            <div class="spinner"></div>
+            <span>Loading teams dashboard...</span>
+          </div>
+        } @else if (filteredTeams().length === 0) {
+          <div class="table-empty-state">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <p class="empty-title">No teams configured</p>
+            <p class="empty-desc">Create your first collaborative team to configure group-level token pools.</p>
+            <button class="btn-primary mt-3" (click)="openCreateTeamModal()">
+              Create Team
+            </button>
+          </div>
+        } @else {
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>TEAM NAME</th>
+                <th>MEMBERS</th>
+                <th>OVERALL<br/> INPUT LIMIT</th>
+                <th>OVERALL <br/>OUTPUT LIMIT</th>
+                <th>DAILY USAGE</th>
+                <th>OVERALL USAGE</th>
+                <th class="text-right">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (team of filteredTeams(); track team.group_id) {
+                <tr>
+                  <td>
+                    <div class="team-title-wrap">
+                      <div class="team-icon-avatar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="9" cy="7" r="4"></circle>
+                          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                      </div>
+                      <div>
+                        <span class="team-name">{{ team.group_name }}</span>
+                        <span class="team-id-badge">ID: #{{ team.group_id }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <button class="member-chip-btn" (click)="openMembersModal(team)">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
+                      <span>{{ team.member_count }} {{ team.member_count === 1 ? 'member' : 'members' }}</span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                  </td>
+                  <td class="num-cell">{{ formatNumber(team.input_token_limit,team.member_count) }}</td>
+                  <td class="num-cell">{{ formatNumber(team.output_token_limit,team.member_count) }}</td>
+                  <td>
+                    <div class="usage-progress-col">
+                      <div class="usage-mini-meta">
+                        <span>{{ formatNumber(team.daily_input_token_usage + team.daily_output_token_usage) }}</span>
+                        <span class="usage-percent-text">{{ calculateTeamUsagePercent(team) }}%</span>
+                      </div>
+                      <div class="mini-progress-track">
+                        <div
+                          class="mini-progress-fill"
+                          [class.warn]="calculateTeamUsagePercent(team) >= 75 && calculateTeamUsagePercent(team) < 90"
+                          [class.danger]="calculateTeamUsagePercent(team) >= 90"
+                          [style.width.%]="calculateTeamUsagePercent(team)"
+                        ></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="num-cell">
+                    {{ formatNumber(team.overall_input_token_usage + team.overall_output_token_usage) }}
+                  </td>
+                  <td class="text-right">
+                    <div class="table-actions-group">
+                      <button class="btn-action-sm" (click)="openMembersModal(team)" title="Manage Members">
+                        Members
+                      </button>
+                      <button class="btn-action-sm" (click)="openEditTeamModal(team)" title="Edit Limits">
+                        Edit
+                      </button>
+                      <button class="btn-action-danger-sm" (click)="deleteTeam(team)" title="Delete Team">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  }
+</div>
+
+<!-- ═════════════════════════════════════════════════════════════════════ -->
+<!-- SLIDE-OVER: MANAGE USER ACCESS & LIMITS                              -->
+<!-- ═════════════════════════════════════════════════════════════════════ -->
+@if (manageState(); as ms) {
+  <div class="manage-overlay" [class.open]="panelOpen()" (click)="onOverlayClick($event)">
+    <aside class="manage-panel" [class.open]="panelOpen()">
+      <!-- Panel Header -->
+      <div class="panel-header">
+        <div class="panel-title-wrap">
+          <h2>Manage User</h2>
+        </div>
+        <button class="panel-close" (click)="closeManagePanel()" aria-label="Close panel">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="panel-user-label">
+        <div class="user-avatar-circle mini">
+          {{ getInitials(ms.user.username || ms.user.email) }}
+        </div>
+        <span class="user-email-label">{{ ms.user.email }}</span>
+      </div>
+
+      <div class="panel-body">
+        <!-- Account Access -->
+        <section class="panel-section">
+          <h3 class="section-title">Permissions</h3>
+          <div class="section-card">
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Sensitive Questions</span>
+                <p class="toggle-description">Allow this user to ask KAI queries containing sensitive classifications.</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [ngModel]="ms.sensitiveQuestions" (ngModelChange)="updateManageField('sensitiveQuestions', $event)" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- Token Configuration -->
+        <section class="panel-section">
+          <div class="section-title-row">
+            <h3 class="section-title">Token Limits & Allocation</h3>
+            <button class="btn-token-reset" [disabled]="isResetting()" (click)="resetTokens()">
+              @if (isResetting()) {
+                <span class="btn-spinner"></span>
+                <span>Resetting...</span>
+              } @else {
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                <span>Reset Usage</span>
+              }
+            </button>
+          </div>
+          <div class="section-card">
+            <div class="token-field">
+              <label class="token-field-label">Input Token Limit</label>
+              <p class="token-field-desc">Maximum daily prompt tokens permitted.</p>
+              <div class="token-input-wrapper">
+                <input
+                  type="number"
+                  min="0"
+                  class="token-input"
+                  [ngModel]="ms.inputTokenLimit"
+                  (ngModelChange)="updateManageField('inputTokenLimit', $event)"
+                />
+                <span class="token-unit">tokens</span>
+              </div>
+            </div>
+
+            <div class="token-field">
+              <label class="token-field-label">Output Token Limit</label>
+              <p class="token-field-desc">Maximum daily response completion tokens permitted.</p>
+              <div class="token-input-wrapper">
+                <input
+                  type="number"
+                  min="0"
+                  class="token-input"
+                  [ngModel]="ms.outputTokenLimit"
+                  (ngModelChange)="updateManageField('outputTokenLimit', $event)"
+                />
+                <span class="token-unit">tokens</span>
+              </div>
+            </div>
+
+            <div class="token-field">
+              <div class="token-field-header">
+                <label class="token-field-label">Maximum Token Limit</label>
+                <span class="badge-calculated">Auto-calculated</span>
+              </div>
+              <p class="token-field-desc">Daily quota cap (Input Limit + Output Limit).</p>
+              <div class="token-input-wrapper readonly-wrapper">
+                <input
+                  type="number"
+                  class="token-input"
+                  [ngModel]="ms.maxTokenLimit"
+                  readonly
+                  tabindex="-1"
+                />
+                <span class="token-unit">tokens</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Current Token Usage -->
+        <section class="panel-section">
+          <h3 class="section-title">Current Daily Token Usage</h3>
+          <div class="section-card">
+            <div class="usage-row">
+              <span>Input Tokens Used</span>
+              <span class="usage-value">{{ formatNumber(ms.inputTokensUsed) }} / {{ formatNumber(ms.inputTokenLimit) }}</span>
+            </div>
+            <div class="usage-row">
+              <span>Output Tokens Used</span>
+              <span class="usage-value">{{ formatNumber(ms.outputTokensUsed) }} / {{ formatNumber(ms.outputTokenLimit) }}</span>
+            </div>
+            <div class="divider"></div>
+            <div class="usage-row total">
+              <span>Total Daily Usage</span>
+              <span class="usage-value highlight">{{ formatNumber(ms.totalDailyUsage) }} / {{ formatNumber(ms.maxTokenLimit) }}</span>
+            </div>
+            <div class="usage-bar-track">
+              <div class="usage-bar-fill" [style.width.%]="usagePercent"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Panel Footer -->
+      <div class="panel-footer">
+        <button class="btn-cancel" [disabled]="isSaving()" (click)="closeManagePanel()">Cancel</button>
+        <button class="btn-save" [disabled]="isSaving()" (click)="saveChanges()">
+          @if (isSaving()) {
+            <span class="btn-spinner"></span>
+            <span>Saving...</span>
+          } @else {
+            <span>Save Changes</span>
+          }
+        </button>
+      </div>
+    </aside>
+  </div>
+}
+
+<!-- ═════════════════════════════════════════════════════════════════════ -->
+<!-- MODAL: CREATE / EDIT TEAM (Task 915)                                -->
+<!-- ═════════════════════════════════════════════════════════════════════ -->
+@if (teamModalOpen()) {
+  <div class="modal-backdrop" (click)="closeTeamModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">
+            {{ teamModalMode() === 'create' ? 'Create New Workgroup Team' : 'Update Team Token Limits' }}
+          </h3>
+          <p class="modal-subtitle">
+            Configure shared capacity limits for collaborative team members.
+          </p>
+        </div>
+        <button class="panel-close" (click)="closeTeamModal()" aria-label="Close dialog">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Team Name</label>
+          <input
+            type="text"
+            class="form-input"
+            placeholder="e.g. AI Engineering Team"
+            [disabled]="teamModalMode() === 'edit'"
+            [ngModel]="teamForm().group_name"
+            (ngModelChange)="updateTeamFormField('group_name', $event)"
+          />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Input Token Limit</label>
+            <input
+              type="number"
+              min="0"
+              class="form-input"
+              [ngModel]="teamForm().input_token_limit"
+              (ngModelChange)="updateTeamFormField('input_token_limit', $event)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Output Token Limit</label>
+            <input
+              type="number"
+              min="0"
+              class="form-input"
+              [ngModel]="teamForm().output_token_limit"
+              (ngModelChange)="updateTeamFormField('output_token_limit', $event)"
+            />
+          </div>
+        </div>
+
+        <div class="calculated-preview-box">
+          <span class="preview-label">Combined Daily Cap:</span>
+          <span class="preview-val">
+            {{ formatNumber(teamForm().input_token_limit + teamForm().output_token_limit) }} tokens
+          </span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" [disabled]="isSavingTeam()" (click)="closeTeamModal()">Cancel</button>
+        <button class="btn-primary" [disabled]="isSavingTeam()" (click)="saveTeam()">
+          @if (isSavingTeam()) {
+            <span class="btn-spinner"></span>
+            <span>Saving...</span>
+          } @else {
+            <span>{{ teamModalMode() === 'create' ? 'Create Team' : 'Update Limits' }}</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ═════════════════════════════════════════════════════════════════════ -->
+<!-- MODAL: TEAM MEMBERS MANAGEMENT (Task 915)                           -->
+<!-- ═════════════════════════════════════════════════════════════════════ -->
+@if (membersModalOpen(); as mmo) {
+  <div class="modal-backdrop" (click)="closeMembersModal()">
+    <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <div class="team-modal-badge">TEAM #{{ selectedTeam()?.group_id }}</div>
+          <h3 class="modal-title">{{ selectedTeam()?.group_name }} — Members</h3>
+          <p class="modal-subtitle">
+            Manage who belongs to this workgroup team and consumes from its allocated token pool.
+          </p>
+        </div>
+        <button class="panel-close" (click)="closeMembersModal()" aria-label="Close dialog">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Add Member Bar -->
+        <div class="add-member-bar">
+          <div class="add-member-input-wrap">
+            <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            <input
+              type="email"
+              class="add-member-input"
+              placeholder="Search or type email to add..."
+              [ngModel]="newMemberEmail()"
+              (ngModelChange)="onNewMemberEmailInput($event)"
+              (keydown)="handleMemberInputKeydown($event)"
+              (blur)="hideMemberSuggestions()"
+              autocomplete="off"
+            />
+            @if (memberSuggestionsLoading()) {
+              <span class="member-input-spinner"></span>
+            }
+
+            @if (showMemberSuggestions() && memberSuggestions().length > 0) {
+              <div class="member-suggestions-dropdown">
+                <div class="suggestions-header">
+                  <span>Suggestions</span>
+                  <span class="suggestions-hint">Click to multi-select</span>
+                </div>
+                @for (user of memberSuggestions(); track user) {
+                  <div
+                    class="suggestion-item"
+                    [class.selected]="isMemberSelectedToAdd(user)"
+                    (mousedown)="toggleMemberSelection(user); $event.preventDefault()"
+                  >
+                    <input
+                      type="checkbox"
+                      [checked]="isMemberSelectedToAdd(user)"
+                      class="suggestion-checkbox"
+                      tabindex="-1"
+                      (click)="$event.stopPropagation()"
+                      (change)="toggleMemberSelection(user)"
+                    />
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="suggestion-email">{{ user }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+          <button
+            class="btn-primary"
+            [disabled]="isAddingMember() || (selectedMembersToAdd().length === 0 && !newMemberEmail().trim())"
+            (click)="addMember()"
+          >
+            @if (isAddingMember()) {
+              <span class="btn-spinner"></span>
+              <span>Adding...</span>
+            } @else {
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>
+                @if (selectedMembersToAdd().length > 1) {
+                  Add {{ selectedMembersToAdd().length }} Members
+                } @else {
+                  Add Member
+                }
+              </span>
+            }
+          </button>
+        </div>
+
+        <!-- Multi-Select Selected Members Chips -->
+        @if (selectedMembersToAdd().length > 0) {
+          <div class="selected-members-bar">
+            <span class="selected-label">Selected ({{ selectedMembersToAdd().length }}):</span>
+            <div class="selected-members-chips">
+              @for (email of selectedMembersToAdd(); track email) {
+                <span class="member-chip">
+                  <span class="member-chip__text">{{ email }}</span>
+                  <button type="button" class="member-chip__remove" (click)="removeMemberToAdd(email)" aria-label="Remove email">
+                    &times;
+                  </button>
+                </span>
+              }
+            </div>
+            <button type="button" class="btn-clear-chips" (click)="clearAllSelectedMembersToAdd()">
+              Clear all
+            </button>
+          </div>
+        }
+
+        <!-- Filter within Members -->
+        <div class="members-filter-bar">
+          <span class="members-count-title">
+            Members ({{ teamMembers().length }})
+          </span>
+          <div class="search-mini">
+            <input
+              type="text"
+              placeholder="Search in members..."
+              [ngModel]="memberSearchTerm()"
+              (ngModelChange)="memberSearchTerm.set($event)"
+            />
+          </div>
+        </div>
+
+        <!-- Members List -->
+        <div class="members-list-container">
+          @if (membersLoading()) {
+            <div class="members-loading">
+              <div class="spinner"></div>
+              <span>Fetching team members...</span>
+            </div>
+          } @else if (filteredMembers().length === 0) {
+            <div class="members-empty">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+              </svg>
+              <p>No members currently enrolled</p>
+              <small>Use the input above to add employees to this team.</small>
+            </div>
+          } @else {
+            <div class="members-grid">
+              @for (member of filteredMembers(); track member.email) {
+                <div class="member-card">
+                  <div class="member-info">
+                    <div class="member-avatar">
+                      {{ getInitials(member.email) }}
+                    </div>
+                    <span class="member-email" [title]="member.email">{{ member.email }}</span>
+                  </div>
+                  <button
+                    class="btn-member-remove"
+                    [disabled]="isRemovingMember() === member.email"
+                    (click)="removeMember(member.email)"
+                    title="Remove member from team"
+                  >
+                    @if (isRemovingMember() === member.email) {
+                      <span class="btn-spinner mini"></span>
+                    } @else {
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    }
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary" (click)="closeMembersModal()">Done</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ═════════════════════════════════════════════════════════════════════ -->
+<!-- MODAL: CONFIRMATION DIALOG                                          -->
+<!-- ═════════════════════════════════════════════════════════════════════ -->
+@if (confirmModal(); as cm) {
+  <div class="modal-backdrop confirm-backdrop" (click)="closeConfirmModal()">
+    <div class="modal-dialog confirm-dialog" (click)="$event.stopPropagation()">
+      <div class="confirm-dialog-content">
+        <div class="confirm-icon-wrap" [class.danger]="cm.type === 'danger'" [class.warning]="cm.type === 'warning'">
+          @if (cm.type === 'danger') {
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          } @else {
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          }
+        </div>
+        <div class="confirm-text-wrap">
+          <h3 class="confirm-title">{{ cm.title }}</h3>
+          <p class="confirm-message">{{ cm.message }}</p>
+        </div>
+      </div>
+      <div class="confirm-footer">
+        <button class="btn-cancel" (click)="closeConfirmModal()">
+          {{ cm.cancelText || 'Cancel' }}
+        </button>
+        <button
+          class="btn-confirm-action"
+          [class.btn-danger]="cm.type === 'danger'"
+          [class.btn-warning]="cm.type === 'warning'"
+          (click)="handleModalConfirm()"
+        >
+          {{ cm.confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

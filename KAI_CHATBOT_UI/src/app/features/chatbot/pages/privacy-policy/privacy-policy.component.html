@@ -1,0 +1,171 @@
+<div class="privacy-policy-page" [class.is-modal-view]="isModal">
+  <!-- Top Navigation Header -->
+  <header class="privacy-top-header">
+    <div class="header-inner">
+      <button
+        class="back-chatbot-btn"
+        (click)="onBack()"
+        type="button"
+        aria-label="Back to chatbot"
+      >
+        <app-chat-icon name="arrow-left" width="16" height="16"></app-chat-icon>
+        <span>Back to chatbot</span>
+      </button>
+
+      <div class="title-block">
+        <h1 class="policy-main-title">{{ policyMeta().title }}</h1>
+        <div class="policy-updated-date">Updated: {{ policyMeta().updated_date }}</div>
+      </div>
+
+      <!-- Spacer for symmetry with the back button -->
+      <div class="header-spacer" aria-hidden="true"></div>
+    </div>
+  </header>
+
+  <!-- Main Body Layout: Fixed Sidebar on Left + Independently Scrolling Content on Right -->
+  <div class="privacy-body-wrapper">
+    @if (loading()) {
+      <div class="privacy-loading-state">
+        <div class="loading-shimmer-title"></div>
+        <div class="loading-shimmer-line"></div>
+        <div class="loading-shimmer-line short"></div>
+        <div class="loading-grid">
+          <div class="loading-sidebar"></div>
+          <div class="loading-content"></div>
+        </div>
+      </div>
+    } @else {
+      <!-- Left Fixed & Independently Scrollable Sidebar -->
+      <aside class="privacy-sidebar" aria-label="Table of contents">
+        <nav class="toc-nav">
+          <ul class="toc-list">
+            @for (section of sections(); track section.order) {
+              <li class="toc-item">
+                <button
+                  type="button"
+                  class="toc-link"
+                  [class.is-active]="activeSectionOrder() === section.order"
+                  (click)="scrollToSection(section.order)"
+                  [attr.aria-current]="activeSectionOrder() === section.order ? 'true' : null"
+                >
+                  <span class="toc-order">{{ section.order }}.</span>
+                  <span class="toc-text">{{ section.title }}</span>
+                </button>
+              </li>
+            }
+
+            @if (hasConfigurations()) {
+              <li class="toc-item">
+                <button
+                  type="button"
+                  class="toc-link"
+                  [class.is-active]="activeSectionOrder() === 'configurations'"
+                  (click)="scrollToConfigurations()"
+                  [attr.aria-current]="activeSectionOrder() === 'configurations' ? 'true' : null"
+                >
+                  <span class="toc-order">{{ sections().length + 1 }}.</span>
+                  <span class="toc-text">Configurations</span>
+                </button>
+              </li>
+            }
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Right Independently Scrollable Content Area -->
+      <main class="privacy-content-main-scroll" #contentContainer>
+        <article class="privacy-content-main">
+          <!-- Introductory Statement -->
+          @if (policyMeta().intro) {
+            <section class="policy-intro-section">
+              <p class="intro-paragraph">{{ policyMeta().intro }}</p>
+            </section>
+          }
+
+          <!-- Dynamically Rendered Policy Sections -->
+          @for (section of sections(); track section.order) {
+            <section
+              class="policy-section"
+              [id]="'section-' + section.order"
+              [attr.data-section-order]="section.order"
+            >
+              <h2 class="section-title">
+                {{ section.order }}. {{ section.title }}
+              </h2>
+
+              @if (section.description) {
+                <p class="section-description">{{ section.description }}</p>
+              }
+
+              @if (section.items && section.items.length > 0) {
+                <ul class="section-items-list">
+                  @for (item of section.items; track item) {
+                    <li class="section-item">{{ item }}</li>
+                  }
+                </ul>
+              }
+
+              @if (section.subtext) {
+                <p class="section-subtext">{{ section.subtext }}</p>
+              }
+            </section>
+          }
+
+          <!-- Configurations Section -->
+          @if (hasConfigurations()) {
+            <section
+              class="policy-section configurations-section"
+              id="section-configurations"
+              data-section-order="configurations"
+            >
+              <h2 class="section-title">
+                {{ sections().length + 1 }}. Configurations
+              </h2>
+              <p class="section-description">
+                Current operational parameters and system limits configured for KAI across integrated services:
+              </p>
+
+              <div class="config-categories-list">
+                @for (category of configCategories(); track category) {
+                  <div class="config-category-card">
+                    <div class="config-category-header">
+                      <span class="category-badge">{{ category }}</span>
+                      <h3 class="category-title">{{ formatCategoryTitle(category) }}</h3>
+                    </div>
+
+                    <div class="config-table-wrapper">
+                      <table class="config-table">
+                        <thead>
+                          <tr>
+                            <th scope="col" class="th-key">Key</th>
+                            <th scope="col" class="th-value">Value</th>
+                            <th scope="col" class="th-desc">Description</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (item of configurations()[category]; track item.key) {
+                            <tr class="config-row">
+                              <td class="td-key">
+                                <code class="config-key-code">{{ item.key }}</code>
+                              </td>
+                              <td class="td-value">
+                                <span class="config-value-pill">{{ item.value }}</span>
+                              </td>
+                              <td class="td-desc">
+                                <span class="config-desc-text">{{ item.description }}</span>
+                              </td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
+          }
+        </article>
+      </main>
+    }
+  </div>
+</div>

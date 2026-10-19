@@ -1,0 +1,20 @@
+<div class="welcome-page-container">
+  <app-welcome-state
+    id="tour-welcome"
+    [userName]="chatState.userInfo.name"
+    [avatarUrl]="chatState.userInfo.avatar ?? null"
+    [cards]="currentCards"
+    (cardClicked)="handleCardClick($event)"
+    (categoryPillClicked)="handleCategoryPillClick($event)"
+  >
+    <div class="welcome-composer-section">
+      <app-prompt-composer
+        class="composer-wrapper"
+        [isWelcomePage]="true"
+      ></app-prompt-composer>
+      <div class="mobile-welcome-disclaimer">
+        K-AI is AI-powered. double-check for accuracy.
+      </div>
+    </div>
+  </app-welcome-state>
+</div>

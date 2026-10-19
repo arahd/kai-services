@@ -1,0 +1,28 @@
+<header class="chatbot-header">
+  <div class="header-left">
+    @if (isMobile) {
+    <button class="menu-button" (click)="onMenuClick()" aria-label="Open sidebar" type="button">
+      <app-chat-icon name="menu" width="22" height="22"></app-chat-icon>
+    </button>
+    }
+    <div class="greeting">
+      <h1 class="header-title">
+        {{ greeting }},
+        {{ capitalizeFirstLetter(userInfo?.name?.split(".")[0]) || "" }} !
+      </h1>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="theme-controls-pill">
+      <button class="icon-btn" [class.active]="theme === 'light'" (click)="setTheme('light')" aria-label="Light mode" type="button">
+        <app-chat-icon name="sun" width="16" height="16"></app-chat-icon>
+      </button>
+      <button class="icon-btn" [class.active]="theme === 'system'" (click)="setTheme('system')" aria-label="System preference" type="button">
+        <app-chat-icon name="monitor" width="16" height="16"></app-chat-icon>
+      </button>
+      <button class="icon-btn" [class.active]="theme === 'dark'" (click)="setTheme('dark')" aria-label="Dark mode" type="button">
+        <app-chat-icon name="moon" width="16" height="16"></app-chat-icon>
+      </button>
+    </div>
+  </div>
+</header>

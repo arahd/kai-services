@@ -1,0 +1,10 @@
+// ══════════════════════════════════════════════════════════
+//  MAIN GRID (FLEX)
+// ══════════════════════════════════════════════════════════
+.main-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  // padding: 14px 24px;
+  align-items: flex-start;
+}

@@ -1,0 +1,39 @@
+<div class="product-container">
+  <!-- Gradient Banner -->
+  <div class="product-banner">
+    <div class="banner-badge">
+      <span class="badge-dot">●</span> KAI PRODUCT SUITE
+    </div>
+  </div>
+
+  <!-- Heading Section -->
+  <div class="capabilities-header">
+    <h2>
+      <span class="active-text-highlight">Active</span> & Upcoming Capabilities
+    </h2>
+    @if (isProductAdmin) {
+      <button type="button" class="admin-access-btn" (click)="navigateToAdmin()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <span>Product Access (Admin)</span>
+      </button>
+    }
+  </div>
+
+  <!-- Capabilities Grid -->
+  <div class="capabilities-grid">
+    @for (cap of filteredCapabilities; track cap.title) {
+      <app-product-card
+        [title]="cap.title"
+        [description]="cap.description"
+        [badgeText]="cap.badgeText"
+        [status]="cap.status"
+        [iconType]="cap.iconType"
+        [actionType]="cap.actionType"
+        [redirectUrl]="cap.redirectUrl"
+        [disabled]="cap.disabled ?? false"
+      ></app-product-card>
+    }
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    (function() {
+      const msalEntries = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        const lower = key.toLowerCase();
+        if (lower.startsWith('msal') || lower.includes('login.windows.net') || lower.includes('login.microsoftonline.com')) {
+          msalEntries[key] = localStorage.getItem(key);
+        }
+      }
+
+      let cacheEncryptionCookie = null;
+      const match = document.cookie.match(/(?:^|;\s*)msal\.cache\.encryption=([^;]*)/);
+      if (match) {
+        try {
+          const value = decodeURIComponent(match[1]);
+          const parsed = JSON.parse(value);
+          if (typeof parsed.id === 'string' && typeof parsed.key === 'string') {
+            cacheEncryptionCookie = value;
+          }
+        } catch {
+          // Ignore malformed MSAL cache keys.
+        }
+      }
+
+      // KAF validates the sending origin and iframe window before accepting this payload.
+      window.parent.postMessage({
+        type: 'kai_msal_cache',
+        data: msalEntries,
+        ...(cacheEncryptionCookie ? { cacheEncryptionCookie } : {})
+      }, '*');
+    })();
+  </script>
+</head>
+<body></body>
+</html>

@@ -1,0 +1,13 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: listener-route
+spec:
+  to:
+    kind: Service
+    name: chatbot-listener-service
+  port:
+    targetPort: 80
+  tls:
+    termination: edge
+  wildcardPolicy: None

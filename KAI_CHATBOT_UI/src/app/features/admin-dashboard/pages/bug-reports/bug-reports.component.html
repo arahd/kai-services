@@ -1,0 +1,611 @@
+<div class="admin-dashboard">
+  <header class="dashboard-header">
+    <div class="header-main">
+      <div class="title-group">
+        <h1>Bug Reports Dashboard</h1>
+        <p class="subtitle">Monitor, investigate, and resolve issues reported by chatbot users</p>
+      </div>
+    </div>
+
+    <div class="stats-overview">
+      <div class="stat-card stat-card--total">
+        <div class="stat-icon total">
+          <svg
+            width="46"
+            height="46"
+            viewBox="0 0 46 46"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <rect width="45.2028" height="45.2028" rx="11.3764" fill="#EDF7F1" />
+            <path
+              d="M22.6014 30.0848V21.666"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M24.4723 17.9243C25.4646 17.9243 26.4163 18.3185 27.118 19.0202C27.8197 19.7219 28.2139 20.6736 28.2139 21.666V24.4722C28.2139 25.9608 27.6226 27.3883 26.5701 28.4409C25.5175 29.4934 24.0899 30.0847 22.6014 30.0847C21.1129 30.0847 19.6853 29.4934 18.6328 28.4409C17.5802 27.3883 16.9889 25.9608 16.9889 24.4722V21.666C16.9889 20.6736 17.3831 19.7219 18.0848 19.0202C18.7865 18.3185 19.7382 17.9243 20.7306 17.9243H24.4723Z"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M24.5846 15.0057L26.3432 13.2471"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M31.0205 31.02C31.0216 30.0577 30.6519 29.1319 29.9882 28.4351C29.3245 27.7383 28.4178 27.324 27.4566 27.2783"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M31.0203 16.0537C31.0193 16.9724 30.6803 17.8587 30.0679 18.5435C29.4555 19.2284 28.6125 19.664 27.6996 19.7673"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M31.9556 23.5371H28.2139"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M14.1827 31.02C14.1816 30.0577 14.5513 29.1319 15.215 28.4351C15.8787 27.7383 16.7854 27.324 17.7466 27.2783"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M14.1826 16.0537C14.1837 16.9724 14.5227 17.8587 15.1351 18.5435C15.7475 19.2284 16.5905 19.664 17.5034 19.7673"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M16.9889 23.5371H13.2472"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M18.8597 13.2471L20.6183 15.0057"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M19.7952 18.0459V16.9889C19.7952 16.2446 20.0908 15.5308 20.6171 15.0045C21.1434 14.4783 21.8572 14.1826 22.6014 14.1826C23.3457 14.1826 24.0595 14.4783 24.5857 15.0045C25.112 15.5308 25.4077 16.2446 25.4077 16.9889V18.0459"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <span class="stat-label">Total Reports</span>
+        <span class="stat-value">{{ totalReports }}</span>
+      </div>
+      <div class="stat-card stat-card--open">
+        <div class="stat-icon open">
+          <svg width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="45.2028" height="45.2028" rx="11.3764" fill="#EDF7F1" />
+            <path
+              d="M16.989 24.4723L18.3921 21.7596C18.5446 21.4566 18.7767 21.2009 19.0634 21.0196C19.3501 20.8384 19.6806 20.7385 20.0197 20.7306H30.0848M30.0848 20.7306C30.3706 20.7301 30.6527 20.7951 30.9095 20.9206C31.1663 21.0461 31.3909 21.2287 31.5661 21.4545C31.7413 21.6803 31.8625 21.9432 31.9203 22.2231C31.9781 22.503 31.971 22.7924 31.8995 23.0692L30.459 28.6817C30.3548 29.0854 30.1187 29.4427 29.7882 29.6969C29.4577 29.9511 29.0518 30.0876 28.6349 30.0848H15.1181C14.622 30.0848 14.1461 29.8877 13.7953 29.5368C13.4444 29.186 13.2473 28.7101 13.2473 28.214V16.0535C13.2473 15.5574 13.4444 15.0815 13.7953 14.7307C14.1461 14.3798 14.622 14.1827 15.1181 14.1827H18.7663C19.0792 14.1796 19.3878 14.2551 19.664 14.4022C19.9402 14.5493 20.175 14.7632 20.3471 15.0246L21.1048 16.1471C21.2752 16.4058 21.5071 16.6181 21.7797 16.765C22.0524 16.912 22.3572 16.9889 22.667 16.989H28.214C28.7102 16.989 29.186 17.1861 29.5369 17.5369C29.8877 17.8878 30.0848 18.3636 30.0848 18.8598V20.7306Z"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <span class="stat-label">Open</span>
+        <span class="stat-value">{{ openCount }}</span>
+      </div>
+      <div class="stat-card stat-card--investigation">
+        <div class="stat-icon investigation">
+          <svg width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="45.2028" height="45.2028" rx="11.3764" fill="#EDF7F1" />
+            <path
+              d="M21.666 29.1493C25.7989 29.1493 29.1493 25.7989 29.1493 21.666C29.1493 17.533 25.7989 14.1826 21.666 14.1826C17.533 14.1826 14.1826 17.533 14.1826 21.666C14.1826 25.7989 17.533 29.1493 21.666 29.1493Z"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M31.0201 31.0194L26.9978 26.9971"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <span class="stat-label">Investigating</span>
+        <span class="stat-value">{{ investigationCount }}</span>
+      </div>
+      <div class="stat-card stat-card--closed">
+        <div class="stat-icon closed">
+          <svg width="47" height="47" viewBox="0 0 47 47" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="46.9954" height="46.9954" rx="12.2727" fill="#EDF7F1" />
+            <path
+              d="M32.6657 21.6262C33.0929 23.7227 32.7885 25.9024 31.8032 27.8016C30.8178 29.7008 29.2112 31.2049 27.2511 32.0629C25.291 32.9209 23.0961 33.0811 21.0322 32.5166C18.9684 31.9522 17.1605 30.6973 15.9099 28.9612C14.6593 27.2251 14.0417 25.1127 14.1601 22.9763C14.2785 20.84 15.1256 18.8088 16.5604 17.2215C17.9951 15.6341 19.9306 14.5866 22.0442 14.2536C24.1577 13.9207 26.3215 14.3223 28.1748 15.3916"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M20.6914 22.5616L23.4977 25.3678L32.8518 16.0137"
+              stroke="#49AB74"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <span class="stat-label">Closed</span>
+        <span class="stat-value">{{ closedCount }}</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-content">
+    <section class="content-card">
+      <div class="card-header">
+        <div class="card-header-title">
+          <h2>Reported Tickets</h2>
+        </div>
+
+        <div class="card-header-filters">
+          <div class="search-field" [class.is-disabled]="loading">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z"
+                stroke="currentColor"
+                stroke-width="1.25"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M14 14L11.1 11.1"
+                stroke="currentColor"
+                stroke-width="1.25"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <input
+              type="search"
+              [ngModel]="searchQuery"
+              (ngModelChange)="onSearchChange($event)"
+              placeholder="Search..."
+              aria-label="Search bug reports"
+              [disabled]="loading"
+            />
+          </div>
+
+          <select
+            class="status-filter-select"
+            [(ngModel)]="statusFilter"
+            (ngModelChange)="onStatusFilterChange()"
+            aria-label="Filter by status"
+            [disabled]="loading"
+          >
+            <option value="">Sort by: All</option>
+            <option value="open">Sort by: Open</option>
+            <option value="Investigation">Sort by: Investigating</option>
+            <option value="closed">Sort by: Closed</option>
+          </select>
+
+          @if (searchQuery || statusFilter) {
+            <button
+              type="button"
+              class="filter-btn filter-btn--ghost"
+              (click)="clearFilters()"
+              [disabled]="loading"
+            >
+              Clear
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="table-card-body" [class.is-loading]="loading">
+        @if (loading) {
+          <div
+            class="table-loading-overlay"
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+          >
+            <span class="loader"></span>
+            <p>Fetching bug reports...</p>
+          </div>
+        }
+
+        @if (!loading && bugReports.length === 0) {
+        <div class="empty-state">
+          <span class="empty-icon">📂</span>
+          @if (searchQuery || statusFilter) {
+            <p>No bug reports match your current filters.</p>
+          } @else {
+            <p>No bug reports found for bot type: <strong>{{ botType }}</strong></p>
+          }
+        </div>
+      } @else if (bugReports.length > 0) {
+        <div class="table-container" [class.is-dimmed]="loading">
+          <table class="tickets-table">
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Issue</th>
+                <th>Reporter</th>
+                <th>Date</th>
+                <th>Attachment</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (bug of bugReports; track bug.ticket_number) {
+                <tr [class.row-updating]="updatingStatus[bug.ticket_number]">
+                  <td>
+                    <span class="ticket-id">{{ bug.ticket_number }}</span>
+                  </td>
+                  <td>
+                    <div class="issue-cell">
+                      <div class="issue-title" [title]="bug.bug_name">{{ bug.bug_name }}</div>
+                      <div class="issue-description-container">
+                        <div class="issue-description">
+                          @if (bug.description) {
+                            {{ isExpanded(bug.ticket_number) ? bug.description : (bug.description | slice:0:80) }}
+                          } @else {
+                            No description provided
+                          }
+                        </div>
+                        @if (bug.description && bug.description.length > 80) {
+                          <button
+                            type="button"
+                            class="read-more-btn"
+                            (click)="toggleDescription(bug.ticket_number)"
+                            [disabled]="loading"
+                          >
+                            {{ isExpanded(bug.ticket_number) ? 'Show Less' : 'Read More' }}
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="reporter-name" [title]="bug.created_by">{{ bug.created_by }}</span>
+                  </td>
+                  <td>
+                    <div class="date-cell">
+                      <span class="date-part">{{ formatReportDate(bug.created_at) }}</span>
+                      <span class="time-part">{{ formatReportTime(bug.created_at) }}</span>
+                    </div>
+                  </td>
+                  <td class="attachment-cell">
+                    @if (hasAttachments(bug)) {
+                      @if (bug.attachments.length === 1 && fetchingAttachment[bug.attachments[0].id]) {
+                        <span class="loader-tiny" title="Loading attachment..."></span>
+                      } @else {
+                        <button
+                          type="button"
+                          class="attachment-badge-btn"
+                          (click)="openAttachments(bug)"
+                          [title]="getAttachmentLabel(bug)"
+                          [disabled]="loading || (bug.attachments.length === 1 && fetchingAttachment[bug.attachments[0].id])"
+                        >
+                          <svg
+                            width="57"
+                            height="24"
+                            viewBox="0 0 57 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                          >
+                            <rect width="56.3438" height="24" rx="8" fill="#EBFFF4" />
+                            <path
+                              d="M14.6172 16.1261L18.5002 12.1501"
+                              stroke="#49AB74"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M15.9998 9.00006L11.7928 13.2931C11.6053 13.4806 11.5 13.7349 11.5 14.0001C11.5 14.2652 11.6053 14.5195 11.7928 14.7071C11.9803 14.8945 12.2346 14.9998 12.4998 14.9998C12.7649 14.9998 13.0192 14.8945 13.2068 14.7071L17.4138 10.4141C17.7887 10.039 17.9993 9.53039 17.9993 9.00006C17.9993 8.46973 17.7887 7.96112 17.4138 7.58606C17.0387 7.21112 16.5301 7.00049 15.9998 7.00049C15.4694 7.00049 14.9608 7.21112 14.5858 7.58606L10.3783 11.8786C9.81561 12.4412 9.49951 13.2043 9.49951 14.0001C9.49951 14.7958 9.81561 15.5589 10.3783 16.1216C10.9409 16.6842 11.704 17.0003 12.4998 17.0003C13.2955 17.0003 14.0586 16.6842 14.6213 16.1216"
+                              stroke="#49AB74"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M25.2743 16.6667L22.3823 8.02666H23.4923L26.0063 15.5327L28.5443 8.02666H29.6543L26.7623 16.6667H25.2743ZM30.4424 9.04066V7.93666H31.5104V9.04066H30.4424ZM30.4424 16.6667V10.1867H31.5104V16.6667H30.4424ZM36.1187 16.8467C35.4827 16.8467 34.9267 16.7067 34.4507 16.4267C33.9787 16.1427 33.6107 15.7487 33.3467 15.2447C33.0827 14.7367 32.9507 14.1447 32.9507 13.4687C32.9507 12.7607 33.0807 12.1487 33.3407 11.6327C33.6007 11.1127 33.9627 10.7127 34.4267 10.4327C34.8947 10.1487 35.4427 10.0067 36.0707 10.0067C36.7227 10.0067 37.2767 10.1567 37.7327 10.4567C38.1927 10.7567 38.5367 11.1847 38.7647 11.7407C38.9967 12.2967 39.0967 12.9587 39.0647 13.7267H37.9847V13.3427C37.9727 12.5467 37.8107 11.9527 37.4987 11.5607C37.1867 11.1647 36.7227 10.9667 36.1067 10.9667C35.4467 10.9667 34.9447 11.1787 34.6007 11.6027C34.2567 12.0267 34.0847 12.6347 34.0847 13.4267C34.0847 14.1907 34.2567 14.7827 34.6007 15.2027C34.9447 15.6227 35.4347 15.8327 36.0707 15.8327C36.4987 15.8327 36.8707 15.7347 37.1867 15.5387C37.5027 15.3427 37.7507 15.0607 37.9307 14.6927L38.9567 15.0467C38.7047 15.6187 38.3247 16.0627 37.8167 16.3787C37.3127 16.6907 36.7467 16.8467 36.1187 16.8467ZM33.7247 13.7267V12.8687H38.5127V13.7267H33.7247ZM41.5462 16.6667L39.5662 10.1807L40.6282 10.1867L42.0742 14.9267L43.5322 10.1867H44.4742L45.9262 14.9267L47.3782 10.1867H48.4342L46.4542 16.6667H45.5662L44.0002 11.7407L42.4342 16.6667H41.5462Z"
+                            fill="#49AB74"
+                          />
+                        </svg>
+                      </button>
+                    }
+                  } @else {
+                    <span class="no-attachment">—</span>
+                  }
+                </td>
+                  <td class="status-cell">
+                    <div class="status-select-wrapper">
+                      @if (updatingStatus[bug.ticket_number]) {
+                        <span class="loader-tiny"></span>
+                      } @else {
+                        <div
+                          class="status-dropdown"
+                          [class.is-open]="isStatusMenuOpen(bug.ticket_number)"
+                        >
+                          <button
+                            type="button"
+                            class="status-select-pill"
+                            [class.open]="bug.status === 'open'"
+                            [class.investigation]="bug.status === 'Investigation'"
+                            [class.closed]="bug.status === 'closed'"
+                            (click)="toggleStatusMenu(bug.ticket_number, $event)"
+                            [attr.aria-expanded]="isStatusMenuOpen(bug.ticket_number)"
+                            [attr.aria-label]="'Status for ' + bug.ticket_number"
+                            [disabled]="loading"
+                          >
+                            <span>{{ getStatusLabel(bug.status) }}</span>
+                            <svg
+                              class="status-chevron"
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              aria-hidden="true"
+                            >
+                              <path
+                                d="M6 9L12 15L18 9"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+                          </button>
+                          @if (isStatusMenuOpen(bug.ticket_number)) {
+                            <ul class="status-dropdown-menu" role="listbox">
+                              @for (option of statusOptions; track option.value) {
+                                <li role="option">
+                                  <button
+                                    type="button"
+                                    class="status-dropdown-option"
+                                    [class.active]="bug.status === option.value"
+                                    (click)="selectStatus(bug, option.value, $event)"
+                                  >
+                                    {{ option.label }}
+                                  </button>
+                                </li>
+                              }
+                            </ul>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (bugReports.length > 0) {
+          <div class="table-pagination" [class.is-dimmed]="loading">
+            <button
+              type="button"
+              class="pagination-nav-btn"
+              [disabled]="page <= 1 || loading"
+              (click)="goToPage(page - 1)"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M10 12L6 8L10 4"
+                  stroke="currentColor"
+                  stroke-width="1.25"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Back
+            </button>
+
+            @for (pageNum of paginationPages; track pageNum) {
+              <button
+                type="button"
+                class="pagination-page-btn"
+                [class.active]="pageNum === page"
+                [disabled]="loading"
+                (click)="goToPage(pageNum)"
+              >
+                {{ pageNum }}
+              </button>
+            }
+
+            <button
+              type="button"
+              class="pagination-nav-btn"
+              [disabled]="page >= totalPages || loading"
+              (click)="goToPage(page + 1)"
+            >
+              Next
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M6 4L10 8L6 12"
+                  stroke="currentColor"
+                  stroke-width="1.25"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        }
+      }
+      </div>
+    </section>
+  </main>
+
+  @if (attachmentPickerBug) {
+    <div class="preview-modal-overlay" (click)="closeAttachmentPicker()">
+      <div class="attachment-picker-modal" (click)="$event.stopPropagation()">
+        <div class="attachment-picker-header">
+          <h3>Attachments ({{ attachmentPickerBug.attachments.length }})</h3>
+          <button type="button" class="action-btn close-btn" (click)="closeAttachmentPicker()">&times;</button>
+        </div>
+        <ul class="attachment-picker-list">
+          @for (attachment of attachmentPickerBug.attachments; track attachment.id) {
+            <li>
+              <button
+                type="button"
+                class="attachment-picker-item"
+                (click)="openPreview(attachment)"
+                [disabled]="fetchingAttachment[attachment.id]"
+              >
+                <span class="attachment-picker-name" [title]="attachment.file_name">{{ attachment.file_name }}</span>
+                <span class="attachment-picker-right">
+                  @if (fetchingAttachment[attachment.id]) {
+                    <span class="loader-tiny"></span>
+                  } @else {
+                    <span class="attachment-picker-size">{{ formatBytes(attachment.file_size) }}</span>
+                  }
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+
+  <!-- File Preview Modal Overlay -->
+  @if (previewAttachment) {
+    <div class="preview-modal-overlay" (click)="closeFilePreview()">
+      <div class="preview-modal-container" (click)="$event.stopPropagation()">
+        <!-- Modal Header -->
+        <div class="preview-modal-header">
+          <div class="preview-file-info">
+            <span class="preview-file-icon">
+              @if (isPreviewImage) {
+                🖼️
+              } @else if (isPreviewPdf) {
+                📄
+              } @else if (isPreviewText) {
+                📝
+              } @else {
+                📦
+              }
+            </span>
+            <span class="preview-file-name" [title]="previewAttachment.file_name">{{
+              previewAttachment.file_name
+            }}</span>
+          </div>
+          <div class="preview-modal-actions">
+            @if (previewFileUrl) {
+              <a
+                [href]="previewFileUrl"
+                [download]="previewAttachment.file_name"
+                class="action-btn download-btn"
+                title="Download File"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+              </a>
+            }
+            <button
+              class="action-btn close-btn"
+              (click)="closeFilePreview()"
+              title="Close Preview"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="preview-modal-body">
+          @if (isPreviewImage) {
+            <div class="preview-content-image">
+              <img [src]="previewFileUrl" alt="Image Preview" />
+            </div>
+          } @else if (isPreviewPdf) {
+            <div class="preview-content-pdf">
+              <iframe
+                [src]="safePreviewUrl"
+                width="100%"
+                height="100%"
+                frameborder="0"
+              ></iframe>
+            </div>
+          } @else if (isPreviewText) {
+            <div class="preview-content-text">
+              <pre><code>{{ previewTextContent }}</code></pre>
+            </div>
+          } @else {
+            <div class="preview-content-fallback">
+              <div class="fallback-card">
+                <div class="fallback-icon">
+                  <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                    ></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
+                <h3>No Preview Available</h3>
+                <p>
+                  This file type cannot be previewed inline.
+                </p>
+                @if (previewFileUrl && previewAttachment) {
+                  <button
+                    type="button"
+                    class="premium-download-link"
+                    (click)="downloadAttachment(previewAttachment)"
+                  >
+                    Download to view
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

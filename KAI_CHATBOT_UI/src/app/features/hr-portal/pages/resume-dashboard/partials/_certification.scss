@@ -1,0 +1,135 @@
+// ══════════════════════════════════════════════════════════
+//  CERTIFICATION REDESIGN
+// ══════════════════════════════════════════════════════════
+
+.certification-card {
+  grid-column: span 2; // Span across main grid if needed
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  font-family: "Manrope", sans-serif;
+
+  &__header {
+    padding: 16px 20px;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  &__content {
+    padding: 0;
+  }
+}
+
+.cert-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead tr {
+    background: #fff;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  th {
+    padding: 12px 20px;
+    text-align: left;
+    letter-spacing: 0.03em;
+    color: #6a7282;
+    font-family: Manrope;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px; /* 133.333% */
+    text-transform: uppercase;
+  }
+
+  td {
+    padding: 14px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 14px;
+    color: #4b5563;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  &__name {
+    color: #101828;
+    font-family: Manrope;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px; /* 142.857% */
+  }
+
+  .cert-table__type {
+    color: #4a5565;
+    font-family: Manrope;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px; /* 142.857% */
+  }
+
+  .cert-table__candidate {
+    font-family: Manrope;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px; /* 142.857% */
+
+    &.not-held {
+      color: #e7000b;
+    }
+
+    &.held {
+      color: #096;
+    }
+  }
+}
+
+.cert-status {
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 4px 10px;
+  display: inline-block;
+
+  &--present {
+    background: #ecfdf5;
+    color: #008236;
+  }
+
+  &--missing {
+    background: #fef2f2;
+    color: #c10007;
+  }
+}
+
+.cert-recommendation {
+  padding: 20px;
+
+  &__box {
+    background: #eff6ff; // Light blue
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: #3b82f6;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.5;
+  }
+}
+
+.cert-empty {
+  padding: 24px;
+  text-align: center;
+  color: #9ca3af;
+  font-style: italic;
+}

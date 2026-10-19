@@ -1,0 +1,60 @@
+# Environment variables required to run inactive_endchat.py
+
+This file lists environment variables used by `inactive_endchat.py`, example values, and short descriptions.
+
+Variables:
+
+1) AZURE_TENENT_ID
+   - Example: 12345678-90ab-cdef-1234-567890abcdef
+   - Purpose: Azure AD tenant (directory) ID for ClientSecretCredential.
+   - Note: The script currently expects the variable name spelled `AZURE_TENENT_ID` (typo in the code). If you prefer the correct spelling (`AZURE_TENANT_ID`), update the script accordingly.
+
+2) AZURE_CLIENT_ID
+   - Example: abcd1234-ab12-34cd-56ef-abcdef123456
+   - Purpose: Azure AD application (client) ID for ClientSecretCredential.
+
+3) AZURE_CLIENT_SECRET
+   - Example: s3cr3tValueGoesHere
+   - Purpose: Client secret for the Azure AD app.
+
+4) AD_SCOPE
+   - Example: https://management.azure.com/.default
+   - Purpose: The scope to request an access token for (passed to credential.get_token).
+
+5) INACTIVE_ENDPOINT_DEV
+   - Example: https://example.com/api/inactive-endpoint
+   - Purpose: The API endpoint the script calls to trigger end-chat actions.
+
+Usage examples
+
+- Windows cmd (one-time set for current session):
+
+  set AZURE_TENENT_ID=12345678-90ab-cdef-1234-567890abcdef
+  set AZURE_CLIENT_ID=abcd1234-ab12-34cd-56ef-abcdef123456
+  set AZURE_CLIENT_SECRET=s3cr3tValueGoesHere
+  set AD_SCOPE=https://management.azure.com/.default
+  set INACTIVE_ENDPOINT_DEV=https://example.com/api/inactive-endpoint
+
+- PowerShell (session):
+
+  $env:AZURE_TENENT_ID = "12345678-90ab-cdef-1234-567890abcdef"
+  $env:AZURE_CLIENT_ID = "abcd1234-ab12-34cd-56ef-abcdef123456"
+  $env:AZURE_CLIENT_SECRET = "s3cr3tValueGoesHere"
+  $env:AD_SCOPE = "https://management.azure.com/.default"
+  $env:INACTIVE_ENDPOINT_DEV = "https://example.com/api/inactive-endpoint"
+
+- .env file (if you use a loader like python-dotenv):
+
+  AZURE_TENENT_ID=12345678-90ab-cdef-1234-567890abcdef
+  AZURE_CLIENT_ID=abcd1234-ab12-34cd-56ef-abcdef123456
+  AZURE_CLIENT_SECRET=s3cr3tValueGoesHere
+  AD_SCOPE=https://management.azure.com/.default
+  INACTIVE_ENDPOINT_DEV=https://example.com/api/inactive-endpoint
+
+Security notes
+
+- Do not commit secrets (like `AZURE_CLIENT_SECRET`) to source control. Use secure secret stores (Azure Key Vault, environment variables in CI/CD, Windows Secret Manager) for production.
+
+- Consider fixing the environment variable typo in the script from `AZURE_TENENT_ID` to `AZURE_TENANT_ID` and updating the README accordingly.
+
+That's it. Save this file in the project root and use it to set environment variables before running the script.

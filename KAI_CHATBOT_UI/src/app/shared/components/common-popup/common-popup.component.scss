@@ -1,0 +1,129 @@
+@use '../../../../styles/mixins' as *;
+
+.popup-overlay {
+  @include overlay-backdrop($bg: rgba(0, 0, 0, 0.55), $blur: 0, $z: 9000);
+  animation: fadeIn 0.2s ease-in;
+}
+
+.popup-box {
+  background: #fff;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: popUp 0.25s ease-out;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  //   background: linear-gradient(90deg, #0078d7, #00b4d8);
+  color: rgb(0, 0, 0);
+
+  h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .close-btn {
+    background: transparent;
+    border: none;
+    color: rgb(0, 0, 0);
+    font-size: 22px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: rotate(90deg);
+    }
+  }
+}
+
+.popup-body {
+  padding: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+
+  p {
+    color: #333;
+    line-height: 1.5;
+  }
+
+  .popup-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+
+    h4.break-word {
+      color: #0078d7;
+      margin: 4px 0;
+      font-size: 15px;
+      font-weight: 500;
+      word-break: break-all;
+
+      a {
+        color: #0078d7;
+        text-decoration: none;
+        word-break: break-all;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .context-group {
+      margin-top: 8px;
+      border-top: 1px solid #e0e0e0;
+      padding-top: 8px;
+    }
+
+    .context {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.4;
+      margin-bottom: 6px;
+    }
+  }
+}
+
+.popup-footer {
+  padding: 10px 20px;
+  text-align: right;
+
+  .btn-close {
+    background: #0078d7;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: #005fa3;
+    }
+  }
+}
+
+@include anim-fade-in;
+
+@keyframes popUp {
+  from {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

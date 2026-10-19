@@ -1,0 +1,13 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: listener-route-sbx
+spec:
+  to:
+    kind: Service
+    name: chatbot-listener-service-sbx
+  port:
+    targetPort: 5000
+  tls:
+    termination: edge
+  wildcardPolicy: None

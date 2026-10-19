@@ -1,0 +1,1051 @@
+{
+  "chatbotUrl": "https://kai-uat.kumaran.ai/conversation",
+  "azureUrl": "https://kai-uat.kumaran.ai",
+   "azureAd": {
+    "clientId": "5c250777-4dad-4f93-9ee7-87a178d1abae",
+    "tenantId": "fce643da-bde9-4d38-a1ab-31e13fb799c0",
+    "redirectUri": "http://localhost:4200",
+    "scopes": "kai.user"
+  }
+}
+
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, from, Observable } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
+import { ConfigService } from '../ConfigService';
+import { AzureAdService } from '../auth/azure-ad.service';
+
+// Interfaces
+export interface PendingUser {
+  _id: number;
+  email: string;
+  approved: string;
+  models: { _id: number; model_name: string }[];
+}
+
+export interface RegisteredUserModel {
+  _id: number;
+  model_name: string;
+}
+
+export interface RegisteredUser {
+  email: string;
+  name?: string;
+  models?: RegisteredUserModel[];
+  approved_time?: string;
+}
+
+export interface ApprovePayload {
+  email: string;
+  approved: 'yes' | 'no';
+  models: string[];
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ChatService {
+  private firstQuestionSource = new BehaviorSubject<string>('');
+  firstQuestion$ = this.firstQuestionSource.asObservable();
+  // Draft conversation subject — used to broadcast the current (unsaved) conversation
+  private draftConvSource = new BehaviorSubject<any | null>(null);
+  draftConv$ = this.draftConvSource.asObservable();
+
+  constructor(private http: HttpClient, private configService: ConfigService, private azureAdService: AzureAdService) { }
+
+  private async refreshTokenAndRetry<T>(callback: (token: string) => Promise<T>): Promise<T> {
+    const newToken = await this.azureAdService.getValidToken();
+    sessionStorage.setItem('jwt_token', newToken);
+    return callback(newToken);
+  }
+
+  sendFirstQuestion(message: string) {
+    this.firstQuestionSource.next(message);
+  }
+
+  /**
+   * Broadcasts a draft (in-memory) conversation so other components (eg. sidenav)
+   * can keep a live copy while the conversation isn't yet persisted to backend.
+   */
+  updateDraftConversation(conv: any | null) {
+    this.draftConvSource.next(conv);
+  }
+
+  sendMessage(payload: { language_type: string; query: string; bot_type: string; userId: string }): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(() => {
+        const url = `${this.configService.getChatbotUrl()}/chatservice`;
+        const token = sessionStorage.getItem('jwt_token') || '';
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
+        return this.http.post(url, payload, { headers }).pipe(
+          catchError((err) => {
+            if (err.status === 401) {
+              console.warn('🔄 Token expired, refreshing...');
+              return from(
+                this.refreshTokenAndRetry(async (newToken) => {
+                  const retryHeaders = { ...headers, Authorization: `Bearer ${newToken}` };
+                  return await this.http.post(url, payload, { headers: retryHeaders }).toPromise();
+                })
+              );
+            }
+            throw err;
+          })
+        );
+      })
+    );
+  }
+
+  sendMessageStream(payload: any): Observable<string> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(() => {
+        const url = `${this.configService.getChatbotUrl()}/chatservice`;
+
+        const makeFetch = (token: string): Observable<string> => {
+          const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          };
+
+          return new Observable<string>((observer) => {
+            fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) })
+              .then(async (response) => {
+                // handle token expiry
+                if (response.status === 401) {
+                  console.warn('🔄 Stream token expired, refreshing...');
+                  await this.refreshTokenAndRetry(async (newToken) => {
+                    makeFetch(newToken).subscribe(observer);
+                    return null as any;
+                  });
+                  return;
+                }
+
+                if (!response.ok || !response.body) {
+                  throw new Error('Streaming request failed');
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                const read = () => {
+                  reader.read().then(({ done, value }) => {
+                    if (done) {
+                      observer.complete();
+                      return;
+                    }
+                    const chunk = decoder.decode(value, { stream: true });
+                    observer.next(chunk);
+                    read();
+                  });
+                };
+
+                read();
+              })
+              .catch((err) => observer.error(err));
+          });
+        };
+
+        const existingToken = sessionStorage.getItem('jwt_token') || '';
+        return makeFetch(existingToken);
+      })
+    );
+  }
+
+  // New: get conversation history with pagination
+  getConversationHistory(payload: any, page: number = 1, limit: number = 20): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/transcript/chat/history?page_number=${page}&page_size=${limit}`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  sendTokenToBackend(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(() => {
+        const url = `${this.configService.getAzureUrl()}/auth/login`;
+        return this.http.get(url);
+      })
+    );
+  }
+
+  endChat(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/conversation/endchat`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  deleteChat(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/transcript/chat/delete`;
+        const token = sessionStorage.getItem('jwt_token');
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
+        const response = await fetch(url, { method: 'DELETE', headers, body: JSON.stringify(payload) });
+        if (response.status === 401) {
+          return this.refreshTokenAndRetry(() => this.deleteChat(payload).toPromise());
+        }
+        if (!response.ok) throw new Error('Delete failed');
+        return response.json();
+      })
+    );
+  }
+
+  pinChat(conversationID: string) {
+    const payload = {
+      conversationID: conversationID,
+    };
+    return this.http.patch(`${this.configService.getAzureUrl()}/transcript/chat/pinned`, payload);
+  }
+
+  searchChat(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/transcript/chat/search`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getChatInformation(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/transcript/chat/search/result`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getSuggesstions(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/conversation/suggested-follow-ups`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  private async postWithAuth<T>(url: string, body: any): Promise<T> {
+    const token = sessionStorage.getItem('jwt_token');
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
+    const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+
+    if (response.status === 401) {
+      // 🔁 Token expired → refresh & retry
+      return this.refreshTokenAndRetry(() => this.postWithAuth<T>(url, body));
+    }
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return response.json() as Promise<T>;
+  }
+
+  requestAccess(payload: { email: string; models: Array<string> }): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(() => {
+        const url = `${this.configService.getAzureUrl()}/auth/request-access`;
+        return this.http.post(url, payload);
+      })
+    );
+  }
+
+  getAvailableModels(): Observable<string[]> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(() => {
+        const url = `${this.configService.getAzureUrl()}/auth/get-models`;
+        return this.http.get<string[]>(url);
+      })
+    );
+  }
+
+  /**
+ * Get pending users for admin approval
+ */
+  getPendingUserDetails(): Observable<PendingUser[]> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/admin/get-pending-user-details`;
+        return this.postGetWithAuth<PendingUser[]>(url, 'GET');
+      })
+    );
+  }
+
+  /**
+   * Get registered/approved users
+   */
+  getRegisteredUserDetails(): Observable<RegisteredUser[]> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/admin/get-registered-user-details`;
+        return this.postGetWithAuth<RegisteredUser[]>(url, 'GET');
+      })
+    );
+  }
+
+  /**
+   * Approve or deny user access
+   */
+  approveAccess(payload: ApprovePayload): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/admin/approve-access`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  /**
+   * Helper method for GET with auth & token refresh
+   */
+  private async postGetWithAuth<T>(url: string, method: 'GET' | 'POST'): Promise<T> {
+    const token = sessionStorage.getItem('jwt_token');
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
+    const response = await fetch(url, { method, headers });
+
+    if (response.status === 401) {
+      return this.refreshTokenAndRetry(() => this.postGetWithAuth<T>(url, method));
+    }
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    return response.json() as Promise<T>;
+  }
+
+  // Reporting: analytics (main)
+  getReportingAnalytics(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/analytics`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  // Reporting: user analytics
+  getUserAnalytics(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/get/user/analytics`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  // Reporting: search users
+  searchReportingUsers(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/get/user`;
+        // postWithAuth returns parsed json
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  // Reporting: get models
+  getReportingModels(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/get/models`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  // Reporting: model usage
+  getModelUsage(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/get/model/usage`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  // Export endpoints return XLSX blob
+  exportAllUsersXlsx(payload: any): Observable<Blob> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/get/user/all`;
+        const token = sessionStorage.getItem('jwt_token') || '';
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+        const resp = await fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) });
+        if (resp.status === 401) {
+          return this.refreshTokenAndRetry(async (newToken) => {
+            const r = await fetch(url, { method: 'POST', headers: { ...headers, Authorization: `Bearer ${newToken}` }, body: JSON.stringify(payload) });
+            return r.blob();
+          });
+        }
+        if (!resp.ok) throw new Error('Export failed');
+        return resp.blob();
+      })
+    );
+  }
+
+  exportQuestionsXlsx(payload: any): Observable<Blob> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/get/questions`;
+        const token = sessionStorage.getItem('jwt_token') || '';
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+        const resp = await fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) });
+        if (resp.status === 401) {
+          return this.refreshTokenAndRetry(async (newToken) => {
+            const r = await fetch(url, { method: 'POST', headers: { ...headers, Authorization: `Bearer ${newToken}` }, body: JSON.stringify(payload) });
+            return r.blob();
+          });
+        }
+        if (!resp.ok) throw new Error('Export failed');
+        return resp.blob();
+      })
+    );
+  }
+  /* Create client secret */
+  createClientSecret(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/auth/api-secret`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getProjectList(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/apiuser/report/projects`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  // inside ChatService class
+
+  getReportSummary(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/apiuser/report/summary`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getUserProjectList(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/apiuser/report/projects`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getMaxTokensUsed(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/apiuser/report/max_tokens_used`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getMinTokensUsed(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/apiuser/report/min_tokens_used`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getProjectNames(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/apiuser/report/projectlist`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getUsernames(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/apiuser/report/usernames`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getUserDetails(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/apiuser/report/user_details`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getUsersByProject(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/apiuser/report/users_by_project`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getRevokedUsers(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/reporting/apiuser/report/revoked`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  revokeUser(data: any): Observable<any> {
+    return this.http.post(
+      `${this.configService.getAzureUrl()}/auth/revoke_user`,
+      data
+    );
+  }
+
+  activateUser(data: any): Observable<any> {
+    return this.http.post(
+      `${this.configService.getAzureUrl()}/auth/activate_user`,
+      data
+    );
+  }
+  
+}
+
+
+
+
+dev service:
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, from, Observable } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
+import { ConfigService } from '../ConfigService';
+import { AzureAdService } from '../auth/azure-ad.service';
+
+// Interfaces
+export interface PendingUser {
+  _id: number;
+  email: string;
+  approved: string;
+  models: { _id: number; model_name: string }[];
+}
+
+export interface RegisteredUserModel {
+  _id: number;
+  model_name: string;
+}
+
+export interface RegisteredUser {
+  email: string;
+  name?: string;
+  models?: RegisteredUserModel[];
+  approved_time?: string;
+}
+
+export interface ApprovePayload {
+  email: string;
+  approved: 'yes' | 'no';
+  models: string[];
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ChatService {
+  private firstQuestionSource = new BehaviorSubject<string>('');
+  firstQuestion$ = this.firstQuestionSource.asObservable();
+  // Draft conversation subject — used to broadcast the current (unsaved) conversation
+  private draftConvSource = new BehaviorSubject<any | null>(null);
+  draftConv$ = this.draftConvSource.asObservable();
+
+  constructor(private http: HttpClient, private configService: ConfigService, private azureAdService: AzureAdService) { }
+
+  private async refreshTokenAndRetry<T>(callback: (token: string) => Promise<T>): Promise<T> {
+    const newToken = await this.azureAdService.getValidToken();
+    sessionStorage.setItem('jwt_token', newToken);
+    return callback(newToken);
+  }
+
+  sendFirstQuestion(message: string) {
+    this.firstQuestionSource.next(message);
+  }
+
+  /**
+   * Broadcasts a draft (in-memory) conversation so other components (eg. sidenav)
+   * can keep a live copy while the conversation isn't yet persisted to backend.
+   */
+  updateDraftConversation(conv: any | null) {
+    this.draftConvSource.next(conv);
+  }
+
+  sendMessage(payload: { language_type: string; query: string; bot_type: string; userId: string }): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(() => {
+        const url = `${this.configService.getChatbotUrl()}/chatservice`;
+        const token = sessionStorage.getItem('jwt_token') || '';
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
+        return this.http.post(url, payload, { headers }).pipe(
+          catchError((err) => {
+            if (err.status === 401) {
+              console.warn('🔄 Token expired, refreshing...');
+              return from(
+                this.refreshTokenAndRetry(async (newToken) => {
+                  const retryHeaders = { ...headers, Authorization: `Bearer ${newToken}` };
+                  return await this.http.post(url, payload, { headers: retryHeaders }).toPromise();
+                })
+              );
+            }
+            throw err;
+          })
+        );
+      })
+    );
+  }
+
+  sendMessageStream(payload: any): Observable<string> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(() => {
+        const url = `${this.configService.getChatbotUrl()}/chatservice`;
+
+        const makeFetch = (token: string): Observable<string> => {
+          const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          };
+
+          return new Observable<string>((observer) => {
+            fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) })
+              .then(async (response) => {
+                // handle token expiry
+                if (response.status === 401) {
+                  console.warn('🔄 Stream token expired, refreshing...');
+                  await this.refreshTokenAndRetry(async (newToken) => {
+                    makeFetch(newToken).subscribe(observer);
+                    return null as any;
+                  });
+                  return;
+                }
+
+                if (!response.ok || !response.body) {
+                  throw new Error('Streaming request failed');
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                const read = () => {
+                  reader.read().then(({ done, value }) => {
+                    if (done) {
+                      observer.complete();
+                      return;
+                    }
+                    const chunk = decoder.decode(value, { stream: true });
+                    observer.next(chunk);
+                    read();
+                  });
+                };
+
+                read();
+              })
+              .catch((err) => observer.error(err));
+          });
+        };
+
+        const existingToken = sessionStorage.getItem('jwt_token') || '';
+        return makeFetch(existingToken);
+      })
+    );
+  }
+
+  // New: get conversation history with pagination
+  getConversationHistory(payload: any, page: number = 1, limit: number = 20): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/transcript/chat/history?page_number=${page}&page_size=${limit}`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  sendTokenToBackend(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(() => {
+        const url = `${this.configService.getAzureUrl()}/auth/login`;
+        return this.http.get(url);
+      })
+    );
+  }
+
+  endChat(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/conversation/endchat`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  deleteChat(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/transcript/chat/delete`;
+        const token = sessionStorage.getItem('jwt_token');
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
+        const response = await fetch(url, { method: 'DELETE', headers, body: JSON.stringify(payload) });
+        if (response.status === 401) {
+          return this.refreshTokenAndRetry(() => this.deleteChat(payload).toPromise());
+        }
+        if (!response.ok) throw new Error('Delete failed');
+        return response.json();
+      })
+    );
+  }
+
+  pinChat(conversationID: string) {
+    const payload = {
+      conversationID: conversationID,
+    };
+    return this.http.patch(`${this.configService.getAzureUrl()}/transcript/chat/pinned`, payload);
+  }
+
+  searchChat(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/transcript/chat/search`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getChatInformation(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/transcript/chat/search/result`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getSuggesstions(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/conversation/suggested-follow-ups`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  private async postWithAuth<T>(url: string, body: any): Promise<T> {
+    const token = sessionStorage.getItem('jwt_token');
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
+    const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+
+    if (response.status === 401) {
+      // 🔁 Token expired → refresh & retry
+      return this.refreshTokenAndRetry(() => this.postWithAuth<T>(url, body));
+    }
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return response.json() as Promise<T>;
+  }
+
+  requestAccess(payload: { email: string; models: Array<string> }): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(() => {
+        const url = `${this.configService.getAzureUrl()}/auth/request-access`;
+        return this.http.post(url, payload);
+      })
+    );
+  }
+
+  getAvailableModels(): Observable<string[]> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(() => {
+        const url = `${this.configService.getAzureUrl()}/auth/get-models`;
+        return this.http.get<string[]>(url);
+      })
+    );
+  }
+
+  /**
+ * Get pending users for admin approval
+ */
+  getPendingUserDetails(): Observable<PendingUser[]> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-admin/get-pending-user-details`;
+        return this.postGetWithAuth<PendingUser[]>(url, 'GET');
+      })
+    );
+  }
+
+  /**
+   * Get registered/approved users
+   */
+  getRegisteredUserDetails(): Observable<RegisteredUser[]> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-admin/get-registered-user-details`;
+        return this.postGetWithAuth<RegisteredUser[]>(url, 'GET');
+      })
+    );
+  }
+
+  /**
+   * Approve or deny user access
+   */
+  approveAccess(payload: ApprovePayload): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-admin/approve-access`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  /**
+   * Helper method for GET with auth & token refresh
+   */
+  private async postGetWithAuth<T>(url: string, method: 'GET' | 'POST'): Promise<T> {
+    const token = sessionStorage.getItem('jwt_token');
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
+    const response = await fetch(url, { method, headers });
+
+    if (response.status === 401) {
+      return this.refreshTokenAndRetry(() => this.postGetWithAuth<T>(url, method));
+    }
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    return response.json() as Promise<T>;
+  }
+
+  // Reporting: analytics (main)
+  getReportingAnalytics(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/analytics`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  // Reporting: user analytics
+  getUserAnalytics(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/get/user/analytics`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  // Reporting: search users
+  searchReportingUsers(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/get/user`;
+        // postWithAuth returns parsed json
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  // Reporting: get models
+  getReportingModels(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/get/models`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  // Reporting: model usage
+  getModelUsage(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/get/model/usage`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  // Export endpoints return XLSX blob
+  exportAllUsersXlsx(payload: any): Observable<Blob> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/get/user/all`;
+        const token = sessionStorage.getItem('jwt_token') || '';
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+        const resp = await fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) });
+        if (resp.status === 401) {
+          return this.refreshTokenAndRetry(async (newToken) => {
+            const r = await fetch(url, { method: 'POST', headers: { ...headers, Authorization: `Bearer ${newToken}` }, body: JSON.stringify(payload) });
+            return r.blob();
+          });
+        }
+        if (!resp.ok) throw new Error('Export failed');
+        return resp.blob();
+      })
+    );
+  }
+
+  exportQuestionsXlsx(payload: any): Observable<Blob> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/get/questions`;
+        const token = sessionStorage.getItem('jwt_token') || '';
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+        const resp = await fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) });
+        if (resp.status === 401) {
+          return this.refreshTokenAndRetry(async (newToken) => {
+            const r = await fetch(url, { method: 'POST', headers: { ...headers, Authorization: `Bearer ${newToken}` }, body: JSON.stringify(payload) });
+            return r.blob();
+          });
+        }
+        if (!resp.ok) throw new Error('Export failed');
+        return resp.blob();
+      })
+    );
+  }
+  /* Create client secret */
+  createClientSecret(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/auth/api-secret`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getProjectList(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/apiuser/report/projects`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  // inside ChatService class
+
+  getReportSummary(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/apiuser/report/summary`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getUserProjectList(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/apiuser/report/projects`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getMaxTokensUsed(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/apiuser/report/max_tokens_used`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getMinTokensUsed(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/apiuser/report/min_tokens_used`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getProjectNames(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/apiuser/report/projectlist`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getUsernames(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/apiuser/report/usernames`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getUserDetails(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/apiuser/report/user_details`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getUsersByProject(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/apiuser/report/users_by_project`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  getRevokedUsers(payload: any): Observable<any> {
+    return from(this.configService.loadConfig()).pipe(
+      switchMap(async () => {
+        const url = `${this.configService.getAzureUrl()}/kai-reporting/apiuser/report/revoked`;
+        return this.postWithAuth(url, payload);
+      })
+    );
+  }
+
+  revokeUser(data: any): Observable<any> {
+    return this.http.post(
+      `${this.configService.getAzureUrl()}/auth/revoke_user`,
+      data
+    );
+  }
+
+  activateUser(data: any): Observable<any> {
+    return this.http.post(
+      `${this.configService.getAzureUrl()}/auth/activate_user`,
+      data
+    );
+  }
+  
+}

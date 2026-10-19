@@ -1,0 +1,124 @@
+@use "../../../styles/mixins" as *;
+
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.chatbot-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+  background: var(--px-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Full-page drag overlay with backdrop blur and glow */
+.drag-overlay {
+  @include overlay-backdrop(
+    $bg: rgba(15, 23, 42, 0.45),
+    $blur: 18px,
+    $z: 20000
+  );
+  animation: dragOverlayFadeIn 0.25s ease-out;
+  pointer-events: all;
+
+  .drag-overlay-content {
+    text-align: center;
+    padding: 3.5rem 4rem;
+    border-radius: 32px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px dashed rgba(16, 185, 129, 0.5);
+    box-shadow:
+      0 0 80px rgba(16, 185, 129, 0.12),
+      inset 0 0 60px rgba(16, 185, 129, 0.04);
+    animation: dragContentPulse 2s ease-in-out infinite;
+    max-width: 460px;
+    width: 90%;
+  }
+
+  .drag-icon-wrapper {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.2),
+      rgba(52, 211, 153, 0.15)
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.75rem;
+    box-shadow:
+      0 0 0 8px rgba(16, 185, 129, 0.08),
+      0 0 0 16px rgba(16, 185, 129, 0.04);
+    animation: dragIconFloat 2.5s ease-in-out infinite;
+
+    app-chat-icon {
+      color: #34d399;
+      filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.4));
+    }
+  }
+
+  .drag-title {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .drag-subtitle {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+@keyframes dragOverlayFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(18px);
+  }
+}
+
+@keyframes dragContentPulse {
+  0%,
+  100% {
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow:
+      0 0 80px rgba(16, 185, 129, 0.12),
+      inset 0 0 60px rgba(16, 185, 129, 0.04);
+  }
+  50% {
+    border-color: rgba(16, 185, 129, 0.7);
+    box-shadow:
+      0 0 100px rgba(16, 185, 129, 0.2),
+      inset 0 0 80px rgba(16, 185, 129, 0.08);
+  }
+}
+
+@keyframes dragIconFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}

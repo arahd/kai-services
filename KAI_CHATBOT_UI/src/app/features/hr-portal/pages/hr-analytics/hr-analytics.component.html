@@ -1,0 +1,457 @@
+<div class="hr-analytics">
+  <!-- Page Header -->
+  <header class="hr-analytics__header">
+    <h1 class="hr-analytics__title">HR Analytics Dashboard</h1>
+  </header>
+
+  <!-- Filters Card -->
+  <section class="filters-card">
+    <h2 class="filters-card__title">Filters</h2>
+    <div class="filters-card__grid">
+      <!-- Start Date -->
+      <div class="filter-group">
+        <label class="filter-group__label" for="startDateFilter">Start Date</label>
+        <div class="filter-date-wrap">
+          <svg class="calendar-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <rect x="2.5" y="3" width="11" height="10.5" rx="1.5" stroke="currentColor" stroke-width="1.2" />
+            <path d="M2.5 6h11M5 1.5V4M11 1.5V4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+          </svg>
+          <input
+            id="startDateFilter"
+            type="date"
+            class="filter-date-input"
+            [ngModel]="startDate()"
+            (ngModelChange)="startDate.set($event); onFilterChange()"
+          />
+        </div>
+      </div>
+
+      <!-- End Date -->
+      <div class="filter-group">
+        <label class="filter-group__label" for="endDateFilter">End Date</label>
+        <div class="filter-date-wrap">
+          <svg class="calendar-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <rect x="2.5" y="3" width="11" height="10.5" rx="1.5" stroke="currentColor" stroke-width="1.2" />
+            <path d="M2.5 6h11M5 1.5V4M11 1.5V4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+          </svg>
+          <input
+            id="endDateFilter"
+            type="date"
+            class="filter-date-input"
+            [ngModel]="endDate()"
+            (ngModelChange)="endDate.set($event); onFilterChange()"
+          />
+        </div>
+      </div>
+
+      <!-- Module -->
+      <div class="filter-group">
+        <label class="filter-group__label" for="moduleFilter">Select Module</label>
+        <div class="filter-select-wrap">
+          <select
+            id="moduleFilter"
+            class="filter-select"
+            [ngModel]="selectedModule()"
+            (ngModelChange)="selectedModule.set($event); onFilterChange()"
+          >
+            <option value="all">All Modules</option>
+            @for (mod of moduleOptions(); track mod) {
+              @if (mod !== 'all' && mod !== 'All' && mod !== 'All Modules') {
+                <option [value]="mod">{{ mod }}</option>
+              }
+            }
+          </select>
+          <svg class="select-chevron" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- User -->
+      <div class="filter-group filter-group--user">
+        <label class="filter-group__label" for="userFilter">Select User</label>
+        <div class="filter-select-wrap">
+          <app-searchable-select
+            [options]="userOptions()"
+            [selected]="selectedUser()"
+            placeholder="Select User"
+            allOptionLabel="All Users"
+            allOptionValue="all"
+            (selectionChange)="selectedUser.set($event); onFilterChange()"
+          ></app-searchable-select>
+        </div>
+      </div>
+
+      <div class="filter-actions">
+        <button type="button" class="btn-reset" (click)="resetFilters()">
+          <svg class="reset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
+          Reset filters
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard Loading State (Initial Load) -->
+  @if (isLoading() && !dashboardData()) {
+    <div class="analytics-loading-box">
+      <div class="analytics-loading-spinner"></div>
+      <p class="analytics-loading-title">Loading HR Analytics Dashboard...</p>
+      <p class="analytics-loading-subtitle">Gathering usage trends, user activities, and module distributions</p>
+    </div>
+  }
+
+  <!-- Active Loading Indicator for Filter Updates -->
+  @if (isLoading() && dashboardData()) {
+    <div class="analytics-loading-bar">
+      <div class="analytics-loading-bar__indeterminate"></div>
+    </div>
+  }
+
+  <!-- Summary KPI Metrics Cards -->
+  @if (dashboardData(); as data) {
+    <div class="report-section-header">
+      <span class="report-section-header__accent"></span>
+      <span class="report-section-header__title">Overview Summary</span>
+    </div>
+
+    <section class="kpi-grid">
+      <!-- Total Requests -->
+      <div class="kpi-card">
+        <div class="kpi-card__label">{{ data.kpis.totalRequests.title }}</div>
+        <div class="kpi-card__value">{{ data.kpis.totalRequests.value }}</div>
+      </div>
+
+      <!-- Success Rate -->
+      <div class="kpi-card">
+        <div class="kpi-card__label">{{ data.kpis.successRate.title }}</div>
+        <div class="kpi-card__value text-success">{{ data.kpis.successRate.value }}</div>
+      </div>
+
+      <!-- Failed Requests -->
+      <div class="kpi-card">
+        <div class="kpi-card__label">{{ data.kpis.failedRequests.title }}</div>
+        <div class="kpi-card__value text-danger">{{ data.kpis.failedRequests.value }}</div>
+      </div>
+
+      <!-- Active HR Users -->
+      <div class="kpi-card">
+        <div class="kpi-card__label">{{ data.kpis.activeHrUsers.title }}</div>
+        <div class="kpi-card__value">{{ data.kpis.activeHrUsers.value }}</div>
+      </div>
+
+      <!-- Total Tokens Used -->
+      <div class="kpi-card">
+        <div class="kpi-card__label">{{ data.kpis.totalTokensUsed.title }}</div>
+        <div class="kpi-card__value">{{ data.kpis.totalTokensUsed.value }}</div>
+      </div>
+
+      <!-- Average Tokens -->
+      @if (data.kpis.averageTokens) {
+        <div class="kpi-card">
+          <div class="kpi-card__label">{{ data.kpis.averageTokens.title }}</div>
+          <div class="kpi-card__value">{{ data.kpis.averageTokens.value }}</div>
+        </div>
+      }
+
+      <!-- JD Analysis Count -->
+      @if (data.kpis.jdAnalysisCount) {
+        <div class="kpi-card">
+          <div class="kpi-card__label">{{ data.kpis.jdAnalysisCount.title }}</div>
+          <div class="kpi-card__value">{{ data.kpis.jdAnalysisCount.value }}</div>
+        </div>
+      }
+    </section>
+
+    <!-- Dynamic Process Breakdown & Module Distribution -->
+    @if (data.moduleCards && data.moduleCards.length > 0) {
+      <div class="report-section-header">
+        <span class="report-section-header__accent"></span>
+        <span class="report-section-header__title">Process Breakdown</span>
+        @if (data.moduleDistribution && data.moduleDistribution.length > 0) {
+          <div class="module-dist-tags">
+            @for (dist of data.moduleDistribution; track dist.module) {
+              <span class="module-dist-badge">
+                <strong>{{ dist.module }}:</strong> {{ dist.count }} reports
+              </span>
+            }
+          </div>
+        }
+      </div>
+
+      <section class="module-cards-grid">
+        @for (card of data.moduleCards; track card.process + card.process_type) {
+          <div class="module-card">
+            <div class="module-card__tag">{{ card.process }}</div>
+            <div class="module-card__type">{{ card.process_type }}</div>
+            <div class="module-card__count">{{ card.count }} <span class="module-card__unit">reports</span></div>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- Visual Charts Section (2 Columns) -->
+    <section class="charts-grid">
+      <!-- Trend Line Chart -->
+      <div class="chart-card chart-card--line">
+        <div class="chart-card__header">
+          <h3 class="chart-card__title">Activity & Usage Trends</h3>
+        </div>
+        <div class="chart-card__body">
+          @if (lineChartOptions.series && lineChartOptions.series.length > 0) {
+            <apx-chart
+              [series]="lineChartOptions.series"
+              [chart]="lineChartOptions.chart"
+              [xaxis]="lineChartOptions.xaxis"
+              [yaxis]="lineChartOptions.yaxis"
+              [stroke]="lineChartOptions.stroke"
+              [grid]="lineChartOptions.grid"
+              [colors]="lineChartOptions.colors"
+              [legend]="lineChartOptions.legend"
+              [tooltip]="lineChartOptions.tooltip"
+              [dataLabels]="lineChartOptions.dataLabels"
+            ></apx-chart>
+          } @else {
+            <div class="chart-empty-state">No trend data available for selected filter period.</div>
+          }
+        </div>
+      </div>
+
+      <!-- Donut Chart -->
+      <div class="chart-card chart-card--donut">
+        <div class="chart-card__header">
+          <h3 class="chart-card__title">Success vs Failed Requests</h3>
+        </div>
+        <div class="chart-card__body chart-card__body--donut">
+          @if (donutChartOptions.series && donutChartOptions.series.length > 0) {
+            <apx-chart
+              [series]="donutChartOptions.series"
+              [chart]="donutChartOptions.chart"
+              [labels]="donutChartOptions.labels"
+              [colors]="donutChartOptions.colors"
+              [plotOptions]="donutChartOptions.plotOptions"
+              [dataLabels]="donutChartOptions.dataLabels"
+              [legend]="donutChartOptions.legend"
+              [tooltip]="donutChartOptions.tooltip"
+            ></apx-chart>
+          }
+        </div>
+        <div class="donut-legend-col">
+          <div class="donut-legend-item">
+            <div class="legend-item-left">
+              <span class="legend-dot legend-dot--green"></span>
+              <span class="legend-label">Success reports</span>
+            </div>
+            <span class="legend-val">{{ data.successFailureRatio.success }}</span>
+          </div>
+          <div class="donut-legend-item">
+            <div class="legend-item-left">
+              <span class="legend-dot legend-dot--red"></span>
+              <span class="legend-label">Failed reports</span>
+            </div>
+            <span class="legend-val">{{ data.successFailureRatio.failed }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Top HR Users Table -->
+    <section class="table-card">
+      <div class="table-card__header">
+        <h3 class="table-card__title">Top HR Users</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="col-rank">RANK</th>
+              <th class="col-users">USER</th>
+              <th class="col-module">MODULE</th>
+              <th class="col-reports text-center">REPORTS</th>
+              <th class="col-tokens text-right">
+                <span class="token-header">
+                  <span class="coin-icon">🪙</span> TOKENS
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of data.topUsers; track trackByRank($index, user)) {
+              <tr>
+                <td class="col-rank font-medium">{{ user.rank }}</td>
+                <td class="col-users text-primary">{{ user.user }}</td>
+                <td class="col-module text-secondary">{{ user.module }}</td>
+                <td class="col-reports text-center font-medium">{{ user.reportCount }}</td>
+                <td class="col-tokens text-right">
+                  <span class="token-value">
+                    <span class="coin-icon">🪙</span> {{ user.tokens }}
+                  </span>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="empty-state-cell">No top users records available.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Recent Activity Table -->
+    <section class="table-card">
+      <div class="table-card__header">
+        <h3 class="table-card__title">Recent Activity</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="col-sno">S.NO</th>
+              <th class="col-date">DATE & TIME</th>
+              <th class="col-user">USER</th>
+              <th class="col-module">MODULE</th>
+              <th class="col-type">TYPE</th>
+              <th class="col-resume">UPLOADED FILES</th>
+              <th class="col-tokens text-right">TOKENS</th>
+              <th class="col-status text-right">STATUS</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of data.recentActivities; track trackBySNo($index, item)) {
+              <tr>
+                <td class="col-sno text-secondary">{{ item.sNo }}</td>
+                <td class="col-date cell-datetime text-secondary">
+                  <div class="date-line">{{ item.date || item.createdDate }}</div>
+                  @if (item.time) {
+                    <div class="time-line">{{ item.time }}</div>
+                  }
+                </td>
+                <td class="col-user text-primary font-medium">{{ item.user }}</td>
+                <td class="col-module text-secondary">{{ item.module }}</td>
+                <td class="col-type text-secondary">{{ item.processType }}</td>
+                <td class="col-resume font-medium">
+                  @if (item.uploadedFileName && item.uploadedFileName !== '-') {
+                    <button
+                      type="button"
+                      class="hr-view-badge-btn"
+                      (click)="openUploadedFilesModal(item, $event)"
+                      [title]="'View ' + item.uploadedFileName"
+                    >
+                      <svg
+                        width="57"
+                        height="24"
+                        viewBox="0 0 57 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                      >
+                        <rect width="56.3438" height="24" rx="8" fill="#EBFFF4" />
+                        <path
+                          d="M14.6172 16.1261L18.5002 12.1501"
+                          stroke="#49AB74"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M15.9998 9.00006L11.7928 13.2931C11.6053 13.4806 11.5 13.7349 11.5 14.0001C11.5 14.2652 11.6053 14.5195 11.7928 14.7071C11.9803 14.8945 12.2346 14.9998 12.4998 14.9998C12.7649 14.9998 13.0192 14.8945 13.2068 14.7071L17.4138 10.4141C17.7887 10.039 17.9993 9.53039 17.9993 9.00006C17.9993 8.46973 17.7887 7.96112 17.4138 7.58606C17.0387 7.21112 16.5301 7.00049 15.9998 7.00049C15.4694 7.00049 14.9608 7.21112 14.5858 7.58606L10.3783 11.8786C9.81561 12.4412 9.49951 13.2043 9.49951 14.0001C9.49951 14.7958 9.81561 15.5589 10.3783 16.1216C10.9409 16.6842 11.704 17.0003 12.4998 17.0003C13.2955 17.0003 14.0586 16.6842 14.6213 16.1216"
+                          stroke="#49AB74"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M25.2743 16.6667L22.3823 8.02666H23.4923L26.0063 15.5327L28.5443 8.02666H29.6543L26.7623 16.6667H25.2743ZM30.4424 9.04066V7.93666H31.5104V9.04066H30.4424ZM30.4424 16.6667V10.1867H31.5104V16.6667H30.4424ZM36.1187 16.8467C35.4827 16.8467 34.9267 16.7067 34.4507 16.4267C33.9787 16.1427 33.6107 15.7487 33.3467 15.2447C33.0827 14.7367 32.9507 14.1447 32.9507 13.4687C32.9507 12.7607 33.0807 12.1487 33.3407 11.6327C33.6007 11.1127 33.9627 10.7127 34.4267 10.4327C34.8947 10.1487 35.4427 10.0067 36.0707 10.0067C36.7227 10.0067 37.2767 10.1567 37.7327 10.4567C38.1927 10.7567 38.5367 11.1847 38.7647 11.7407C38.9967 12.2967 39.0967 12.9587 39.0647 13.7267H37.9847V13.3427C37.9727 12.5467 37.8107 11.9527 37.4987 11.5607C37.1867 11.1647 36.7227 10.9667 36.1067 10.9667C35.4467 10.9667 34.9447 11.1787 34.6007 11.6027C34.2567 12.0267 34.0847 12.6347 34.0847 13.4267C34.0847 14.1907 34.2567 14.7827 34.6007 15.2027C34.9447 15.6227 35.4347 15.8327 36.0707 15.8327C36.4987 15.8327 36.8707 15.7347 37.1867 15.5387C37.5027 15.3427 37.7507 15.0607 37.9307 14.6927L38.9567 15.0467C38.7047 15.6187 38.3247 16.0627 37.8167 16.3787C37.3127 16.6907 36.7467 16.8467 36.1187 16.8467ZM33.7247 13.7267V12.8687H38.5127V13.7267H33.7247ZM41.5462 16.6667L39.5662 10.1807L40.6282 10.1867L42.0742 14.9267L43.5322 10.1867H44.4742L45.9262 14.9267L47.3782 10.1867H48.4342L46.4542 16.6667H45.5662L44.0002 11.7407L42.4342 16.6667H41.5462Z"
+                          fill="#49AB74"
+                        />
+                      </svg>
+                    </button>
+                  } @else {
+                    -
+                  }
+                </td>
+                <td class="col-tokens text-right font-medium">{{ item.tokensUsed }}</td>
+                <td class="col-status text-right">
+                  <span
+                    class="status-pill"
+                    [class.status-pill--success]="item.status === 'Success'"
+                    [class.status-pill--failed]="item.status === 'Failed'"
+                  >
+                    {{ item.status }}
+                  </span>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="empty-state-cell">No recent activity records available.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+
+  <!-- Uploaded Files Modal Popup -->
+  @if (isUploadedFilesModalOpen()) {
+    <div class="uploaded-files-modal-overlay" (click)="closeUploadedFilesModal()">
+      <div class="uploaded-files-modal-card" (click)="$event.stopPropagation()">
+        <!-- Modal Header -->
+        <div class="uploaded-files-modal-header">
+          <div class="modal-title-group">
+            <div class="modal-header-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#49AB74" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </div>
+            <div>
+              <h3 class="modal-title">Uploaded Files</h3>
+              <span class="modal-count-pill">{{ previewUploadedFiles().length }} {{ previewUploadedFiles().length === 1 ? 'file' : 'files' }}</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="modal-close-btn"
+            (click)="closeUploadedFilesModal()"
+            title="Close"
+          >
+            &times;
+          </button>
+        </div>
+
+        <!-- Modal Body: Only file names -->
+        <div class="uploaded-files-modal-body">
+          <div class="files-list">
+            @for (fileName of previewUploadedFiles(); track $index) {
+              <div class="file-item-card">
+                <div class="file-item-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#49AB74" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
+                <span class="file-item-name" [title]="fileName">{{ fileName }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="uploaded-files-modal-footer">
+          <button
+            type="button"
+            class="btn-modal-close"
+            (click)="closeUploadedFilesModal()"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

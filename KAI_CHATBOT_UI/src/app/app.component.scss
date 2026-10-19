@@ -1,0 +1,109 @@
+@use '../styles/mixins' as *;
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.app-root-body {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.app-root-body.app-layout {
+  display: flex;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--px-bg);
+}
+
+.app-root-body.app-layout app-sidenav {
+  position: relative;
+  z-index: 1000;
+  overflow: visible !important;
+}
+
+.main-area {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  @include flex-column;
+  overflow: hidden;
+  background: var(--px-panel);
+}
+
+.main-content-host {
+  flex: 1;
+  min-height: 0;
+  @include flex-column;
+  overflow: hidden;
+}
+
+/* Common Chat Container Shell Design */
+.chat-container-shell {
+  display: flex;
+  flex-direction: column;
+  justify-content: start !important;
+  flex: 1;
+  background: var(--px-bg);
+  min-height: 0;
+  margin: 0;
+  border-radius: 0;
+  overflow: hidden;
+  position: relative;
+  // padding: 1.3em;
+  // padding-right: 6px;
+}
+
+/* Mobile Sidebar Overlay */
+.mobile-sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .mobile-sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 3000;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .chat-container-shell {
+    margin: 0;
+    border-radius: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.app-root-body:not(.app-layout) .main-area {
+  height: 100%;
+}
+
+.app-root-body:not(.app-layout) .main-content-host {
+  height: 100%;
+}
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
